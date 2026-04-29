@@ -35,7 +35,7 @@ service <-- "Entity, Repository" --> db
 
 ### Hướng dẫn sử dụng dự án
 
-- [`/docs/backend-instruction.md`](backend-instruction.md): Hướng dẫn cài đặt và sử dụng _backend_.
-- [`/docs/frontend-instruction.md`](frontend-instruction.md): Hướng dẫn cài đặt và sử dụng _frontend_.
-- [`/docs/database-instruction.md`](database-instruction.md): Hướng dẫn cài đặt và sử dụng _database Docker_.
-- [`/docs/rules.md`](rules.md): Các chuẩn chung khi sử dụng repository.
+- [`/docs/backend-instruction.md`](/docs/backend-instruction.md): Hướng dẫn cài đặt và sử dụng _backend_.
+- [`/docs/frontend-instruction.md`](/docs/frontend-instruction.md): Hướng dẫn cài đặt và sử dụng _frontend_.
+- [`/docs/database-instruction.md`](/docs/database-instruction.md): Hướng dẫn cài đặt và sử dụng _database Docker_.
+- [`/docs/rules.md`](/docs/rules.md): Các chuẩn chung khi sử dụng repository.
