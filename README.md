@@ -1,11 +1,11 @@
 # HỆ THỐNG QUẢN LÝ BÁN HÀNG VÀ KHO HÀNG VÌ CỘNG ĐỒNG
 
 <div align="center">
-    ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
-    ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white)
-    ![Electron.js](https://img.shields.io/badge/Electron-191970?style=for-the-badge&logo=Electron&logoColor=white)
-    ![Shadcn/ui](https://img.shields.io/badge/shadcn/ui-%23000000.svg?style=for-the-badge&logo=shadcnui&logoColor=white)
-    ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+    <img src="https://img.shields.io/badge/Spring%20Boot-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white" />
+    <img src="https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white" />
+    <img src="https://img.shields.io/badge/Electron-191970?style=for-the-badge&logo=Electron&logoColor=white" />
+    <img src="https://img.shields.io/badge/shadcn/ui-%23000000.svg?style=for-the-badge&logo=shadcnui&logoColor=white" />
+    <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" />
 </div>
 
 Dự án Hệ thống Quản lý chuỗi cung ứng sản phẩm vì cộng đồng là một giải pháp số toàn diện nhằm tối ưu hóa quá trình quản lý chuỗi sản phẩm do người yếu thế tạo ra. Bao gồm các khâu quản lý nguyên vật liệu, sản xuất sản phẩm đến phân phối sản phẩm, giao dịch bán hàng, hạch toán tài chính,...
