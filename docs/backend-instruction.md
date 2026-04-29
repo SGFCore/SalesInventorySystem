@@ -6,8 +6,13 @@
 
 **Yêu cầu cài đặt các phần mềm sau vào máy**:
 
-- Java JDK 25.
+- Java JDK 21.
 - Maven 3.8+.
+
+**Số port**:
+
+- Port trong container: `8080`.
+- Port ngoài container: `8080`.
 
 ### Các lệnh
 
