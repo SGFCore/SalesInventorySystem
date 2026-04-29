@@ -1,0 +1,4 @@
+ALTER SESSION SET CONTAINER = FREEPDB1;
+ALTER SESSION SET CURRENT_SCHEMA = admin;
+
+-- Code ở phía sau 2 dòng lệnh trên
