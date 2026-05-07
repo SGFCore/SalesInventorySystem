@@ -48,8 +48,8 @@ Nếu có thông báo `BUILD SUCCESS` thì đã lỗi.
 
 - `src/main/resources/application.properties`: Cấu hình kết nối với database và một số cấu hình khác.
 - `src/main/resources/fonts`: Chứa một số font chữ dùng để xuất file PDF.
-- `src/main/java/dev/uit/project/controller`: Chứa các class `@Controller`.
-- `src/main/java/dev/uit/project/service`: Chứa các class `@Service`.
-- `src/main/java/dev/uit/project/domain`: Chứa các class `@Entity`.
-- `src/main/java/dev/uit/project/dto`: Chứa các class DTO.
-- `src/main/java/dev/uit/project/repository`: Chứa các class `@Repository`.
+- `src/main/java/dev/uit/project/controllers`: Chứa các class `@Controller`.
+- `src/main/java/dev/uit/project/services`: Chứa các class `@Service`.
+- `src/main/java/dev/uit/project/entities`: Chứa các class `@Entity`.
+- `src/main/java/dev/uit/project/dtos`: Chứa các class DTO.
+- `src/main/java/dev/uit/project/repositories`: Chứa các class `@Repository`.
