@@ -12,5 +12,5 @@ Cả bên trong và bên ngoài container đều dùng chung port.
 
 **Các table đều được tạo trong schema sau**:
 
-- Username: `admin`.
+- Username: `sgf_admin`.
 - Password: `Admin123`.
