@@ -51,6 +51,7 @@ CREATE TABLE PRODUCT (
     CategoryID    NUMBER,
     AllowReturn   NUMBER(1) NOT NULL CHECK (AllowReturn IN (0,1)),
     ImageURL      VARCHAR2(4000),
+    ProductTypeID NUMBER,
     CONSTRAINT fk_product_category FOREIGN KEY (CategoryID) REFERENCES CATEGORY(CategoryID)
 );
 
@@ -62,6 +63,8 @@ CREATE TABLE PRODUCTTYPE (
     ProductTypeName VARCHAR2(30) NOT NULL,
     CategoryID      NUMBER NOT NULL
 );
+-- Add the FK for product type now that PRODUCTTYPE exists
+ALTER TABLE PRODUCT ADD CONSTRAINT fk_product_producttype FOREIGN KEY (ProductTypeID) REFERENCES PRODUCTTYPE(ProductTypeID);
 
 -- =============================================
 -- 6. COMBO TABLE
@@ -177,7 +180,7 @@ CREATE TABLE "ORDER" (
     ShippingStatus NUMBER CHECK (ShippingStatus IN (0,1,2,3)),
     ShipmentNote   VARCHAR2(100),
     ShippingFee    NUMBER CHECK (ShippingFee >= 0),
-    ExportTicketID NUMBER,
+    ExportReceiptID NUMBER,
     CONSTRAINT fk_order_customer FOREIGN KEY (CustomerID) REFERENCES CUSTOMER(CustomerID),
     CONSTRAINT fk_order_employee FOREIGN KEY (EmployeeID) REFERENCES EMPLOYEE(EmployeeID),
     CONSTRAINT fk_order_invoice FOREIGN KEY (InvoiceID) REFERENCES INVOICE(InvoiceID),
@@ -415,7 +418,9 @@ CREATE TABLE EXPORTRECEIPT (
     Reason          NVARCHAR2(255),
     Status          NVARCHAR2(50) DEFAULT 'Đã hoàn thành',
     CreatedDate     DATE DEFAULT SYSDATE,
-    CONSTRAINT fk_exportreceipt_employee FOREIGN KEY (EmployeeID) REFERENCES EMPLOYEE(EmployeeID)
+    WarehouseID NUMBER NOT NULL,
+    CONSTRAINT fk_exportreceipt_employee FOREIGN KEY (EmployeeID) REFERENCES EMPLOYEE(EmployeeID),
+    CONSTRAINT fk_exportreceipt_warehouse FOREIGN KEY (WarehouseID) REFERENCES WAREHOUSE(WareHouseID)
 );
 
 -- =============================================
@@ -497,3 +502,5 @@ CREATE TABLE FEEDBACK (
     CONSTRAINT fk_feedback_orderdetail FOREIGN KEY (OrderDetailID) REFERENCES ORDERDETAIL(OrderDetailID),
     CONSTRAINT fk_feedback_customer FOREIGN KEY (CustomerID) REFERENCES CUSTOMER(CustomerID)
 );
+-- Add the FK for order export receipt after EXPORTRECEIPT exists
+ALTER TABLE "ORDER" ADD CONSTRAINT fk_order_exportreceipt FOREIGN KEY (ExportReceiptID) REFERENCES EXPORTRECEIPT(ExportReceiptID);
