@@ -49,7 +49,7 @@ public class Detailinventory {
 
     @ColumnDefault("1")
     @Column(name = "ISALERTENABLED")
-    private Boolean isalertenabled;
+    private Integer isAlertEnabled;
 
     @Size(max = 100)
     @Nationalized

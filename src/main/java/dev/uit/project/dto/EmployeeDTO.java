@@ -8,14 +8,14 @@ public class EmployeeDTO {
     private String email;
     private String phone;
     private String passwordhash;
-    private Boolean status;
+    private Integer status;
 
     // Constructor không tham số
     public EmployeeDTO() {
     }
 
     // Constructor có tham số
-    public EmployeeDTO(Long id, String fullname, String email, String phone, String passwordhash, Boolean status) {
+    public EmployeeDTO(Long id, String fullname, String email, String phone, String passwordhash, Integer status) {
         this.id = id;
         this.fullname = fullname;
         this.email = email;
@@ -65,11 +65,11 @@ public class EmployeeDTO {
         this.passwordhash = passwordhash;
     }
 
-    public Boolean getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

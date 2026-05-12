@@ -5,14 +5,14 @@ import dev.uit.project.entity.Paymentmethod;
 public class PaymentmethodDTO {
     private Long id;
     private String paymentname;
-    private Boolean status;
+    private Integer status;
 
     // Constructor không tham số
     public PaymentmethodDTO() {
     }
 
     // Constructor có tham số
-    public PaymentmethodDTO(Long id, String paymentname, Boolean status) {
+    public PaymentmethodDTO(Long id, String paymentname, Integer status) {
         this.id = id;
         this.paymentname = paymentname;
         this.status = status;
@@ -35,11 +35,11 @@ public class PaymentmethodDTO {
         this.paymentname = paymentname;
     }
 
-    public Boolean getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

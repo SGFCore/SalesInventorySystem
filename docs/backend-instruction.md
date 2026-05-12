@@ -27,12 +27,6 @@ mvnw clean install
 **Chạy server**:
 
 ```bash
-mvnw spring-boot:run
-```
-
-hoặc
-
-```bash
 mvn spring-boot:run
 ```
 

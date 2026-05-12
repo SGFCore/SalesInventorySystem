@@ -40,7 +40,7 @@ public class Employee {
 
     @ColumnDefault("1")
     @Column(name = "STATUS")
-    private Boolean status;
+    private Integer status;
 
 
 }

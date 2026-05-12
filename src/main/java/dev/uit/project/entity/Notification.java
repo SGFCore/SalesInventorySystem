@@ -49,7 +49,7 @@ public class Notification {
     private Long type;
 
     @Column(name = "STATUS")
-    private Boolean status;
+    private Integer status;
 
     @NotNull
     @ColumnDefault("SYSDATE")

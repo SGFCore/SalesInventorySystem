@@ -10,7 +10,7 @@ public class ShipcompanyDTO {
     private String email;
     private String address;
     private String notes;
-    private Boolean status;
+    private Integer status;
 
     // Constructor không tham số
     public ShipcompanyDTO() {
@@ -19,7 +19,7 @@ public class ShipcompanyDTO {
     // Constructor đầy đủ tham số
     public ShipcompanyDTO(Long id, String shipcompanyname, String supportedregion,
                           String phone, String email, String address, String notes,
-                          Boolean status) {
+                          Integer status) {
         this.id = id;
         this.shipcompanyname = shipcompanyname;
         this.supportedregion = supportedregion;
@@ -87,11 +87,11 @@ public class ShipcompanyDTO {
         this.notes = notes;
     }
 
-    public Boolean getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

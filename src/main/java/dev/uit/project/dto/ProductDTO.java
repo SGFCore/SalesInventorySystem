@@ -9,7 +9,7 @@ public class ProductDTO {
     private Long productprice;
     private Long productstatus;
     private CategoryDTO categoryid;
-    private Boolean allowreturn;
+    private Integer allowreturn;
     private String imageurl;
     private ProducttypeDTO producttypeid; 
 
@@ -19,7 +19,7 @@ public class ProductDTO {
 
     // Constructor đầy đủ tham số (đã bao gồm producttypeid)
     public ProductDTO(Long id, String productname, String detail, Long productprice,
-                      Long productstatus, CategoryDTO categoryid, Boolean allowreturn,
+                      Long productstatus, CategoryDTO categoryid, Integer allowreturn,
                       String imageurl, ProducttypeDTO producttypeid) {
         this.id = id;
         this.productname = productname;
@@ -81,11 +81,11 @@ public class ProductDTO {
         this.categoryid = categoryid;
     }
 
-    public Boolean getAllowreturn() {
+    public Integer getAllowreturn() {
         return allowreturn;
     }
 
-    public void setAllowreturn(Boolean allowreturn) {
+    public void setAllowreturn(Integer allowreturn) {
         this.allowreturn = allowreturn;
     }
 

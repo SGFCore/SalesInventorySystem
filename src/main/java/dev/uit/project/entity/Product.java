@@ -43,7 +43,7 @@ public class Product {
 
     @NotNull
     @Column(name = "ALLOWRETURN", nullable = false)
-    private Boolean allowreturn;
+    private Integer allowreturn;
 
     @Size(max = 4000)
     @Column(name = "IMAGEURL", length = 4000)

@@ -50,7 +50,7 @@ public class Shipcompany {
 
     @ColumnDefault("1")
     @Column(name = "STATUS")
-    private Boolean status;
+    private Integer status;
 
 
 }

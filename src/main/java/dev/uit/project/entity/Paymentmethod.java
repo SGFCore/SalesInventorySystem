@@ -24,7 +24,7 @@ public class Paymentmethod {
     private String paymentname;
 
     @Column(name = "STATUS")
-    private Boolean status;
+    private Integer status;
 
 
 }

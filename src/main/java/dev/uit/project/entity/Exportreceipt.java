@@ -30,7 +30,7 @@ public class Exportreceipt {
 
     @NotNull
     @Column(name = "EXPORTTYPE", nullable = false)
-    private Boolean exporttype;
+    private Integer exporttype;
 
     @Size(max = 255)
     @Nationalized
