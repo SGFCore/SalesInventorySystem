@@ -11,13 +11,16 @@ public class ProductDTO {
     private CategoryDTO categoryid;
     private Boolean allowreturn;
     private String imageurl;
+    private ProducttypeDTO producttypeid; 
 
     // Constructor không tham số
     public ProductDTO() {
     }
 
-    // Constructor có tham số
-    public ProductDTO(Long id, String productname, String detail, Long productprice, Long productstatus, CategoryDTO categoryid, Boolean allowreturn, String imageurl) {
+    // Constructor đầy đủ tham số (đã bao gồm producttypeid)
+    public ProductDTO(Long id, String productname, String detail, Long productprice,
+                      Long productstatus, CategoryDTO categoryid, Boolean allowreturn,
+                      String imageurl, ProducttypeDTO producttypeid) {
         this.id = id;
         this.productname = productname;
         this.detail = detail;
@@ -26,6 +29,7 @@ public class ProductDTO {
         this.categoryid = categoryid;
         this.allowreturn = allowreturn;
         this.imageurl = imageurl;
+        this.producttypeid = producttypeid;
     }
 
     // Getters và Setters
@@ -93,20 +97,33 @@ public class ProductDTO {
         this.imageurl = imageurl;
     }
 
-    // Phương thức fromEntity
+    public ProducttypeDTO getProducttypeid() {
+        return producttypeid;
+    }
+
+    public void setProducttypeid(ProducttypeDTO producttypeid) {
+        this.producttypeid = producttypeid;
+    }
+
+    // Phương thức fromEntity 
     public static ProductDTO fromEntity(Product entity) {
         if (entity == null) {
             return null;
         }
+        CategoryDTO categoryDTO = entity.getCategoryid() != null 
+                ? CategoryDTO.fromEntity(entity.getCategoryid()) : null;
+        ProducttypeDTO producttypeDTO = entity.getProducttypeid() != null 
+                ? ProducttypeDTO.fromEntity(entity.getProducttypeid()) : null;
         return new ProductDTO(
-            entity.getId(),
-            entity.getProductname(),
-            entity.getDetail(),
-            entity.getProductprice(),
-            entity.getProductstatus(),
-            entity.getCategoryid() != null ? CategoryDTO.fromEntity(entity.getCategoryid()) : null,
-            entity.getAllowreturn(),
-            entity.getImageurl()
+                entity.getId(),
+                entity.getProductname(),
+                entity.getDetail(),
+                entity.getProductprice(),
+                entity.getProductstatus(),
+                categoryDTO,
+                entity.getAllowreturn(),
+                entity.getImageurl(),
+                producttypeDTO
         );
     }
 }

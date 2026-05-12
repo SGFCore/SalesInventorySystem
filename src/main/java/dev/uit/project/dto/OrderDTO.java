@@ -129,6 +129,14 @@ public class OrderDTO {
         this.shippingfee = shippingfee;
     }
 
+    public Long getExportreceiptid() {
+        return exportreceiptid;
+    }
+
+    public void setExportreceiptid(Long exportreceiptid) {
+        this.exportreceiptid = exportreceiptid;
+    }
+
     // Phương thức fromEntity
     public static OrderDTO fromEntity(Order entity) {
         if (entity == null) {
@@ -138,6 +146,8 @@ public class OrderDTO {
         Long employeeId = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
         Long invoiceId = entity.getInvoiceid() != null ? entity.getInvoiceid().getId() : null;
         Long shipCompanyId = entity.getShipcompanyid() != null ? entity.getShipcompanyid().getId() : null;
+        Long exportreceiptId = entity.getExportreceiptid() != null ? entity.getExportreceiptid().getId() : null;
+
         return new OrderDTO(
                 entity.getId(),
                 customerId,
@@ -150,15 +160,7 @@ public class OrderDTO {
                 entity.getShippingstatus(),
                 entity.getShipmentnote(),
                 entity.getShippingfee(),
-                entity.getExportreceiptid()
+                exportreceiptId
         );
-    }
-
-    public Long getExportreceiptid() {
-        return exportreceiptid;
-    }
-
-    public void setExportreceiptid(Long exportreceiptid) {
-        this.exportreceiptid = exportreceiptid;
     }
 }
