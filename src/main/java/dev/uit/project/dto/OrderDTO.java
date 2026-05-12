@@ -15,7 +15,7 @@ public class OrderDTO {
     private Long shippingstatus;
     private String shipmentnote;
     private Long shippingfee;
-    private Long exportticketid;
+    private Long exportreceiptid;
 
     // Constructor không tham số
     public OrderDTO() {
@@ -25,7 +25,7 @@ public class OrderDTO {
     public OrderDTO(Long id, Long customerId, Long employeeId, Long invoiceId,
                     String shipcode, Long shipCompanyId, BigDecimal totalamount,
                     Long orderstatus, Long shippingstatus, String shipmentnote,
-                    Long shippingfee, Long exportticketid) {
+                    Long shippingfee, Long exportreceiptid) {
         this.id = id;
         this.customerId = customerId;
         this.employeeId = employeeId;
@@ -37,7 +37,7 @@ public class OrderDTO {
         this.shippingstatus = shippingstatus;
         this.shipmentnote = shipmentnote;
         this.shippingfee = shippingfee;
-        this.exportticketid = exportticketid;
+        this.exportreceiptid = exportreceiptid;
     }
 
     // Getter và Setter
@@ -129,14 +129,6 @@ public class OrderDTO {
         this.shippingfee = shippingfee;
     }
 
-    public Long getExportticketid() {
-        return exportticketid;
-    }
-
-    public void setExportticketid(Long exportticketid) {
-        this.exportticketid = exportticketid;
-    }
-
     // Phương thức fromEntity
     public static OrderDTO fromEntity(Order entity) {
         if (entity == null) {
@@ -158,7 +150,15 @@ public class OrderDTO {
                 entity.getShippingstatus(),
                 entity.getShipmentnote(),
                 entity.getShippingfee(),
-                entity.getExportticketid()
+                entity.getExportreceiptid()
         );
+    }
+
+    public Long getExportreceiptid() {
+        return exportreceiptid;
+    }
+
+    public void setExportreceiptid(Long exportreceiptid) {
+        this.exportreceiptid = exportreceiptid;
     }
 }

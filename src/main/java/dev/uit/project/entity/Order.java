@@ -63,8 +63,10 @@ public class Order {
     @Column(name = "SHIPPINGFEE")
     private Long shippingfee;
 
-    @Column(name = "EXPORTTICKETID")
-    private Long exportticketid;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @JoinColumn(name = "EXPORTRECEIPTID")
+    private Exportreceipt exportreceiptid;
 
 
 }

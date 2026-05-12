@@ -47,5 +47,11 @@ public class Exportreceipt {
     @Column(name = "CREATEDDATE")
     private LocalDate createddate;
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @JoinColumn(name = "WAREHOUSEID", nullable = false)
+    private Warehouse warehouseid;
+
 
 }

@@ -49,5 +49,10 @@ public class Product {
     @Column(name = "IMAGEURL", length = 4000)
     private String imageurl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @JoinColumn(name = "PRODUCTTYPEID")
+    private Producttype producttypeid;
+
 
 }
