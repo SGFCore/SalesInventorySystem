@@ -1,0 +1,32 @@
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.math.BigDecimal;
+
+public class ImportreceiptdetailDTO {
+    private Long importreceiptId;
+    private Long productId;
+    private Long expectedquantity;
+    private Long actualquantity;
+    public ImportreceiptdetailDTO() {}
+    public ImportreceiptdetailDTO(Long importreceiptId, Long productId, Long expectedquantity, Long actualquantity) {
+        this.importreceiptId = importreceiptId; this.productId = productId;
+        this.expectedquantity = expectedquantity; this.actualquantity = actualquantity;
+    }
+    public Long getImportreceiptId() { return importreceiptId; }
+    public void setImportreceiptId(Long importreceiptId) { this.importreceiptId = importreceiptId; }
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
+    public Long getExpectedquantity() { return expectedquantity; }
+    public void setExpectedquantity(Long expectedquantity) { this.expectedquantity = expectedquantity; }
+    public Long getActualquantity() { return actualquantity; }
+    public void setActualquantity(Long actualquantity) { this.actualquantity = actualquantity; }
+    public static ImportreceiptdetailDTO fromEntity(Importreceiptdetail entity) {
+        if (entity == null) return null;
+        ImportreceiptdetailId id = entity.getId();
+        return new ImportreceiptdetailDTO(id.getImportreceiptid(), id.getProductid(),
+                entity.getExpectedquantity(), entity.getActualquantity());
+    }
+}
