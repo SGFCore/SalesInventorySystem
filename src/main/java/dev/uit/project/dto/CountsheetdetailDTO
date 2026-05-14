@@ -1,0 +1,38 @@
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.math.BigDecimal;
+
+public class CountsheetdetailDTO {
+    private Long countsheetId;
+    private Long warehouseId;
+    private Long productId;
+    private Long quantity;
+    private String note;
+
+    public CountsheetdetailDTO() {}
+    public CountsheetdetailDTO(Long countsheetId, Long warehouseId, Long productId, Long quantity, String note) {
+        this.countsheetId = countsheetId; this.warehouseId = warehouseId; this.productId = productId;
+        this.quantity = quantity; this.note = note;
+    }
+    // Getters & Setters
+    public Long getCountsheetId() { return countsheetId; }
+    public void setCountsheetId(Long countsheetId) { this.countsheetId = countsheetId; }
+    public Long getWarehouseId() { return warehouseId; }
+    public void setWarehouseId(Long warehouseId) { this.warehouseId = warehouseId; }
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
+    public Long getQuantity() { return quantity; }
+    public void setQuantity(Long quantity) { this.quantity = quantity; }
+    public String getNote() { return note; }
+    public void setNote(String note) { this.note = note; }
+
+    public static CountsheetdetailDTO fromEntity(Countsheetdetail entity) {
+        if (entity == null) return null;
+        CountsheetdetailId id = entity.getId();
+        return new CountsheetdetailDTO(id.getCountsheetid(), id.getWarehouseid(), id.getProductid(),
+                entity.getQuantity(), entity.getNote());
+    }
+}

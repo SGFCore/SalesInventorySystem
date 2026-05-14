@@ -1,0 +1,48 @@
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.math.BigDecimal;
+
+public class OrderreturnDTO {
+    private Long id;
+    private Long orderId;
+    private Long employeeId;
+    private LocalDate returndate;
+    private String reason;
+    private BigDecimal totalrefund;
+    private String returnrefcode;
+    private String status;
+    public OrderreturnDTO() {}
+    public OrderreturnDTO(Long id, Long orderId, Long employeeId, LocalDate returndate,
+                          String reason, BigDecimal totalrefund, String returnrefcode, String status) {
+        this.id = id; this.orderId = orderId; this.employeeId = employeeId; this.returndate = returndate;
+        this.reason = reason; this.totalrefund = totalrefund; this.returnrefcode = returnrefcode; this.status = status;
+    }
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getOrderId() { return orderId; }
+    public void setOrderId(Long orderId) { this.orderId = orderId; }
+    public Long getEmployeeId() { return employeeId; }
+    public void setEmployeeId(Long employeeId) { this.employeeId = employeeId; }
+    public LocalDate getReturndate() { return returndate; }
+    public void setReturndate(LocalDate returndate) { this.returndate = returndate; }
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
+    public BigDecimal getTotalrefund() { return totalrefund; }
+    public void setTotalrefund(BigDecimal totalrefund) { this.totalrefund = totalrefund; }
+    public String getReturnrefcode() { return returnrefcode; }
+    public void setReturnrefcode(String returnrefcode) { this.returnrefcode = returnrefcode; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    
+    public static OrderreturnDTO fromEntity(Orderreturn entity) {
+        if (entity == null) return null;
+        Long orderId = entity.getOrderid() != null ? entity.getOrderid().getId() : null;
+        Long employeeId = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
+        return new OrderreturnDTO(entity.getId(), orderId, employeeId, entity.getReturndate(),
+                entity.getReason(), entity.getTotalrefund(), entity.getReturnrefcode(), entity.getStatus());
+    }
+}

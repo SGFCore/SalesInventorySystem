@@ -1,0 +1,48 @@
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.math.BigDecimal;
+
+public class NotificationDTO {
+    private Long id;
+    private Long employeeId;
+    private String title;
+    private Long productId;
+    private String message;
+    private Long type;
+    private Boolean status;
+    private LocalDate createddate;
+    public NotificationDTO() {}
+    public NotificationDTO(Long id, Long employeeId, String title, Long productId, String message,
+                           Long type, Boolean status, LocalDate createddate) {
+        this.id = id; this.employeeId = employeeId; this.title = title; this.productId = productId;
+        this.message = message; this.type = type; this.status = status; this.createddate = createddate;
+    }
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getEmployeeId() { return employeeId; }
+    public void setEmployeeId(Long employeeId) { this.employeeId = employeeId; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+    public Long getType() { return type; }
+    public void setType(Long type) { this.type = type; }
+    public Boolean getStatus() { return status; }
+    public void setStatus(Boolean status) { this.status = status; }
+    public LocalDate getCreateddate() { return createddate; }
+    public void setCreateddate(LocalDate createddate) { this.createddate = createddate; }
+    
+    public static NotificationDTO fromEntity(Notification entity) {
+        if (entity == null) return null;
+        Long employeeId = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
+        Long productId = entity.getProductid() != null ? entity.getProductid().getId() : null;
+        return new NotificationDTO(entity.getId(), employeeId, entity.getTitle(), productId,
+                entity.getMessage(), entity.getType(), entity.getStatus(), entity.getCreateddate());
+    }
+}

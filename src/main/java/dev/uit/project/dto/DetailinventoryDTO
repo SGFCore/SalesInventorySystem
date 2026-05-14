@@ -1,0 +1,53 @@
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.math.BigDecimal;
+
+public class DetailinventoryDTO {
+    private Long warehouseId;
+    private Long productId;
+    private Long currentquantity;
+    private Long realstock;
+    private Long availablestock;
+    private Long minstock;
+    private Long maxstock;
+    private Boolean isalertenabled;
+    private String storagelocation;
+    public DetailinventoryDTO() {}
+    public DetailinventoryDTO(Long warehouseId, Long productId, Long currentquantity, Long realstock,
+                              Long availablestock, Long minstock, Long maxstock,
+                              Boolean isalertenabled, String storagelocation) {
+        this.warehouseId = warehouseId; this.productId = productId; this.currentquantity = currentquantity;
+        this.realstock = realstock; this.availablestock = availablestock; this.minstock = minstock;
+        this.maxstock = maxstock; this.isalertenabled = isalertenabled; this.storagelocation = storagelocation;
+    }
+    // Getters & Setters
+    public Long getWarehouseId() { return warehouseId; }
+    public void setWarehouseId(Long warehouseId) { this.warehouseId = warehouseId; }
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
+    public Long getCurrentquantity() { return currentquantity; }
+    public void setCurrentquantity(Long currentquantity) { this.currentquantity = currentquantity; }
+    public Long getRealstock() { return realstock; }
+    public void setRealstock(Long realstock) { this.realstock = realstock; }
+    public Long getAvailablestock() { return availablestock; }
+    public void setAvailablestock(Long availablestock) { this.availablestock = availablestock; }
+    public Long getMinstock() { return minstock; }
+    public void setMinstock(Long minstock) { this.minstock = minstock; }
+    public Long getMaxstock() { return maxstock; }
+    public void setMaxstock(Long maxstock) { this.maxstock = maxstock; }
+    public Boolean getIsalertenabled() { return isalertenabled; }
+    public void setIsalertenabled(Boolean isalertenabled) { this.isalertenabled = isalertenabled; }
+    public String getStoragelocation() { return storagelocation; }
+    public void setStoragelocation(String storagelocation) { this.storagelocation = storagelocation; }
+    
+    public static DetailinventoryDTO fromEntity(Detailinventory entity) {
+        if (entity == null) return null;
+        DetailinventoryId id = entity.getId();
+        return new DetailinventoryDTO(id.getWarehouseid(), id.getProductid(), entity.getCurrentquantity(),
+                entity.getRealstock(), entity.getAvailablestock(), entity.getMinstock(),
+                entity.getMaxstock(), entity.getIsalertenabled(), entity.getStoragelocation());
+    }
+}

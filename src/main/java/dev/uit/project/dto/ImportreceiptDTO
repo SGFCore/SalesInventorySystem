@@ -1,0 +1,54 @@
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.math.BigDecimal;
+
+public class ImportreceiptDTO {
+    private Long id;
+    private Long employeeId;
+    private Long warehouseId;
+    private String status;
+    private LocalDate createddate;
+    private Long requestId;
+    private String discrepancyreason;
+    private String discrepancyimageurl;
+    private Long hasdiscrepancy;
+    public ImportreceiptDTO() {}
+    public ImportreceiptDTO(Long id, Long employeeId, Long warehouseId, String status, LocalDate createddate,
+                            Long requestId, String discrepancyreason, String discrepancyimageurl, Long hasdiscrepancy) {
+        this.id = id; this.employeeId = employeeId; this.warehouseId = warehouseId; this.status = status;
+        this.createddate = createddate; this.requestId = requestId; this.discrepancyreason = discrepancyreason;
+        this.discrepancyimageurl = discrepancyimageurl; this.hasdiscrepancy = hasdiscrepancy;
+    }
+    // Getters & Setters (bỏ qua, bạn tự thêm)
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getEmployeeId() { return employeeId; }
+    public void setEmployeeId(Long employeeId) { this.employeeId = employeeId; }
+    public Long getWarehouseId() { return warehouseId; }
+    public void setWarehouseId(Long warehouseId) { this.warehouseId = warehouseId; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public LocalDate getCreateddate() { return createddate; }
+    public void setCreateddate(LocalDate createddate) { this.createddate = createddate; }
+    public Long getRequestId() { return requestId; }
+    public void setRequestId(Long requestId) { this.requestId = requestId; }
+    public String getDiscrepancyreason() { return discrepancyreason; }
+    public void setDiscrepancyreason(String discrepancyreason) { this.discrepancyreason = discrepancyreason; }
+    public String getDiscrepancyimageurl() { return discrepancyimageurl; }
+    public void setDiscrepancyimageurl(String discrepancyimageurl) { this.discrepancyimageurl = discrepancyimageurl; }
+    public Long getHasdiscrepancy() { return hasdiscrepancy; }
+    public void setHasdiscrepancy(Long hasdiscrepancy) { this.hasdiscrepancy = hasdiscrepancy; }
+
+    public static ImportreceiptDTO fromEntity(Importreceipt entity) {
+        if (entity == null) return null;
+        Long employeeId = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
+        Long warehouseId = entity.getWarehouseid() != null ? entity.getWarehouseid().getId() : null;
+        Long requestId = entity.getRequestid() != null ? entity.getRequestid().getId() : null;
+        return new ImportreceiptDTO(entity.getId(), employeeId, warehouseId, entity.getStatus(),
+                entity.getCreateddate(), requestId, entity.getDiscrepancyreason(),
+                entity.getDiscrepancyimageurl(), entity.getHasdiscrepancy());
+    }
+}
