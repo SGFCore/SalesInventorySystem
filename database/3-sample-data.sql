@@ -1,3 +1,4 @@
+-- INSERT DỮ LIỆU DEMO
 -- =============================================
 -- 1. CUSTOMERTYPE (4 dòng - tối đa với CHECK hiện tại)
 -- =============================================
@@ -38,6 +39,8 @@ insert into customertype (
            N'Nhà hảo tâm / ủng hộ thường xuyên',
            50000000 );
 
+select *
+  from customertype;
 -- =============================================
 -- 2. ROLE (4 dòng)
 -- =============================================
@@ -122,6 +125,9 @@ insert into employee (
            'hashed_sale',
            1 );
 
+select *
+  from employee;
+
 -- =============================================
 -- 5. EMPLOYEEROLE (4 dòng - chỉ gán cho 4 nhân viên hiện có)
 -- =============================================
@@ -145,6 +151,9 @@ insert into employeerole (
    roleid
 ) values ( 4,
            3 );
+
+select *
+  from employeerole;
 
 -- =============================================
 -- 6. WAREHOUSE (3 dòng)
@@ -195,8 +204,11 @@ insert into warehouse (
            1,
            3 );
 
+select *
+  from warehouse;
+
 -- =============================================
--- 7. PRODUCTTYPE (21 dòng)
+-- 7. PRODUCTTYPE
 -- =============================================
 insert into producttype (
    producttypename,
@@ -303,6 +315,9 @@ insert into producttype (
    categoryid
 ) values ( N'Combo quà tặng',
            8 );
+
+select *
+  from producttype;
 
 -- =============================================
 -- 8. PRODUCT (31 dòng)
@@ -835,6 +850,9 @@ insert into product (
            'https://picsum.photos/1000?random=131',
            21 );
 
+select *
+  from product;
+
 -- =============================================
 -- 9. COMBO (10 dòng)
 -- =============================================
@@ -848,6 +866,9 @@ insert into combo ( comboprice ) values ( 180000 );
 insert into combo ( comboprice ) values ( 220000 );
 insert into combo ( comboprice ) values ( 99000 );
 insert into combo ( comboprice ) values ( 400000 );
+
+select *
+  from combo;
 
 -- =============================================
 -- 10. COMBODETAIL (đầy đủ 10 Combo, dùng ProductID 1-31)
@@ -1049,6 +1070,9 @@ insert into combodetail (
            29,
            1 );
 
+select *
+  from combodetail;
+
 -- =============================================
 -- 11. SHIPCOMPANY (10 dòng)
 -- =============================================
@@ -1203,6 +1227,9 @@ insert into shipcompany (
            N'Be Group',
            1 );
 
+select *
+  from shipcompany;
+
 -- =============================================
 -- 12. CUSTOMER (10 dòng, CustomerTypeID có thể NULL)
 -- =============================================
@@ -1213,14 +1240,16 @@ insert into customer (
    companyname,
    phone,
    address,
-   email
+   email,
+   totalaccumulatedspent
 ) values ( 1,
            N'Nguyễn',
            N'Thị Hoa',
            null,
            '0988777666',
            N'12 Trần Duy Hưng, Hà Nội',
-           'hoa.nguyen@gmail.com' );
+           'hoa.nguyen@gmail.com',
+           170000 );
 insert into customer (
    customertypeid,
    firstname,
@@ -1228,14 +1257,16 @@ insert into customer (
    companyname,
    phone,
    address,
-   email
+   email,
+   totalaccumulatedspent
 ) values ( 2,
            N'Phạm',
            N'Văn Bình',
            N'Nhà hàng Tâm An',
            '0988777667',
            N'34 Ngọc Khánh, Hà Nội',
-           'binh.pham@taman.vn' );
+           'binh.pham@taman.vn',
+           190000 );
 insert into customer (
    customertypeid,
    firstname,
@@ -1243,14 +1274,16 @@ insert into customer (
    companyname,
    phone,
    address,
-   email
+   email,
+   totalaccumulatedspent
 ) values ( null,
            N'Khách',
            N'Lẻ',
            null,
            '0912345678',
            N'56 Chợ Mơ',
-           null );
+           null,
+           65000 );
 insert into customer (
    customertypeid,
    firstname,
@@ -1258,14 +1291,16 @@ insert into customer (
    companyname,
    phone,
    address,
-   email
+   email,
+   totalaccumulatedspent
 ) values ( 3,
            N'Lê',
            N'Hoàng Nam',
            null,
            '0922333444',
            N'100 Quang Trung, Gò Vấp',
-           'nam.le@email.com' );
+           'nam.le@email.com',
+           195000 );
 insert into customer (
    customertypeid,
    firstname,
@@ -1273,14 +1308,16 @@ insert into customer (
    companyname,
    phone,
    address,
-   email
+   email,
+   totalaccumulatedspent
 ) values ( 4,
            N'Trần',
            N'Kim Chi',
            null,
            '0933444555',
            N'2B Lê Lợi, Q1',
-           'chi.tran@email.com' );
+           'chi.tran@email.com',
+           880000 );
 insert into customer (
    customertypeid,
    firstname,
@@ -1288,14 +1325,16 @@ insert into customer (
    companyname,
    phone,
    address,
-   email
+   email,
+   totalaccumulatedspent
 ) values ( 1,
            N'Hoàng',
            N'Văn Doanh',
            N'Công ty CP Đầu Tư',
            '0944555666',
            N'Landmark 81',
-           'doanh.hoang@congty.vn' );
+           'doanh.hoang@congty.vn',
+           300000 );
 insert into customer (
    customertypeid,
    firstname,
@@ -1303,14 +1342,16 @@ insert into customer (
    companyname,
    phone,
    address,
-   email
+   email,
+   totalaccumulatedspent
 ) values ( 2,
            N'Đinh',
            N'Thị Ngọc',
            null,
            '0955666777',
            N'5 Cầu Giấy, HN',
-           'ngoc.dinh@email.com' );
+           'ngoc.dinh@email.com',
+           125000 );
 insert into customer (
    customertypeid,
    firstname,
@@ -1318,14 +1359,16 @@ insert into customer (
    companyname,
    phone,
    address,
-   email
+   email,
+   totalaccumulatedspent
 ) values ( 3,
            N'Vũ',
            N'Tuấn Anh',
            null,
            '0966777888',
            N'15 Tây Hồ, HN',
-           'anh.vu@email.com' );
+           'anh.vu@email.com',
+           210000 );
 insert into customer (
    customertypeid,
    firstname,
@@ -1333,14 +1376,16 @@ insert into customer (
    companyname,
    phone,
    address,
-   email
+   email,
+   totalaccumulatedspent
 ) values ( 4,
            N'Bùi',
            N'Lan Hương',
            null,
            '0977888999',
            N'99 Đống Đa, HN',
-           'huong.bui@email.com' );
+           'huong.bui@email.com',
+           395000 );
 insert into customer (
    customertypeid,
    firstname,
@@ -1348,14 +1393,19 @@ insert into customer (
    companyname,
    phone,
    address,
-   email
+   email,
+   totalaccumulatedspent
 ) values ( null,
            N'Tập đoàn',
            N'SGF Partner',
            N'SGF Partner Corp',
            '0988999111',
            N'KCN Sóng Thần',
-           'contact@sgfpartner.vn' );
+           'contact@sgfpartner.vn',
+           3500000 );
+
+select *
+  from customer;
 
 -- =============================================
 -- 13. PAYMENTMETHOD (10 dòng)
@@ -1410,6 +1460,9 @@ insert into paymentmethod (
    status
 ) values ( N'ShopeePay',
            1 );
+
+select *
+  from paymentmethod;
 
 -- =============================================
 -- 14. RETURNPOLICY (8 dòng)
@@ -1502,6 +1555,9 @@ insert into returnpolicy (
            0,
            date '2024-06-01',
            1 );
+
+select *
+  from returnpolicy;
 
 -- =============================================
 -- 15. DISCOUNT (10 dòng, CustomerTypeID NULL hoặc 1-4)
@@ -1676,6 +1732,9 @@ insert into discount (
            0,
            date '2024-11-30',
            date '2024-11-25' );
+
+select *
+  from discount;
 
 -- =============================================
 -- 16. DETAILINVENTORY (Kho tổng 31 sp, kho bán hàng 11 sp, kho lỗi 2 sp)
@@ -2269,7 +2328,7 @@ insert into detailinventory (
            170,
            1,
            N'Kệ F-02' );
-
+-- KHO HÀNG TRỰC TIẾP
 insert into detailinventory (
    warehouseid,
    productid,
@@ -2479,7 +2538,7 @@ insert into detailinventory (
            15,
            1,
            N'Quầy A-07' );
-
+-- KHO HÀNG LỖI
 insert into detailinventory (
    warehouseid,
    productid,
@@ -2518,6 +2577,9 @@ insert into detailinventory (
            5,
            0,
            N'Kệ lỗi' );
+
+select *
+  from detailinventory;
 
 -- =============================================
 -- 17. EXPORTRECEIPT (10 dòng, chỉ dùng EmployeeID 1-4, WarehouseID 1-3)
@@ -2633,6 +2695,9 @@ insert into exportreceipt (
            N'Đã hoàn thành',
            2 );
 
+select *
+  from exportreceipt;
+
 -- =============================================
 -- 18. EXPORTRECEIPTDETAIL (10 dòng, ProductID 1-31)
 -- =============================================
@@ -2707,10 +2772,14 @@ insert into exportreceiptdetail (
            6,
            1 );
 
+select *
+  from exportreceiptdetail;
+
 -- =============================================
 -- 19. INVOICE (10 dòng, EmployeeID 1-4, CustomerID 1-10)
 -- =============================================
 insert into invoice (
+   invoiceid,
    customerid,
    employeeid,
    salechannelcode,
@@ -2720,12 +2789,14 @@ insert into invoice (
    status
 ) values ( 1,
            1,
+           1,
            0,
-           175000,
+           170000,
            0,
-           175000,
+           170000,
            N'Đã thanh toán' );
 insert into invoice (
+   invoiceid,
    customerid,
    employeeid,
    salechannelcode,
@@ -2734,118 +2805,15 @@ insert into invoice (
    finalamount,
    status
 ) values ( 2,
+           2,
            1,
            1,
-           450000,
+           190000,
            0,
-           450000,
-           N'Chờ thanh toán' );
-insert into invoice (
-   customerid,
-   employeeid,
-   salechannelcode,
-   totalamount,
-   taxamount,
-   finalamount,
-   status
-) values ( 4,
-           4,
-           1,
-           500000,
-           0,
-           500000,
+           190000,
            N'Đã thanh toán' );
 insert into invoice (
-   customerid,
-   employeeid,
-   salechannelcode,
-   totalamount,
-   taxamount,
-   finalamount,
-   status
-) values ( 5,
-           4,
-           0,
-           150000,
-           0,
-           150000,
-           N'Đã thanh toán' );
-insert into invoice (
-   customerid,
-   employeeid,
-   salechannelcode,
-   totalamount,
-   taxamount,
-   finalamount,
-   status
-) values ( 6,
-           3,
-           0,
-           3000000,
-           300000,
-           3300000,
-           N'Đã thanh toán' );
-insert into invoice (
-   customerid,
-   employeeid,
-   salechannelcode,
-   totalamount,
-   taxamount,
-   finalamount,
-   status
-) values ( 7,
-           4,
-           1,
-           200000,
-           0,
-           200000,
-           N'Đã thanh toán' );
-insert into invoice (
-   customerid,
-   employeeid,
-   salechannelcode,
-   totalamount,
-   taxamount,
-   finalamount,
-   status
-) values ( 8,
-           4,
-           1,
-           85000,
-           0,
-           85000,
-           N'Chờ thanh toán' );
-insert into invoice (
-   customerid,
-   employeeid,
-   salechannelcode,
-   totalamount,
-   taxamount,
-   finalamount,
-   status
-) values ( 9,
-           4,
-           0,
-           450000,
-           0,
-           450000,
-           N'Đã thanh toán' );
-insert into invoice (
-   customerid,
-   employeeid,
-   salechannelcode,
-   totalamount,
-   taxamount,
-   finalamount,
-   status
-) values ( 10,
-           1,
-           0,
-           15000000,
-           1500000,
-           16500000,
-           N'Chờ thanh toán' );
-insert into invoice (
+   invoiceid,
    customerid,
    employeeid,
    salechannelcode,
@@ -2855,15 +2823,164 @@ insert into invoice (
    status
 ) values ( 3,
            4,
+           4,
+           0,
+           195000,
+           0,
+           195000,
+           N'Đã thanh toán' );
+insert into invoice (
+   invoiceid,
+   customerid,
+   employeeid,
+   salechannelcode,
+   totalamount,
+   taxamount,
+   finalamount,
+   status
+) values ( 4,
+           5,
+           4,
+           1,
+           880000,
+           0,
+           880000,
+           N'Đã thanh toán' );
+insert into invoice (
+   invoiceid,
+   customerid,
+   employeeid,
+   salechannelcode,
+   totalamount,
+   taxamount,
+   finalamount,
+   status
+) values ( 5,
+           6,
+           3,
+           0,
+           300000,
+           0,
+           300000,
+           N'Đã thanh toán' );
+insert into invoice (
+   invoiceid,
+   customerid,
+   employeeid,
+   salechannelcode,
+   totalamount,
+   taxamount,
+   finalamount,
+   status
+) values ( 6,
+           7,
+           4,
+           1,
+           125000,
+           0,
+           125000,
+           N'Đã thanh toán' );
+insert into invoice (
+   invoiceid,
+   customerid,
+   employeeid,
+   salechannelcode,
+   totalamount,
+   taxamount,
+   finalamount,
+   status
+) values ( 7,
+           8,
+           4,
+           0,
+           210000,
+           0,
+           210000,
+           N'Đã thanh toán' );
+insert into invoice (
+   invoiceid,
+   customerid,
+   employeeid,
+   salechannelcode,
+   totalamount,
+   taxamount,
+   finalamount,
+   status
+) values ( 8,
+           9,
+           4,
+           1,
+           395000,
+           0,
+           395000,
+           N'Đã thanh toán' );
+insert into invoice (
+   invoiceid,
+   customerid,
+   employeeid,
+   salechannelcode,
+   totalamount,
+   taxamount,
+   finalamount,
+   status
+) values ( 9,
+           10,
+           1,
+           0,
+           3500000,
+           0,
+           3500000,
+           N'Đã thanh toán' );
+insert into invoice (
+   invoiceid,
+   customerid,
+   employeeid,
+   salechannelcode,
+   totalamount,
+   taxamount,
+   finalamount,
+   status
+) values ( 10,
+           3,
+           4,
            0,
            65000,
            0,
            65000,
            N'Đã thanh toán' );
 
+select *
+  from invoice;
+
 -- =============================================
 -- 20. ORDERS (10 dòng, các FK hợp lệ)
 -- =============================================
+-- Order 1 (trực tiếp)
+insert into orders (
+   customerid,
+   employeeid,
+   invoiceid,
+   shipcode,
+   shipcompanyid,
+   totalamount,
+   orderstatus,
+   shippingstatus,
+   shipmentnote,
+   shippingfee,
+   exportreceiptid
+) values ( 1,
+           1,
+           1,
+           null,
+           null,
+           170000,
+           1,
+           null,
+           null,
+           0,
+           null );
+
+-- Order 2 (trực tuyến)
 insert into orders (
    customerid,
    employeeid,
@@ -2881,35 +2998,14 @@ insert into orders (
            2,
            'SPX123456',
            1,
-           450000,
+           190000,
            0,
            0,
            N'Giao giờ hành chính',
            30000,
            1 );
-insert into orders (
-   customerid,
-   employeeid,
-   invoiceid,
-   shipcode,
-   shipcompanyid,
-   totalamount,
-   orderstatus,
-   shippingstatus,
-   shipmentnote,
-   shippingfee,
-   exportreceiptid
-) values ( 1,
-           1,
-           1,
-           null,
-           null,
-           175000,
-           1,
-           null,
-           null,
-           0,
-           null );
+
+-- Order 3 (trực tiếp)
 insert into orders (
    customerid,
    employeeid,
@@ -2925,14 +3021,16 @@ insert into orders (
 ) values ( 4,
            4,
            3,
-           'GHTK888',
+           null,
+           null,
+           195000,
            1,
-           500000,
-           1,
-           2,
-           N'Gọi trước khi giao',
-           25000,
-           5 );
+           null,
+           null,
+           0,
+           null );
+
+-- Order 4 (trực tuyến)
 insert into orders (
    customerid,
    employeeid,
@@ -2948,14 +3046,16 @@ insert into orders (
 ) values ( 5,
            4,
            4,
-           null,
-           null,
-           150000,
+           'GHTK888',
            1,
-           null,
-           null,
-           0,
-           null );
+           880000,
+           1,
+           2,
+           N'Gọi trước khi giao',
+           50000,
+           5 );
+
+-- Order 5 (trực tiếp)
 insert into orders (
    customerid,
    employeeid,
@@ -2971,14 +3071,16 @@ insert into orders (
 ) values ( 6,
            3,
            5,
-           'VTP999',
-           2,
-           3300000,
-           0,
+           null,
+           null,
+           300000,
            1,
-           N'Giao bằng xe tải nhỏ',
-           100000,
-           3 );
+           null,
+           null,
+           0,
+           null );
+
+-- Order 6 (trực tuyến)
 insert into orders (
    customerid,
    employeeid,
@@ -2996,12 +3098,14 @@ insert into orders (
            6,
            'AHA111',
            5,
-           200000,
+           125000,
            1,
            2,
            N'Giao ngay',
-           35000,
+           25000,
            8 );
+
+-- Order 7 (trực tiếp)
 insert into orders (
    customerid,
    employeeid,
@@ -3017,14 +3121,16 @@ insert into orders (
 ) values ( 8,
            4,
            7,
-           'JNT222',
-           4,
-           85000,
+           null,
+           null,
+           210000,
+           1,
+           null,
+           null,
            0,
-           0,
-           N'Giao buổi sáng',
-           20000,
-           9 );
+           null );
+
+-- Order 8 (trực tuyến)
 insert into orders (
    customerid,
    employeeid,
@@ -3040,14 +3146,16 @@ insert into orders (
 ) values ( 9,
            4,
            8,
-           null,
-           null,
-           450000,
-           1,
-           null,
-           null,
+           'JNT222',
+           4,
+           395000,
            0,
-           null );
+           0,
+           N'Giao buổi sáng',
+           40000,
+           9 );
+
+-- Order 9 (trực tiếp)
 insert into orders (
    customerid,
    employeeid,
@@ -3063,14 +3171,16 @@ insert into orders (
 ) values ( 10,
            1,
            9,
-           'LALA333',
-           6,
-           16500000,
-           0,
+           null,
+           null,
+           3500000,
            1,
-           N'Xe tải thùng',
-           200000,
+           null,
+           null,
+           0,
            null );
+
+-- Order 10 (trực tiếp)
 insert into orders (
    customerid,
    employeeid,
@@ -3095,39 +3205,28 @@ insert into orders (
            0,
            10 );
 
+select *
+  from orders;
+
 -- =============================================
 -- 21. ORDERDETAIL (10 dòng)
 -- =============================================
+-- Order 1
 insert into orderdetail (
    orderid,
    productid,
-   comboid,
    quantity,
    unitprice,
    discountamount,
    totalamount
 ) values ( 1,
-           11,
-           null,
-           5,
-           35000,
-           0,
-           175000 );
-insert into orderdetail (
-   orderid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 2,
-           26,
-           null,
+           1,
            2,
-           60000,
+           85000,
            0,
-           120000 );
+           170000 );
+
+-- Order 2
 insert into orderdetail (
    orderid,
    productid,
@@ -3137,22 +3236,7 @@ insert into orderdetail (
    discountamount,
    totalamount
 ) values ( 2,
-           21,
            null,
-           1,
-           30000,
-           0,
-           30000 );
-insert into orderdetail (
-   orderid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 2,
-           1,
            2,
            1,
            150000,
@@ -3161,29 +3245,72 @@ insert into orderdetail (
 insert into orderdetail (
    orderid,
    productid,
-   comboid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 2,
+           9,
+           1,
+           40000,
+           0,
+           40000 );
+
+-- Order 3
+insert into orderdetail (
+   orderid,
+   productid,
    quantity,
    unitprice,
    discountamount,
    totalamount
 ) values ( 3,
-           2,
-           null,
            4,
-           80000,
+           3,
+           65000,
            0,
-           320000 );
+           195000 );
+
+-- Order 4
 insert into orderdetail (
    orderid,
    productid,
-   comboid,
    quantity,
    unitprice,
    discountamount,
    totalamount
 ) values ( 4,
            24,
-           null,
+           4,
+           220000,
+           0,
+           880000 );
+
+-- Order 5
+insert into orderdetail (
+   orderid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 5,
+           7,
+           10,
+           30000,
+           0,
+           300000 );
+
+-- Order 6
+insert into orderdetail (
+   orderid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 6,
+           8,
            2,
            45000,
            0,
@@ -3191,48 +3318,46 @@ insert into orderdetail (
 insert into orderdetail (
    orderid,
    productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 5,
-           1,
-           null,
-           50,
-           85000,
-           0,
-           4250000 );
-insert into orderdetail (
-   orderid,
-   productid,
-   comboid,
    quantity,
    unitprice,
    discountamount,
    totalamount
 ) values ( 6,
-           31,
-           null,
+           21,
            1,
-           85000,
+           35000,
            0,
-           85000 );
+           35000 );
+
+-- Order 7
 insert into orderdetail (
    orderid,
    productid,
-   comboid,
    quantity,
    unitprice,
    discountamount,
    totalamount
 ) values ( 7,
-           10,
-           null,
+           28,
            1,
-           40000,
+           150000,
            0,
-           40000 );
+           150000 );
+insert into orderdetail (
+   orderid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 7,
+           25,
+           1,
+           60000,
+           0,
+           60000 );
+
+-- Order 8
 insert into orderdetail (
    orderid,
    productid,
@@ -3241,13 +3366,302 @@ insert into orderdetail (
    unitprice,
    discountamount,
    totalamount
-) values ( 10,
-           4,
+) values ( 8,
            null,
+           5,
            1,
+           300000,
+           0,
+           300000 );
+insert into orderdetail (
+   orderid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 8,
+           15,
+           1,
+           95000,
+           0,
+           95000 );
+
+-- Order 9
+insert into orderdetail (
+   orderid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 9,
+           10,
+           100,
+           35000,
+           0,
+           3500000 );
+
+-- Order 10
+insert into orderdetail (
+   orderid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 10,
+           22,
+           1,
+           30000,
+           0,
+           30000 );
+insert into orderdetail (
+   orderid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 10,
+           26,
+           1,
+           35000,
+           0,
+           35000 );
+
+select *
+  from orderdetail;
+
+-- =============================================
+-- 23. INVOICEDETAIL (10 dòng)
+-- =============================================
+-- Invoice 1
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 1,
+           1,
+           2,
+           85000,
+           0,
+           170000 );
+
+-- Invoice 2
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   comboid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 2,
+           null,
+           2,
+           1,
+           150000,
+           0,
+           150000 );
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 2,
+           9,
+           1,
+           40000,
+           0,
+           40000 );
+
+-- Invoice 3
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 3,
+           4,
+           3,
            65000,
            0,
-           65000 );
+           195000 );
+
+-- Invoice 4
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 4,
+           24,
+           4,
+           220000,
+           0,
+           880000 );
+
+-- Invoice 5
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 5,
+           7,
+           10,
+           30000,
+           0,
+           300000 );
+
+-- Invoice 6
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 6,
+           8,
+           2,
+           45000,
+           0,
+           90000 );
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 6,
+           21,
+           1,
+           35000,
+           0,
+           35000 );
+
+-- Invoice 7
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 7,
+           28,
+           1,
+           150000,
+           0,
+           150000 );
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 7,
+           25,
+           1,
+           60000,
+           0,
+           60000 );
+
+-- Invoice 8
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   comboid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 8,
+           null,
+           5,
+           1,
+           300000,
+           0,
+           300000 );
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 8,
+           15,
+           1,
+           95000,
+           0,
+           95000 );
+
+-- Invoice 9
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 9,
+           10,
+           100,
+           35000,
+           0,
+           3500000 );
+
+-- Invoice 10
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 10,
+           22,
+           1,
+           30000,
+           0,
+           30000 );
+insert into invoicedetail (
+   invoiceid,
+   productid,
+   quantity,
+   unitprice,
+   discountamount,
+   totalamount
+) values ( 10,
+           26,
+           1,
+           35000,
+           0,
+           35000 );
+
+
+select *
+  from invoicedetail;
+alter table invoicedetail modify (
+   invoicedetailid generated by default as identity ( start with 1 )
+);
+truncate table invoicedetail;
 
 -- =============================================
 -- 22. PAYMENT (10 dòng)
@@ -3260,7 +3674,7 @@ insert into payment (
    paymentdate
 ) values ( 1,
            1,
-           175000,
+           170000,
            null,
            current_timestamp );
 insert into payment (
@@ -3271,8 +3685,8 @@ insert into payment (
    paymentdate
 ) values ( 2,
            2,
-           200000,
-           'CK_SGF_001',
+           190000,
+           'CK_002',
            current_timestamp );
 insert into payment (
    invoiceid,
@@ -3281,9 +3695,9 @@ insert into payment (
    referencecode,
    paymentdate
 ) values ( 3,
-           4,
-           500000,
-           'VNPAY_123',
+           1,
+           195000,
+           null,
            current_timestamp );
 insert into payment (
    invoiceid,
@@ -3292,9 +3706,9 @@ insert into payment (
    referencecode,
    paymentdate
 ) values ( 4,
-           1,
-           150000,
-           null,
+           2,
+           880000,
+           'CK_004',
            current_timestamp );
 insert into payment (
    invoiceid,
@@ -3303,9 +3717,9 @@ insert into payment (
    referencecode,
    paymentdate
 ) values ( 5,
-           2,
-           3300000,
-           'CK_SGF_002',
+           1,
+           300000,
+           null,
            current_timestamp );
 insert into payment (
    invoiceid,
@@ -3314,9 +3728,20 @@ insert into payment (
    referencecode,
    paymentdate
 ) values ( 6,
-           5,
-           200000,
-           'ZALOPAY_456',
+           2,
+           125000,
+           'CK_006',
+           current_timestamp );
+insert into payment (
+   invoiceid,
+   paymentmethodid,
+   amountpaid,
+   referencecode,
+   paymentdate
+) values ( 7,
+           1,
+           210000,
+           null,
            current_timestamp );
 insert into payment (
    invoiceid,
@@ -3325,20 +3750,9 @@ insert into payment (
    referencecode,
    paymentdate
 ) values ( 8,
-           1,
-           450000,
-           null,
-           current_timestamp );
-insert into payment (
-   invoiceid,
-   paymentmethodid,
-   amountpaid,
-   referencecode,
-   paymentdate
-) values ( 10,
-           1,
-           65000,
-           null,
+           2,
+           395000,
+           'CK_008',
            current_timestamp );
 insert into payment (
    invoiceid,
@@ -3348,8 +3762,8 @@ insert into payment (
    paymentdate
 ) values ( 9,
            2,
-           5000000,
-           'CK_SGF_003_DEPOSIT',
+           3500000,
+           'CK_009',
            current_timestamp );
 insert into payment (
    invoiceid,
@@ -3357,165 +3771,14 @@ insert into payment (
    amountpaid,
    referencecode,
    paymentdate
-) values ( 2,
-           6,
-           250000,
-           'COD_PART2',
-           current_timestamp );
-
--- =============================================
--- 23. INVOICEDETAIL (10 dòng)
--- =============================================
-insert into invoicedetail (
-   invoiceid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 1,
-           11,
-           null,
-           5,
-           35000,
-           0,
-           175000 );
-insert into invoicedetail (
-   invoiceid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 2,
-           26,
-           null,
-           2,
-           60000,
-           0,
-           120000 );
-insert into invoicedetail (
-   invoiceid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 2,
-           21,
-           null,
-           1,
-           30000,
-           0,
-           30000 );
-insert into invoicedetail (
-   invoiceid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 2,
-           1,
-           2,
-           1,
-           150000,
-           0,
-           150000 );
-insert into invoicedetail (
-   invoiceid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 3,
-           2,
-           null,
-           4,
-           80000,
-           0,
-           320000 );
-insert into invoicedetail (
-   invoiceid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 4,
-           24,
-           null,
-           2,
-           45000,
-           0,
-           90000 );
-insert into invoicedetail (
-   invoiceid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 5,
-           1,
-           null,
-           50,
-           85000,
-           0,
-           4250000 );
-insert into invoicedetail (
-   invoiceid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 6,
-           3,
-           null,
-           1,
-           85000,
-           0,
-           85000 );
-insert into invoicedetail (
-   invoiceid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
-) values ( 7,
-           10,
-           null,
-           1,
-           40000,
-           0,
-           40000 );
-insert into invoicedetail (
-   invoiceid,
-   productid,
-   comboid,
-   quantity,
-   unitprice,
-   discountamount,
-   totalamount
 ) values ( 10,
-           4,
-           null,
            1,
            65000,
-           0,
-           65000 );
+           null,
+           current_timestamp );
+
+select *
+  from payment;
 
 -- =============================================
 -- 24. NOTIFICATION (3 dòng)
@@ -3565,6 +3828,9 @@ insert into notification (
            1,
            0,
            sysdate );
+
+select *
+  from notification;
 
 -- =============================================
 -- 25. REQUESTFORM (10 dòng, EmployeeID 1-4, ApproverID 1-4)
@@ -3679,6 +3945,205 @@ insert into requestform (
            N'Đã duyệt',
            1,
            null );
+
+select *
+  from requestform;
+
+
+-- =============================================
+-- 26. REQUESTDETAIL (10 dòng)
+-- =============================================
+insert into requestdetail (
+   requestid,
+   productid,
+   quantity
+) values ( 1,
+           11,
+           10 );
+insert into requestdetail (
+   requestid,
+   productid,
+   quantity
+) values ( 1,
+           1,
+           50 );
+insert into requestdetail (
+   requestid,
+   productid,
+   quantity
+) values ( 2,
+           26,
+           20 );
+insert into requestdetail (
+   requestid,
+   productid,
+   quantity
+) values ( 3,
+           2,
+           50 );
+insert into requestdetail (
+   requestid,
+   productid,
+   quantity
+) values ( 4,
+           23,
+           20 );
+insert into requestdetail (
+   requestid,
+   productid,
+   quantity
+) values ( 5,
+           4,
+           100 );
+insert into requestdetail (
+   requestid,
+   productid,
+   quantity
+) values ( 6,
+           5,
+           50 );
+insert into requestdetail (
+   requestid,
+   productid,
+   quantity
+) values ( 7,
+           10,
+           30 );
+insert into requestdetail (
+   requestid,
+   productid,
+   quantity
+) values ( 8,
+           21,
+           15 );
+insert into requestdetail (
+   requestid,
+   productid,
+   quantity
+) values ( 10,
+           16,
+           10 );
+
+select *
+  from requestdetail;
+
+-- =============================================
+-- 27. TRANSFERTICKET (10 dòng, SourceWHID/DestWHID 1-3)
+-- =============================================
+insert into transferticket (
+   employeeid,
+   sourcewhid,
+   destwhid,
+   status,
+   createddate
+) values ( 2,
+           1,
+           2,
+           N'Chờ xuất kho',
+           date '2024-05-15' );
+insert into transferticket (
+   employeeid,
+   sourcewhid,
+   destwhid,
+   status,
+   createddate
+) values ( 2,
+           2,
+           1,
+           N'Đang luân chuyển',
+           date '2024-05-16' );
+insert into transferticket (
+   employeeid,
+   sourcewhid,
+   destwhid,
+   status,
+   createddate
+) values ( 4,
+           1,
+           3,
+           N'Đã nhập kho',
+           date '2024-05-10' );
+insert into transferticket (
+   employeeid,
+   sourcewhid,
+   destwhid,
+   status,
+   createddate
+) values ( 4,
+           2,
+           1,
+           N'Từ chối',
+           date '2024-05-11' );
+insert into transferticket (
+   employeeid,
+   sourcewhid,
+   destwhid,
+   status,
+   createddate
+) values ( 1,
+           1,
+           2,
+           N'Đang luân chuyển',
+           date '2024-05-17' );
+insert into transferticket (
+   employeeid,
+   sourcewhid,
+   destwhid,
+   status,
+   createddate
+) values ( 2,
+           1,
+           3,
+           N'Chờ xuất kho',
+           date '2024-05-18' );
+insert into transferticket (
+   employeeid,
+   sourcewhid,
+   destwhid,
+   status,
+   createddate
+) values ( 2,
+           1,
+           2,
+           N'Đã nhập kho',
+           date '2024-05-01' );
+insert into transferticket (
+   employeeid,
+   sourcewhid,
+   destwhid,
+   status,
+   createddate
+) values ( 3,
+           2,
+           3,
+           N'Đã nhập kho',
+           date '2024-05-12' );
+insert into transferticket (
+   employeeid,
+   sourcewhid,
+   destwhid,
+   status,
+   createddate
+) values ( 3,
+           1,
+           2,
+           N'Đang luân chuyển',
+           date '2024-05-19' );
+insert into transferticket (
+   employeeid,
+   sourcewhid,
+   destwhid,
+   status,
+   createddate
+) values ( 4,
+           1,
+           2,
+           N'Chờ duyệt',
+           date '2024-05-20' );
+
+select *
+  from transferticket;
+
 
 -- =============================================
 -- 26. REQUESTDETAIL (10 dòng)
@@ -3982,6 +4447,9 @@ insert into transferticketdetail (
            null,
            2 );
 
+select *
+  from transferticketdetail;
+
 -- =============================================
 -- 29. IMPORTRECEIPT (10 dòng)
 -- =============================================
@@ -4116,6 +4584,9 @@ insert into importreceipt (
            null,
            0 );
 
+select *
+  from importreceipt;
+
 -- =============================================
 -- 30. IMPORTRECEIPTDETAIL (10 dòng)
 -- =============================================
@@ -4210,6 +4681,9 @@ insert into importreceiptdetail (
            30,
            30 );
 
+select *
+  from importreceiptdetail;
+
 -- =============================================
 -- 31. COUNTSHEET (10 dòng)
 -- =============================================
@@ -4263,6 +4737,9 @@ insert into countsheet (
    status
 ) values ( date '2024-06-15',
            1 );
+
+select *
+  from countsheet;
 
 -- =============================================
 -- 32. COUNTSHEETDETAIL (đã có sẵn từ yêu cầu trước, copy lại)
@@ -4598,6 +5075,9 @@ insert into countsheetdetail (
            260,
            N'Khớp' );
 
+select *
+  from countsheetdetail;
+
 -- =============================================
 -- 33. ORDERRETURN (10 dòng, EmployeeID 1-4)
 -- =============================================
@@ -4752,6 +5232,9 @@ insert into orderreturn (
            'RET_010',
            N'Chờ xử lý' );
 
+select *
+  from orderreturn;
+
 -- =============================================
 -- 34. RETURNDETAIL (6 dòng, TargetWarehouseID 1-3)
 -- =============================================
@@ -4834,6 +5317,9 @@ insert into returndetail (
            1,
            N'Chờ xử lý' );
 
+select *
+  from returndetail;
+
 -- =============================================
 -- 35. LISTDISCOUNT (10 dòng)
 -- =============================================
@@ -4907,6 +5393,9 @@ insert into listdiscount (
 ) values ( 7,
            5,
            0 );
+
+select *
+  from listdiscount;
 
 -- =============================================
 -- 36. FEEDBACK (10 dòng)
@@ -5041,5 +5530,8 @@ insert into feedback (
            current_timestamp,
            null,
            4 );
+
+select *
+  from feedback;
 
 commit;
