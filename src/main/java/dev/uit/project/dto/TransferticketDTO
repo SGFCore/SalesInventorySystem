@@ -1,0 +1,41 @@
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.math.BigDecimal;
+
+public class TransferticketDTO {
+    private Long id;
+    private Long employeeId;
+    private Long sourcewhId;
+    private Long destwhId;
+    private String status;
+    private LocalDate createddate;
+    public TransferticketDTO() {}
+    public TransferticketDTO(Long id, Long employeeId, Long sourcewhId, Long destwhId, String status, LocalDate createddate) {
+        this.id = id; this.employeeId = employeeId; this.sourcewhId = sourcewhId;
+        this.destwhId = destwhId; this.status = status; this.createddate = createddate;
+    }
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getEmployeeId() { return employeeId; }
+    public void setEmployeeId(Long employeeId) { this.employeeId = employeeId; }
+    public Long getSourcewhId() { return sourcewhId; }
+    public void setSourcewhId(Long sourcewhId) { this.sourcewhId = sourcewhId; }
+    public Long getDestwhId() { return destwhId; }
+    public void setDestwhId(Long destwhId) { this.destwhId = destwhId; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public LocalDate getCreateddate() { return createddate; }
+    public void setCreateddate(LocalDate createddate) { this.createddate = createddate; }
+    public static TransferticketDTO fromEntity(Transferticket entity) {
+        if (entity == null) return null;
+        Long employeeId = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
+        Long sourcewhId = entity.getSourcewhid() != null ? entity.getSourcewhid().getId() : null;
+        Long destwhId = entity.getDestwhid() != null ? entity.getDestwhid().getId() : null;
+        return new TransferticketDTO(entity.getId(), employeeId, sourcewhId, destwhId,
+                entity.getStatus(), entity.getCreateddate());
+    }
+}

@@ -1,0 +1,26 @@
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.math.BigDecimal;
+
+public class CountsheetDTO {
+    private Long id;
+    private LocalDate createddate;
+    private Long status;
+    public CountsheetDTO() {}
+    public CountsheetDTO(Long id, LocalDate createddate, Long status) {
+        this.id = id; this.createddate = createddate; this.status = status;
+    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public LocalDate getCreateddate() { return createddate; }
+    public void setCreateddate(LocalDate createddate) { this.createddate = createddate; }
+    public Long getStatus() { return status; }
+    public void setStatus(Long status) { this.status = status; }
+    public static CountsheetDTO fromEntity(Countsheet entity) {
+        if (entity == null) return null;
+        return new CountsheetDTO(entity.getId(), entity.getCreateddate(), entity.getStatus());
+    }
+}

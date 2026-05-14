@@ -2,17 +2,16 @@
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
-    extend: {},
-  },
-  plugins: [],
-  theme: {
     extend: {
       colors: {
         border: "hsl(var(--border))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         ring: "hsl(var(--ring))",
+        main: "oklch(var(--main))",
+        supporting: "rgb(var(--supporting))",
       },
     },
   },
+  plugins: [],
 };

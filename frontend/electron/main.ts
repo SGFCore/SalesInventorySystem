@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
 
 function createWindow() {
@@ -7,10 +7,33 @@ function createWindow() {
     height: 700,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   });
 
   win.loadURL("http://localhost:5173");
+
+  // Ẩn menu bar
+  Menu.setApplicationMenu(null);
+
+  // Mở DevTools để kiểm tra lỗi
+  win.webContents.openDevTools();
+
+  // Log lỗi nếu có
+  win.webContents.on("crashed", () => {
+    console.error("WebContents crashed");
+  });
+
+  process.on("uncaughtException", (error) => {
+    console.error("Uncaught exception:", error);
+  });
 }
 
 app.whenReady().then(createWindow);
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+});

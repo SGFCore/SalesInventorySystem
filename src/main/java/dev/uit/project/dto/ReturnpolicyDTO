@@ -1,0 +1,40 @@
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.math.BigDecimal;
+
+public class ReturnpolicyDTO {
+    private Long id;
+    private String policyname;
+    private Long maxreturndays;
+    private BigDecimal penaltyfeerate;
+    private LocalDate effectivedate;
+    private Long isactive;
+    public ReturnpolicyDTO() {}
+    public ReturnpolicyDTO(Long id, String policyname, Long maxreturndays, BigDecimal penaltyfeerate,
+                           LocalDate effectivedate, Long isactive) {
+        this.id = id; this.policyname = policyname; this.maxreturndays = maxreturndays;
+        this.penaltyfeerate = penaltyfeerate; this.effectivedate = effectivedate; this.isactive = isactive;
+    }
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getPolicyname() { return policyname; }
+    public void setPolicyname(String policyname) { this.policyname = policyname; }
+    public Long getMaxreturndays() { return maxreturndays; }
+    public void setMaxreturndays(Long maxreturndays) { this.maxreturndays = maxreturndays; }
+    public BigDecimal getPenaltyfeerate() { return penaltyfeerate; }
+    public void setPenaltyfeerate(BigDecimal penaltyfeerate) { this.penaltyfeerate = penaltyfeerate; }
+    public LocalDate getEffectivedate() { return effectivedate; }
+    public void setEffectivedate(LocalDate effectivedate) { this.effectivedate = effectivedate; }
+    public Long getIsactive() { return isactive; }
+    public void setIsactive(Long isactive) { this.isactive = isactive; }
+    
+    public static ReturnpolicyDTO fromEntity(Returnpolicy entity) {
+        if (entity == null) return null;
+        return new ReturnpolicyDTO(entity.getId(), entity.getPolicyname(), entity.getMaxreturndays(),
+                entity.getPenaltyfeerate(), entity.getEffectivedate(), entity.getIsactive());
+    }
+}
