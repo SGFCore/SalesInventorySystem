@@ -11,8 +11,26 @@ function createWindow() {
         height: 700,
         webPreferences: {
             preload: path_1.default.join(__dirname, "preload.js"),
+            nodeIntegration: false,
+            contextIsolation: true,
         },
     });
     win.loadURL("http://localhost:5173");
+    // Ẩn menu bar
+    electron_1.Menu.setApplicationMenu(null);
+    // Mở DevTools để kiểm tra lỗi
+    win.webContents.openDevTools();
+    // Log lỗi nếu có
+    win.webContents.on("crashed", () => {
+        console.error("WebContents crashed");
+    });
+    process.on("uncaughtException", (error) => {
+        console.error("Uncaught exception:", error);
+    });
 }
 electron_1.app.whenReady().then(createWindow);
+electron_1.app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+        electron_1.app.quit();
+    }
+});
