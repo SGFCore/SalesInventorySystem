@@ -1,0 +1,9 @@
+package dev.uit.project.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import dev.uit.project.entities.DetailInventory;
+
+public interface DetailInventoryRepository extends JpaRepository<DetailInventory, Long> {
+
+}
