@@ -1,0 +1,94 @@
+package dev.uit.project.service;
+
+import java.util.List;
+import org.springframework.stereotype.Service;
+import dev.uit.project.dto.InvoiceDetailDTO;
+import dev.uit.project.entity.InvoiceDetail;
+import dev.uit.project.repository.InvoiceDetailRepository;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class InvoiceDetailService {
+    
+    private final InvoiceDetailRepository invoiceDetailRepository;
+    
+    /**
+     * Lấy danh sách tất cả các chi tiết hóa đơn
+     */
+    public List<InvoiceDetailDTO> list() {
+        return invoiceDetailRepository.findAll()
+            .stream()
+            .map(this::convertToDTO)
+            .toList();
+    }
+    
+    /**
+     * Lấy thông tin chi tiết hóa đơn theo ID
+     */
+    public InvoiceDetailDTO get(Long id) {
+        return invoiceDetailRepository.findById(id)
+            .map(this::convertToDTO)
+            .orElseThrow(() -> new RuntimeException("InvoiceDetail not found with id: " + id));
+    }
+    
+    /**
+     * Tạo mới một chi tiết hóa đơn
+     */
+    public InvoiceDetailDTO create(InvoiceDetailDTO invoiceDetailDTO) {
+        InvoiceDetail invoiceDetail = convertToEntity(invoiceDetailDTO);
+        InvoiceDetail savedInvoiceDetail = invoiceDetailRepository.save(invoiceDetail);
+        return convertToDTO(savedInvoiceDetail);
+    }
+    
+    /**
+     * Cập nhật thông tin chi tiết hóa đơn
+     */
+    public InvoiceDetailDTO update(Long id, InvoiceDetailDTO invoiceDetailDTO) {
+        InvoiceDetail existingInvoiceDetail = invoiceDetailRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("InvoiceDetail not found with id: " + id));
+        
+        existingInvoiceDetail.setInvoiceId(invoiceDetailDTO.getInvoiceId());
+        existingInvoiceDetail.setProductId(invoiceDetailDTO.getProductId());
+        existingInvoiceDetail.setQuantity(invoiceDetailDTO.getQuantity());
+        existingInvoiceDetail.setUnitPrice(invoiceDetailDTO.getUnitPrice());
+        
+        InvoiceDetail updatedInvoiceDetail = invoiceDetailRepository.save(existingInvoiceDetail);
+        return convertToDTO(updatedInvoiceDetail);
+    }
+    
+    /**
+     * Xóa một chi tiết hóa đơn
+     */
+    public void delete(Long id) {
+        if (!invoiceDetailRepository.existsById(id)) {
+            throw new RuntimeException("InvoiceDetail not found with id: " + id);
+        }
+        invoiceDetailRepository.deleteById(id);
+    }
+    
+    /**
+     * Chuyển đổi Entity sang DTO
+     */
+    private InvoiceDetailDTO convertToDTO(InvoiceDetail invoiceDetail) {
+        return new InvoiceDetailDTO(
+            invoiceDetail.getId(),
+            invoiceDetail.getInvoiceId(),
+            invoiceDetail.getProductId(),
+            invoiceDetail.getQuantity(),
+            invoiceDetail.getUnitPrice()
+        );
+    }
+    
+    /**
+     * Chuyển đổi DTO sang Entity
+     */
+    private InvoiceDetail convertToEntity(InvoiceDetailDTO invoiceDetailDTO) {
+        InvoiceDetail invoiceDetail = new InvoiceDetail();
+        invoiceDetail.setInvoiceId(invoiceDetailDTO.getInvoiceId());
+        invoiceDetail.setProductId(invoiceDetailDTO.getProductId());
+        invoiceDetail.setQuantity(invoiceDetailDTO.getQuantity());
+        invoiceDetail.setUnitPrice(invoiceDetailDTO.getUnitPrice());
+        return invoiceDetail;
+    }
+}

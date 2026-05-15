@@ -1,0 +1,85 @@
+package dev.uit.project.service;
+
+import java.util.List;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import dev.uit.project.dto.OrderReturnDTO;
+import dev.uit.project.entity.OrderReturn;
+import dev.uit.project.repository.OrderReturnRepository;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class OderReturnService {
+    
+    private final OrderReturnRepository orderReturnRepository;
+    
+    /**
+     * Lấy danh sách tất cả các phiếu trả hàng
+     */
+    public List<OrderReturnDTO> list() {
+        return orderReturnRepository.findAll()
+            .stream()
+            .map(this::convertToDTO)
+            .toList();
+    }
+    
+    /**
+     * Lấy thông tin phiếu trả hàng theo ID
+     */
+    public OrderReturnDTO get(Long id) {
+        return orderReturnRepository.findById(id)
+            .map(this::convertToDTO)
+            .orElseThrow(() -> new RuntimeException("OrderReturn not found with id: " + id));
+    }
+    
+    /**
+     * Tạo mới một phiếu trả hàng
+     */
+    public OrderReturnDTO create(OrderReturnDTO orderReturnDTO) {
+        OrderReturn orderReturn = convertToEntity(orderReturnDTO);
+        OrderReturn savedOrderReturn = orderReturnRepository.save(orderReturn);
+        return convertToDTO(savedOrderReturn);
+    }
+    
+    /**
+     * Cập nhật thông tin phiếu trả hàng
+     */
+    public OrderReturnDTO update(Long id, OrderReturnDTO orderReturnDTO) {
+        OrderReturn existingOrderReturn = orderReturnRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("OrderReturn not found with id: " + id));
+        
+        BeanUtils.copyProperties(orderReturnDTO, existingOrderReturn, "id");
+        
+        OrderReturn updatedOrderReturn = orderReturnRepository.save(existingOrderReturn);
+        return convertToDTO(updatedOrderReturn);
+    }
+    
+    /**
+     * Xóa một phiếu trả hàng
+     */
+    public void delete(Long id) {
+        if (!orderReturnRepository.existsById(id)) {
+            throw new RuntimeException("OrderReturn not found with id: " + id);
+        }
+        orderReturnRepository.deleteById(id);
+    }
+    
+    /**
+     * Chuyển đổi Entity sang DTO
+     */
+    private OrderReturnDTO convertToDTO(OrderReturn orderReturn) {
+        OrderReturnDTO orderReturnDTO = new OrderReturnDTO();
+        BeanUtils.copyProperties(orderReturn, orderReturnDTO);
+        return orderReturnDTO;
+    }
+    
+    /**
+     * Chuyển đổi DTO sang Entity
+     */
+    private OrderReturn convertToEntity(OrderReturnDTO orderReturnDTO) {
+        OrderReturn orderReturn = new OrderReturn();
+        BeanUtils.copyProperties(orderReturnDTO, orderReturn);
+        return orderReturn;
+    }
+}

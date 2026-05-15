@@ -1,0 +1,87 @@
+package dev.uit.project.service;
+
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
+import dev.uit.project.dto.InvoiceDTO;
+import dev.uit.project.entity.Invoice;
+import dev.uit.project.repository.InvoiceRepository;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class InvoiceService {
+
+    private final InvoiceRepository invoiceRepository;
+
+    /**
+     * Lấy danh sách tất cả hóa đơn
+     */
+    public List<InvoiceDTO> list() {
+        return invoiceRepository.findAll()
+            .stream()
+            .map(this::convertToDTO)
+            .toList();
+    }
+
+    /**
+     * Lấy thông tin hóa đơn theo ID
+     */
+    public InvoiceDTO get(Long id) {
+        return invoiceRepository.findById(id)
+            .map(this::convertToDTO)
+            .orElseThrow(() -> new RuntimeException("Invoice not found with id: " + id));
+    }
+
+    /**
+     * Tạo mới một hóa đơn
+     */
+    public InvoiceDTO create(InvoiceDTO invoiceDTO) {
+        Invoice invoice = convertToEntity(invoiceDTO);
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+        return convertToDTO(savedInvoice);
+    }
+
+    /**
+     * Cập nhật thông tin hóa đơn
+     */
+    public InvoiceDTO update(Long id, InvoiceDTO invoiceDTO) {
+        Invoice existingInvoice = invoiceRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Invoice not found with id: " + id));
+
+        BeanUtils.copyProperties(invoiceDTO, existingInvoice, "id");
+
+        Invoice updatedInvoice = invoiceRepository.save(existingInvoice);
+        return convertToDTO(updatedInvoice);
+    }
+
+    /**
+     * Xóa một hóa đơn
+     */
+    public void delete(Long id) {
+        if (!invoiceRepository.existsById(id)) {
+            throw new RuntimeException("Invoice not found with id: " + id);
+        }
+        invoiceRepository.deleteById(id);
+    }
+
+    /**
+     * Chuyển đổi Entity sang DTO
+     */
+    private InvoiceDTO convertToDTO(Invoice invoice) {
+        InvoiceDTO invoiceDTO = new InvoiceDTO();
+        BeanUtils.copyProperties(invoice, invoiceDTO);
+        return invoiceDTO;
+    }
+
+    /**
+     * Chuyển đổi DTO sang Entity
+     */
+    private Invoice convertToEntity(InvoiceDTO invoiceDTO) {
+        Invoice invoice = new Invoice();
+        BeanUtils.copyProperties(invoiceDTO, invoice);
+        return invoice;
+    }
+}

@@ -1,0 +1,87 @@
+package dev.uit.project.service;
+
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
+import dev.uit.project.dto.OrderDetailDTO;
+import dev.uit.project.entity.OrderDetail;
+import dev.uit.project.repository.OrderDetailRepository;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class OrderDetailService {
+
+    private final OrderDetailRepository orderDetailRepository;
+
+    /**
+     * Lấy danh sách tất cả chi tiết đơn hàng
+     */
+    public List<OrderDetailDTO> list() {
+        return orderDetailRepository.findAll()
+            .stream()
+            .map(this::convertToDTO)
+            .toList();
+    }
+
+    /**
+     * Lấy thông tin chi tiết đơn hàng theo ID
+     */
+    public OrderDetailDTO get(Long id) {
+        return orderDetailRepository.findById(id)
+            .map(this::convertToDTO)
+            .orElseThrow(() -> new RuntimeException("OrderDetail not found with id: " + id));
+    }
+
+    /**
+     * Tạo mới chi tiết đơn hàng
+     */
+    public OrderDetailDTO create(OrderDetailDTO orderDetailDTO) {
+        OrderDetail orderDetail = convertToEntity(orderDetailDTO);
+        OrderDetail savedOrderDetail = orderDetailRepository.save(orderDetail);
+        return convertToDTO(savedOrderDetail);
+    }
+
+    /**
+     * Cập nhật chi tiết đơn hàng
+     */
+    public OrderDetailDTO update(Long id, OrderDetailDTO orderDetailDTO) {
+        OrderDetail existingOrderDetail = orderDetailRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("OrderDetail not found with id: " + id));
+
+        BeanUtils.copyProperties(orderDetailDTO, existingOrderDetail, "id");
+
+        OrderDetail updatedOrderDetail = orderDetailRepository.save(existingOrderDetail);
+        return convertToDTO(updatedOrderDetail);
+    }
+
+    /**
+     * Xóa chi tiết đơn hàng
+     */
+    public void delete(Long id) {
+        if (!orderDetailRepository.existsById(id)) {
+            throw new RuntimeException("OrderDetail not found with id: " + id);
+        }
+        orderDetailRepository.deleteById(id);
+    }
+
+    /**
+     * Chuyển đổi Entity sang DTO
+     */
+    private OrderDetailDTO convertToDTO(OrderDetail orderDetail) {
+        OrderDetailDTO dto = new OrderDetailDTO();
+        BeanUtils.copyProperties(orderDetail, dto);
+        return dto;
+    }
+
+    /**
+     * Chuyển đổi DTO sang Entity
+     */
+    private OrderDetail convertToEntity(OrderDetailDTO orderDetailDTO) {
+        OrderDetail orderDetail = new OrderDetail();
+        BeanUtils.copyProperties(orderDetailDTO, orderDetail);
+        return orderDetail;
+    }
+}
