@@ -47,23 +47,23 @@ select *
 insert into role (
    roleid,
    rolename
-) values ( 0,
-           N'Admin' );
-insert into role (
-   roleid,
-   rolename
 ) values ( 1,
-           N'Kế toán' );
+           N'Quản lý' );
 insert into role (
    roleid,
    rolename
 ) values ( 2,
-           N'Quản lý' );
+           N'Thủ kho' );
 insert into role (
    roleid,
    rolename
 ) values ( 3,
            N'Nhân viên bán hàng' );
+insert into role (
+   roleid,
+   rolename
+) values ( 4,
+           N'Kế toán' );
 
 -- =============================================
 -- 3. CATEGORY (8 dòng)
@@ -86,32 +86,21 @@ insert into employee (
    phone,
    passwordhash,
    status
-) values ( N'Nguyễn Giám Đốc',
-           'giamdoc.nguyen@sgf.vn',
-           '0988111222',
-           'hashed_admin',
-           1 );
-insert into employee (
-   fullname,
-   email,
-   phone,
-   passwordhash,
-   status
-) values ( N'Lê Thị Kế Toán',
-           'ketoan.le@sgf.vn',
-           '0988333444',
-           'hashed_kt',
-           1 );
-insert into employee (
-   fullname,
-   email,
-   phone,
-   passwordhash,
-   status
 ) values ( N'Phạm Văn Quản Lý',
            'quanly.pham@sgf.vn',
            '0988444555',
            'hashed_mgr',
+           1 );
+insert into employee (
+   fullname,
+   email,
+   phone,
+   passwordhash,
+   status
+) values ( N'Nguyễn Thủ Kho',
+           'thukho.nguyen@sgf.vn',
+           '0988111222',
+           'hashed_thukho',
            1 );
 insert into employee (
    fullname,
@@ -124,9 +113,18 @@ insert into employee (
            '0988555666',
            'hashed_sale',
            1 );
-
-select *
-  from employee;
+insert into employee (
+   fullname,
+   email,
+   phone,
+   passwordhash,
+   status
+) values ( N'Lê Thị Kế Toán',
+           'ketoan.le@sgf.vn',
+           '0988333444',
+           'hashed_kt',
+           1 );
+select * from employee;
 
 -- =============================================
 -- 5. EMPLOYEEROLE (4 dòng - chỉ gán cho 4 nhân viên hiện có)
@@ -135,22 +133,22 @@ insert into employeerole (
    employeeid,
    roleid
 ) values ( 1,
-           0 );
-insert into employeerole (
-   employeeid,
-   roleid
-) values ( 2,
            1 );
 insert into employeerole (
    employeeid,
    roleid
-) values ( 3,
+) values ( 2,
            2 );
 insert into employeerole (
    employeeid,
    roleid
-) values ( 4,
+) values ( 3,
            3 );
+insert into employeerole (
+   employeeid,
+   roleid
+) values ( 4,
+           4 );
 
 select *
   from employeerole;
