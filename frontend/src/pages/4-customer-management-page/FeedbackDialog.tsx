@@ -3,13 +3,14 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import type { Customer, Feedback } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { dialog, page } from "@/pages/page-classes";
 
 const MOCK_FEEDBACKS: Feedback[] = [
   {
@@ -45,26 +46,26 @@ export function FeedbackDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-white">
+      <DialogContent className={cn("sm:max-w-[600px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-blue-600">
-            Phản hồi từ: {customer.LastName}
+          <DialogTitle className={dialog.title}>
+            Phản hồi từ: {customer.FirstName} {customer.LastName}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="border rounded-md overflow-hidden">
+          <div className={page.tableWrap}>
             <Table>
               <TableBody>
                 {MOCK_FEEDBACKS.map((f) => (
-                  <TableRow key={f.FeedbackID}>
-                    <TableCell className="text-xs text-slate-500 italic w-24">
+                  <TableRow key={f.FeedbackID} className={page.tableRow}>
+                    <TableCell className="w-24 text-xs text-slate-500">
                       {f.FeedBackDate.toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm font-medium">
+                      <div className="text-sm font-medium text-slate-900">
                         Đánh giá: {f.Rating}/5
                       </div>
-                      <div className="text-sm text-slate-700">
+                      <div className="text-sm text-slate-600">
                         {f.FeedbackComment}
                       </div>
                     </TableCell>
@@ -73,19 +74,19 @@ export function FeedbackDialog({
               </TableBody>
             </Table>
           </div>
-          <div className="grid gap-2 border-t pt-4">
-            <Label className="font-bold">Ghi nhận phản hồi mới</Label>
+          <div className="grid gap-2 border-t border-slate-100 pt-4">
+            <Label className={dialog.label}>Ghi nhận phản hồi mới</Label>
             <Input
               placeholder="Nội dung phản hồi..."
-              className="focus:ring-blue-600"
+              className={dialog.input}
             />
             <div className="flex gap-2">
               <Input
                 type="number"
                 placeholder="Rating (1-5)"
-                className="w-32"
+                className={cn(dialog.input, "w-32 max-w-none")}
               />
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white flex-1">
+              <Button className={cn(dialog.submit, "flex-1")}>
                 Gửi phản hồi
               </Button>
             </div>

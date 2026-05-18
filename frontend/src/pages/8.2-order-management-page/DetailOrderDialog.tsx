@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import type { Order } from "@/lib/types";
+import { dialog } from "@/pages/page-classes";
 
 interface DetailProps {
   open: boolean;
@@ -41,9 +43,9 @@ export function DetailOrderDialog({ open, onOpenChange, order }: DetailProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[650px] bg-white border-none rounded-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[650px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-4">
+          <DialogTitle className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-4">
             Chi tiết Đơn Hàng #{order.OrderID}
           </DialogTitle>
         </DialogHeader>
@@ -132,7 +134,7 @@ export function DetailOrderDialog({ open, onOpenChange, order }: DetailProps) {
 
         <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
-            className="bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-none w-24"
+            className="bg-slate-100 hover:bg-slate-200 text-slate-700 w-24"
             onClick={() => onOpenChange(false)}
           >
             Đóng

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
 
 interface Props {
@@ -34,14 +36,14 @@ export function NewProductTypeDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Thêm loại sản phẩm mới
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="newProductTypeName">Tên loại sản phẩm</Label>
             <Input
@@ -49,18 +51,18 @@ export function NewProductTypeDialog({ open, onOpenChange }: Props) {
               name="ProductTypeName"
               value={formData.ProductTypeName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
               placeholder="Nhập tên loại sản phẩm..."
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo mới

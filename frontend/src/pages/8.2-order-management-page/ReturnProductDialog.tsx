@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { Order, ReturnPolicy } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
 
 interface ReturnProps {
   open: boolean;
@@ -85,9 +87,9 @@ export function ReturnProductDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] bg-white border-none rounded-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[550px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-4">
+          <DialogTitle className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-4">
             Yêu cầu Trả Hàng #{order?.OrderID}
           </DialogTitle>
         </DialogHeader>
@@ -107,7 +109,7 @@ export function ReturnProductDialog({
                   >
                     <TableCell className="w-[40px] py-3 text-center">
                       <Checkbox
-                        className="rounded-none border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                        className="border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                         checked={selectedProductIds.includes(item.ProductID)}
                         onCheckedChange={() =>
                           handleToggleProduct(item.ProductID)
@@ -134,12 +136,12 @@ export function ReturnProductDialog({
           <Collapsible
             open={isPolicyOpen}
             onOpenChange={setIsPolicyOpen}
-            className="border border-slate-200 mt-2 rounded-none"
+            className="border border-slate-200 mt-2"
           >
             <CollapsibleTrigger asChild>
               <Button
                 variant="ghost"
-                className="flex items-center justify-between w-full px-4 py-3 font-bold text-slate-900 text-xs bg-slate-50 rounded-none hover:bg-slate-100 text-left"
+                className="flex items-center justify-between w-full px-4 py-3 font-bold text-slate-900 text-xs bg-slate-50 hover:bg-slate-100 text-left"
               >
                 <span>CHÍNH SÁCH ĐỔI TRẢ ÁP DỤNG</span>
                 {isPolicyOpen ? (
@@ -183,13 +185,13 @@ export function ReturnProductDialog({
         <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             variant="outline"
-            className="rounded-none"
+           
             onClick={() => onOpenChange(false)}
           >
             Hủy bỏ
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={handleSubmit}
             disabled={selectedProductIds.length === 0}
           >

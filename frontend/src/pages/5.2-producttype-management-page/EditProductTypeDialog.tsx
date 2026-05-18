@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { btn, dialog } from "@/pages/page-classes";
+import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import type { ProductType } from "./ProductTypeManagementPage";
 
@@ -47,14 +49,14 @@ export function EditProductTypeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white border-none">
+      <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Cập nhật loại sản phẩm
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="ProductTypeName">Tên loại sản phẩm</Label>
             <Input
@@ -62,17 +64,17 @@ export function EditProductTypeDialog({
               name="ProductTypeName"
               value={formData.ProductTypeName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Lưu thay đổi

@@ -9,6 +9,7 @@ import {
 import { Label } from "@/components/ui/label";
 import type { Warehouse } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { dialog } from "@/pages/page-classes";
 
 interface Props {
   open: boolean;
@@ -25,14 +26,14 @@ export function DetailWarehouseDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-white border border-slate-200 rounded-none transition-none">
+      <DialogContent className={cn("sm:max-w-[500px] transition-none", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-blue-600">
             Thông tin chi tiết kho hàng
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-slate-500 text-xs">Mã kho hàng</Label>
@@ -106,7 +107,7 @@ export function DetailWarehouseDialog({
 
         <DialogFooter>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none transition-none"
+            className="bg-blue-600 hover:bg-blue-700 text-white transition-none"
             onClick={() => onOpenChange(false)}
           >
             Đóng

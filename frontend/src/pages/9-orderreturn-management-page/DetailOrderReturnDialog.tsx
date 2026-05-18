@@ -9,6 +9,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import type { OrderReturn, ReturnDetail } from "@/lib/types";
+import { dialog } from "@/pages/page-classes";
+import { cn } from "@/lib/utils";
 
 interface DetailProps {
   open: boolean;
@@ -58,9 +60,9 @@ export function DetailOrderReturnDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[500px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[500px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Chi tiết đơn hoàn trả hàng
           </DialogTitle>
         </DialogHeader>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, UserCircle2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -13,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { btn, dialog, page } from "@/pages/page-classes";
 import { toast } from "sonner";
 
 export function SignIn() {
@@ -35,13 +37,15 @@ export function SignIn() {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4">
-      <Card className="w-full max-w-[400px] shadow-2xl border-none">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold text-blue-600 tracking-tight">
+    <div className="fixed inset-0 flex items-center justify-center bg-slate-50 p-6">
+      <Card className="w-full max-w-[400px] border border-slate-200 shadow-sm">
+        <CardHeader className="space-y-1 pb-4 text-center">
+          <CardTitle className="text-2xl font-semibold tracking-tight text-blue-600">
             SGFMS
           </CardTitle>
-          <CardDescription className="text-slate-500"></CardDescription>
+          <CardDescription className={page.textMuted}>
+            Đăng nhập hệ thống quản lý
+          </CardDescription>
         </CardHeader>
 
         <form onSubmit={handleSubmit}>
@@ -56,13 +60,14 @@ export function SignIn() {
                 placeholder="Nhập mã nhân viên..."
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
+                className={dialog.input}
                 required
               />
             </div>
 
             {/* Password Input */}
             <div className="space-y-2">
-              <Label htmlFor="password" text-slate-700>
+              <Label htmlFor="password" className="text-slate-700">
                 Mật khẩu
               </Label>
               <Input
@@ -71,23 +76,22 @@ export function SignIn() {
                 placeholder="Nhập mật khẩu..."
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className={dialog.input}
                 required
               />
             </div>
-
-            <div className="flex flex-col gap-4 pb-8 mt-5">
-              <Button
-                type="submit"
-                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-              >
-                Đăng nhập ngay
-              </Button>
-
-              <div className="text-center text-sm text-slate-500">
-                Nếu bạn gặp sự cố khi đăng nhập, vui lòng liên hệ với phòng IT.
-              </div>
-            </div>
           </CardContent>
+          <CardFooter className="flex flex-col gap-3 px-6 pb-6">
+            <Button
+              type="submit"
+              className={cn(btn.primary, "h-10 w-full font-medium")}
+            >
+              Đăng nhập
+            </Button>
+            <p className="text-center text-xs text-slate-500">
+              Nếu bạn gặp sự cố khi đăng nhập, vui lòng liên hệ phòng IT.
+            </p>
+          </CardFooter>
         </form>
       </Card>
     </div>

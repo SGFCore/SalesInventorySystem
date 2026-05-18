@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
 
 interface Props {
@@ -35,14 +37,14 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white border-none max-h-[90vh] overflow-y-auto rounded-none">
+      <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Thêm nhóm khách hàng mới
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="CustomerTypeName">Tên nhóm khách hàng</Label>
             <Input
@@ -50,7 +52,7 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
               name="CustomerTypeName"
               value={formData.CustomerTypeName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600 rounded-none"
+              className={dialog.input}
             />
           </div>
 
@@ -63,7 +65,7 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
                 type="number"
                 value={formData.Discount}
                 onChange={handleChange}
-                className="border-slate-200 focus:ring-blue-600 rounded-none"
+                className={dialog.input}
               />
             </div>
             <div className="grid gap-2">
@@ -74,7 +76,7 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
                 type="number"
                 value={formData.SpendingLimit}
                 onChange={handleChange}
-                className="border-slate-200 focus:ring-blue-600 rounded-none"
+                className={dialog.input}
               />
             </div>
           </div>
@@ -86,7 +88,7 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
               name="Detail"
               value={formData.Detail}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600 rounded-none"
+              className={dialog.input}
             />
           </div>
         </div>
@@ -94,13 +96,13 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
         <DialogFooter>
           <Button
             variant="outline"
-            className="rounded-none"
+           
             onClick={() => onOpenChange(false)}
           >
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo mới

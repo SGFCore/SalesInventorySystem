@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEmp } from "@/context/empContext";
+import { btn, dialog } from "@/pages/page-classes";
 import { Plus, Trash2 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 
@@ -81,14 +83,14 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] bg-white border-none max-h-[90vh] overflow-y-auto rounded-none">
+      <DialogContent className={cn("sm:max-w-[550px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Tạo yêu cầu bổ sung mới
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="border-t border-slate-100 pt-4">
             <div className="flex items-center justify-between mb-3">
               <Label className="text-sm font-semibold text-slate-900">
@@ -99,7 +101,7 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
                 variant="outline"
                 size="sm"
                 onClick={addItemRow}
-                className="text-blue-600 border-blue-200 rounded-none flex items-center gap-1 h-8 text-xs"
+                className="text-blue-600 border-blue-200 flex items-center gap-1 h-8 text-xs"
               >
                 <Plus className="h-3.5 w-3.5" /> Thêm dòng
               </Button>
@@ -113,19 +115,19 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
                   className="flex items-end gap-2 bg-slate-50 p-2 border border-slate-100 relative"
                 >
                   <div className="grid gap-1 w-20">
-                    <Label className="text-[10px] text-slate-500">Mã SP</Label>
+                    <Label className="text-xs text-slate-500">Mã SP</Label>
                     <Input
                       type="number"
                       value={item.ProductId}
                       onChange={(e) =>
                         handleItemChange(index, "ProductId", e.target.value)
                       }
-                      className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                     />
                   </div>
 
                   <div className="grid gap-1 flex-1">
-                    <Label className="text-[10px] text-slate-500">
+                    <Label className="text-xs text-slate-500">
                       Tên sản phẩm hàng hóa
                     </Label>
                     <Input
@@ -133,12 +135,12 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
                       onChange={(e) =>
                         handleItemChange(index, "ProductName", e.target.value)
                       }
-                      className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                     />
                   </div>
 
                   <div className="grid gap-1 w-16">
-                    <Label className="text-[10px] text-slate-500">
+                    <Label className="text-xs text-slate-500">
                       Số lượng
                     </Label>
                     <Input
@@ -147,7 +149,7 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
                       onChange={(e) =>
                         handleItemChange(index, "Quantity", e.target.value)
                       }
-                      className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                     />
                   </div>
 
@@ -156,7 +158,7 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
                     variant="outline"
                     onClick={() => removeItemRow(index)}
                     disabled={items.length === 1}
-                    className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-500 rounded-none bg-white"
+                    className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-500 bg-white"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
@@ -169,13 +171,13 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
         <DialogFooter>
           <Button
             variant="outline"
-            className="rounded-none border-slate-200"
+            className="border-slate-200"
             onClick={() => onOpenChange(false)}
           >
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo mới

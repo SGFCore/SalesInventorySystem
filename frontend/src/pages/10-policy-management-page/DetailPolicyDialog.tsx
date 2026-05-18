@@ -9,6 +9,7 @@ import {
 import { Label } from "@/components/ui/label";
 import type { ReturnPolicy } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { btn, dialog } from "@/pages/page-classes";
 
 interface Props {
   open: boolean;
@@ -21,14 +22,14 @@ export function DetailPolicyDialog({ open, onOpenChange, policy }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-white border border-slate-200 rounded-none">
+      <DialogContent className={cn("sm:max-w-[500px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-blue-600">
             Thông tin chi tiết chính sách đổi trả
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-slate-500 text-xs">Mã chính sách</Label>
@@ -83,7 +84,7 @@ export function DetailPolicyDialog({ open, onOpenChange, policy }: Props) {
 
         <DialogFooter>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={() => onOpenChange(false)}
           >
             Đóng

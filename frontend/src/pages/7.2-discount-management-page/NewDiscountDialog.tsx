@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
+import { btn, dialog } from "@/pages/page-classes";
 import { MOCK_PRODUCTS } from "./DiscountManagementPage";
 
 interface NewProps {
@@ -76,9 +78,9 @@ export function NewDiscountDialog({ open, onOpenChange }: NewProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[480px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Tạo mới chương trình khuyến mãi
           </DialogTitle>
         </DialogHeader>
@@ -94,7 +96,7 @@ export function NewDiscountDialog({ open, onOpenChange }: NewProps) {
               value={discountName}
               onChange={(e) => setDiscountName(e.target.value)}
               placeholder="Nhập tên chương trình..."
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -107,7 +109,7 @@ export function NewDiscountDialog({ open, onOpenChange }: NewProps) {
               id="new-product"
               value={appliedProductID}
               onChange={(e) => setAppliedProductID(e.target.value)}
-              className="border-slate-200 focus:ring-blue-600 text-sm h-9"
+              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
             >
               {MOCK_PRODUCTS.map((prod) => (
                 <option key={prod.ProductID} value={prod.ProductID.toString()}>
@@ -129,7 +131,7 @@ export function NewDiscountDialog({ open, onOpenChange }: NewProps) {
                 value={value}
                 onChange={(e) => setValue(Number(e.target.value))}
                 placeholder="Nhập số tiền giảm..."
-                className="border-slate-200 focus:ring-blue-600"
+                className={dialog.input}
               />
             </div>
 
@@ -140,7 +142,7 @@ export function NewDiscountDialog({ open, onOpenChange }: NewProps) {
                 id="new-cust-type"
                 value={customerTypeID}
                 onChange={(e) => setCustomerTypeID(Number(e.target.value))}
-                className="border-slate-200 focus:ring-blue-600 text-sm h-9"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
               >
                 <option value={1}>Khách hàng Phổ thông</option>
                 <option value={2}>Khách hàng Thân thiết</option>
@@ -160,7 +162,7 @@ export function NewDiscountDialog({ open, onOpenChange }: NewProps) {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="border-slate-200 focus:ring-blue-600 text-slate-700"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-slate-700"
               />
             </div>
 
@@ -174,7 +176,7 @@ export function NewDiscountDialog({ open, onOpenChange }: NewProps) {
                 type="date"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
-                className="border-slate-200 focus:ring-blue-600 text-slate-700"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-slate-700"
               />
             </div>
           </div>
@@ -186,7 +188,7 @@ export function NewDiscountDialog({ open, onOpenChange }: NewProps) {
               id="new-status"
               value={status}
               onChange={(e) => setStatus(Number(e.target.value))}
-              className="border-slate-200 focus:ring-blue-600 text-sm h-9"
+              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
             >
               <option value={0}>Chờ chạy</option>
               <option value={1}>Đang chạy</option>
@@ -202,17 +204,17 @@ export function NewDiscountDialog({ open, onOpenChange }: NewProps) {
               value={detail}
               onChange={(e) => setDetail(e.target.value)}
               placeholder="Nhập ghi chú chi tiết hoặc điều kiện áp dụng..."
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo mới

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useEmp } from "@/context/empContext";
 import { cn } from "@/lib/utils";
 import { EditEmpDialog } from "@/pages/1-emp-info/EditEmpDialog";
+import { btn, entity, page } from "@/pages/page-classes";
 import { ExternalLink, Mail, Phone } from "lucide-react";
 import { useState } from "react";
 
@@ -14,13 +15,13 @@ export default function EmpInfoPage() {
 
   if (!emp)
     return (
-      <div className="p-8 text-center text-slate-500">
+      <div className="p-6 text-center text-sm text-slate-500">
         Không tìm thấy thông tin nhân viên.
       </div>
     );
 
   return (
-    <div className="container mx-auto py-8">
+    <div className={page.shell}>
       <Card className="border-none shadow-none bg-transparent">
         <CardContent className="p-0">
           {/* Container chính chia 2 cột cố định */}
@@ -34,11 +35,10 @@ export default function EmpInfoPage() {
               />
               <Badge
                 className={cn(
-                  "px-3 py-1",
+                  "px-2.5 py-0.5 text-xs font-medium",
                   emp.Status === 1
-                    ? "bg-green-500 hover:bg-green-500"
-                    : "bg-slate-400",
-                  "text-white",
+                    ? "bg-green-600 text-white hover:bg-green-600"
+                    : "bg-slate-400 text-white hover:bg-slate-400",
                 )}
               >
                 {emp.Status === 1 ? "Đang hoạt động" : "Nghỉ việc"}
@@ -50,18 +50,18 @@ export default function EmpInfoPage() {
               {/* Header: Tên & Nút sửa */}
               <div className="flex flex-col gap-1">
                 <div className="flex flex-col items-start">
-                  <div className="text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                  <div className="text-3xl font-semibold tracking-tight text-slate-900 leading-tight">
                     {emp.Fullname}
                   </div>
-                  <div className="text-slate-500 font-medium mt-0 mb-5">
-                    Mã Nhân viên:{" "}
-                    <span className="text-slate-800">{emp.EmployeeID}</span>
+                  <div className="mb-5 mt-1 text-sm text-slate-500">
+                    Mã nhân viên:{" "}
+                    <span className={entity.id}>{emp.EmployeeID}</span>
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setIsEditDialogOpen(true)}
-                    className="flex items-center gap-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+                    className={cn(btn.actionPrimary, 'flex items-center gap-2')}
                   >
                     Sửa hồ sơ <ExternalLink className="w-4 h-4" />
                   </Button>
@@ -71,8 +71,8 @@ export default function EmpInfoPage() {
               {/* Chi tiết liên hệ */}
               <div className="grid grid-cols-1 gap-5 rounded-2xl">
                 <div className="flex gap-4">
-                  <div className="p-2 bg-white rounded-full shadow-sm">
-                    <Mail className="w-5 h-5 text-blue-600" />
+                  <div className="rounded-md border border-slate-200 bg-slate-50 p-2">
+                    <Mail className="h-4 w-4 text-blue-600" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs text-slate-500 w-full text-left">
@@ -88,8 +88,8 @@ export default function EmpInfoPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="p-2 bg-white rounded-full shadow-sm">
-                    <Phone className="w-5 h-5 text-blue-600" />
+                  <div className="rounded-md border border-slate-200 bg-slate-50 p-2">
+                    <Phone className="h-4 w-4 text-blue-600" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs text-slate-500  w-full text-left">

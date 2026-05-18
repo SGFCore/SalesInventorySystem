@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { btn, dialog } from "@/pages/page-classes";
 
 interface NewProps {
   open: boolean;
@@ -58,14 +60,14 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Tạo mới sản phẩm
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="new-productName">
               Tên sản phẩm <span className="text-red-500">*</span>
@@ -76,7 +78,7 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
               value={formData.productName}
               onChange={handleChange}
               placeholder="Nhập tên sản phẩm..."
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -88,7 +90,7 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
               type="number"
               value={formData.productPrice}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -102,7 +104,7 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
               value={formData.categoryName}
               onChange={handleChange}
               placeholder="Ví dụ: Thiết bị điện tử"
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -114,7 +116,7 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
               value={formData.productTypeName}
               onChange={handleChange}
               placeholder="Ví dụ: Hàng cao cấp"
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -126,7 +128,7 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
               value={formData.detail}
               onChange={handleChange}
               placeholder="Mô tả thông số hoặc đặc tính..."
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -148,11 +150,11 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo mới

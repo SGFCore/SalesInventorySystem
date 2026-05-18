@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { btn, dialog } from "@/pages/page-classes";
 
 interface NewProps {
   open: boolean;
@@ -52,14 +54,14 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[450px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Thêm đối tác vận chuyển mới
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="new-shipCompanyName">
               Tên công ty <span className="text-red-500">*</span>
@@ -70,7 +72,7 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               placeholder="Nhập tên đối tác vận chuyển..."
               value={formData.shipCompanyName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -82,7 +84,7 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               placeholder="Ví dụ: Toàn quốc, Miền Nam..."
               value={formData.supportedRegion}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -97,7 +99,7 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               placeholder="example@domain.com"
               value={formData.email}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -111,7 +113,7 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               placeholder="Nhập số điện thoại liên hệ..."
               value={formData.phone}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -123,7 +125,7 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               placeholder="Số nhà, tên đường, quận/huyện..."
               value={formData.address}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -135,17 +137,17 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               placeholder="Nhập thông tin lưu ý thêm nếu có..."
               value={formData.notes}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo mới

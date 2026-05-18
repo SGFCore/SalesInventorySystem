@@ -5,6 +5,7 @@ import type { Category } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { EditCatDialog } from "@/pages/5.1-category-management-page/EditCatDialog";
 import { NewCatDialog } from "@/pages/5.1-category-management-page/NewCatDialog";
+import { page, input, btn, entity } from "@/pages/page-classes";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -71,36 +72,36 @@ export default function CatManagementPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-white min-h-screen">
+    <div className={page.shell}>
       <div ref={topRef} />
 
-      <div className="flex items-center justify-between mb-6">
+      <div className={page.header}>
         <Input
           placeholder="Tìm kiếm danh mục..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm border-slate-200 focus:ring-blue-600"
+          className={input.search}
         />
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className={btn.primary}
           onClick={() => setIsNewOpen(true)}
         >
           Thêm danh mục mới
         </Button>
       </div>
 
-      <div className="border border-slate-200 rounded-lg overflow-hidden">
+      <div className={page.tableWrap}>
         <Table>
           <TableBody>
             {paginatedCategories.map((c) => (
               <TableRow
                 key={c.CategoryID}
-                className="hover:bg-slate-50/50 border-b border-slate-100"
+                className={page.tableRow}
               >
-                <TableCell className="w-20 font-medium text-slate-500">
+                <TableCell className={cn("w-20", entity.id)}>
                   {c.CategoryID}
                 </TableCell>
-                <TableCell className="font-semibold text-left">
+                <TableCell className={cn("text-left", entity.name)}>
                   {c.CategoryName}
                 </TableCell>
                 <TableCell>
@@ -108,7 +109,7 @@ export default function CatManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200"
+                      className={btn.actionPrimary}
                       onClick={() => openAction(c, "edit")}
                     >
                       Cập nhật
@@ -116,7 +117,7 @@ export default function CatManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      className={btn.actionDestructive}
                       onClick={() => openAction(c, "delete")}
                     >
                       Xóa
@@ -129,8 +130,8 @@ export default function CatManagementPage() {
         </Table>
 
         {/* Bộ điều khiển Phân trang */}
-        <div className="flex items-center justify-between px-4 py-4 bg-white border-t border-slate-100">
-          <div className="text-sm text-slate-500">
+        <div className={page.pagination}>
+          <div className={page.paginationText}>
             Hiển thị{" "}
             <span className="font-medium">{paginatedCategories.length}</span>{" "}
             trên <span className="font-medium">{filtered.length}</span> danh mục
@@ -142,28 +143,22 @@ export default function CatManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0"
+              className={btn.paginationNav}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
+                (pageNum) => (
                   <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className={cn(
-                      "h-8 w-8 p-0 transition-none",
-                      currentPage === page
-                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
-                        : "text-slate-600 border-slate-200",
-                    )}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
                   >
-                    {page}
-                  </Button>
+                    {pageNum}</Button>
                 ),
               )}
             </div>
@@ -175,7 +170,7 @@ export default function CatManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0"
+              className={btn.paginationNav}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

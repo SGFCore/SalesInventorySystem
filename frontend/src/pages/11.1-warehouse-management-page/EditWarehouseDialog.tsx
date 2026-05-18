@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trash2, Plus } from "lucide-react";
 import type { Warehouse } from "@/lib/types";
+import { dialog } from "@/pages/page-classes";
+import { cn } from "@/lib/utils";
 
 // Khai báo type định mức tồn kho cho từng sản phẩm trong kho này
 export type DetailInventory = {
@@ -128,9 +130,9 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[550px] bg-white border border-slate-200 rounded-none max-h-[90vh] overflow-y-auto transition-none">
+      <DialogContent className={cn("sm:max-w-[550px] transition-none", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Cập nhật thông tin kho hàng
           </DialogTitle>
         </DialogHeader>
@@ -145,7 +147,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
               onChange={(e) =>
                 setForm({ ...form, WareHouseName: e.target.value })
               }
-              className="focus:ring-blue-600 rounded-none border-slate-200 h-9"
+              className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 h-9"
             />
           </div>
 
@@ -156,7 +158,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
               id="edit-address"
               value={form.Address || ""}
               onChange={(e) => setForm({ ...form, Address: e.target.value })}
-              className="focus:ring-blue-600 rounded-none border-slate-200 h-9"
+              className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 h-9"
             />
           </div>
 
@@ -170,7 +172,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
                 onChange={(e) =>
                   setForm({ ...form, ContactNumber: e.target.value })
                 }
-                className="focus:ring-blue-600 rounded-none border-slate-200 h-9"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 h-9"
               />
             </div>
             <div className="grid gap-1">
@@ -182,7 +184,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
                 onChange={(e) =>
                   setForm({ ...form, ManagerID: Number(e.target.value) })
                 }
-                className="focus:ring-blue-600 rounded-none border-slate-200 h-9"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 h-9"
               />
             </div>
           </div>
@@ -198,7 +200,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
                 onChange={(e) =>
                   setForm({ ...form, Capacity: Number(e.target.value) })
                 }
-                className="focus:ring-blue-600 rounded-none border-slate-200 h-9"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 h-9"
               />
             </div>
             <div className="grid gap-1">
@@ -209,7 +211,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
                 onChange={(e) =>
                   setForm({ ...form, WarehouseType: Number(e.target.value) })
                 }
-                className="flex h-9 w-full rounded-none border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="flex h-9 w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
               >
                 <option value={1}>Kho tổng</option>
                 <option value={2}>Kho phân phối</option>
@@ -226,7 +228,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
               onChange={(e) =>
                 setForm({ ...form, Status: Number(e.target.value) })
               }
-              className="flex h-9 w-full rounded-none border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="flex h-9 w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
             >
               <option value={1}>Đang hoạt động</option>
               <option value={0}>Tạm dừng</option>
@@ -258,7 +260,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
                             Number(e.target.value),
                           )
                         }
-                        className="flex h-8 w-full rounded-none border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        className="flex h-8 w-full border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
                       >
                         {MOCK_PRODUCTS_LIST.map((prod) => (
                           <option key={prod.ProductID} value={prod.ProductID}>
@@ -281,7 +283,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
                             e.target.value,
                           )
                         }
-                        className="rounded-none border-slate-200 h-8 text-xs focus:ring-blue-600"
+                        className="border-slate-200 h-8 text-xs focus-visible:ring-blue-600 focus-visible:ring-offset-0"
                       />
                     </div>
 
@@ -291,7 +293,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
                       size="sm"
                       disabled={inventoryProducts.length === 1}
                       onClick={() => handleRemoveProduct(index)}
-                      className="text-red-500 hover:bg-red-50 rounded-none border-slate-200 h-8 w-8 p-0 flex items-center justify-center disabled:opacity-40 transition-none"
+                      className="text-red-500 hover:bg-red-50 border-slate-200 h-8 w-8 p-0 flex items-center justify-center disabled:opacity-40 transition-none"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
@@ -315,7 +317,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
                             Number(e.target.value),
                           )
                         }
-                        className="rounded-none border-slate-200 h-7 text-xs focus:ring-blue-600"
+                        className="border-slate-200 h-7 text-xs focus-visible:ring-blue-600 focus-visible:ring-offset-0"
                       />
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -334,7 +336,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
                             Number(e.target.value),
                           )
                         }
-                        className="rounded-none border-slate-200 h-7 text-xs focus:ring-blue-600"
+                        className="border-slate-200 h-7 text-xs focus-visible:ring-blue-600 focus-visible:ring-offset-0"
                       />
                     </div>
                   </div>
@@ -347,7 +349,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
               variant="outline"
               size="sm"
               onClick={handleAddProduct}
-              className="text-blue-600 border-blue-200 hover:bg-blue-50 rounded-none mt-3 w-full flex items-center justify-center gap-1 h-8 transition-none"
+              className="text-blue-600 border-blue-200 hover:bg-blue-50 mt-3 w-full flex items-center justify-center gap-1 h-8 transition-none"
             >
               <Plus className="h-4 w-4" /> Thêm định mức sản phẩm vào kho
             </Button>
@@ -357,13 +359,13 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse }: Props) {
         <DialogFooter>
           <Button
             variant="outline"
-            className="rounded-none border-slate-200 transition-none"
+            className="border-slate-200 transition-none"
             onClick={() => onOpenChange(false)}
           >
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none transition-none"
+            className="bg-blue-600 hover:bg-blue-700 text-white transition-none"
             onClick={handleSubmit}
           >
             Lưu thay đổi

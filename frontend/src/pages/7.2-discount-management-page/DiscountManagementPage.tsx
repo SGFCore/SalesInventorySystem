@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { DetailDiscountDialog } from "@/pages/7.2-discount-management-page/DetailDiscountDialog";
 import { EditDiscountDialog } from "@/pages/7.2-discount-management-page/EditDiscountDialog";
 import { NewDiscountDialog } from "@/pages/7.2-discount-management-page/NewDiscountDialog";
+import { page, btn, entity, input } from "@/pages/page-classes";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -110,21 +111,21 @@ export default function DiscountManagementPage() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-white min-h-screen">
+    <div className={page.shell}>
       <div ref={topRef} />
 
       {/* Header Controls */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex w-full max-w-sm items-center space-x-2">
+      <div className={page.header}>
+        <div className={page.searchWrap}>
           <Input
             placeholder="Tìm kiếm theo tên khuyến mãi..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border-slate-200 focus:ring-blue-600"
+            className={input.search}
           />
         </div>
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className={btn.primary}
           onClick={() => setIsNewOpen(true)}
         >
           Thêm khuyến mãi mới
@@ -132,7 +133,7 @@ export default function DiscountManagementPage() {
       </div>
 
       {/* Discount Table */}
-      <div className="border border-slate-200 rounded-lg overflow-hidden">
+      <div className={page.tableWrap}>
         <Table>
           <TableBody>
             {paginatedDiscounts.map((discount) => {
@@ -143,7 +144,7 @@ export default function DiscountManagementPage() {
               return (
                 <TableRow
                   key={discount.DiscountID}
-                  className="hover:bg-slate-50/50 border-b border-slate-100"
+                  className={page.tableRow}
                 >
                   {/* Thông tin chung (Mã & Tên) */}
                   <TableCell>
@@ -167,10 +168,10 @@ export default function DiscountManagementPage() {
                   {/* Giá trị giảm giá */}
                   <TableCell>
                     <div className="flex flex-col items-start text-sm">
-                      <span className="font-medium text-xs text-slate-500">
+                      <span className={entity.cellMeta}>
                         Mức giảm giá
                       </span>
-                      <span className="font-semibold text-blue-600 mt-0.5">
+                      <span className={cn(entity.price, 'mt-0.5')}>
                         {discount.Value.toLocaleString("vi-VN")} đ
                       </span>
                     </div>
@@ -192,7 +193,7 @@ export default function DiscountManagementPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-slate-600 hover:bg-slate-100 w-full"
+                        className={cn(btn.actionSecondary, "w-full")}
                         onClick={() => handleDetailClick(discount)}
                       >
                         Xem chi tiết
@@ -200,7 +201,7 @@ export default function DiscountManagementPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-blue-600 border-blue-100 hover:bg-blue-50 w-full"
+                        className="text-blue-600 border-blue-200 hover:bg-blue-50 w-full"
                         onClick={() => handleEditClick(discount)}
                       >
                         Cập nhật
@@ -214,8 +215,8 @@ export default function DiscountManagementPage() {
         </Table>
 
         {/* Bộ điều khiển Phân trang */}
-        <div className="flex items-center justify-between px-4 py-4">
-          <div className="text-sm text-slate-500">
+        <div className={page.pagination}>
+          <div className={page.paginationText}>
             Hiển thị{" "}
             <span className="font-medium">{paginatedDiscounts.length}</span>{" "}
             trên <span className="font-medium">{filteredDiscounts.length}</span>{" "}
@@ -227,26 +228,22 @@ export default function DiscountManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0"
+              className={btn.paginationNav}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
+                (pageNum) => (
                   <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className={cn(
-                      "h-8 w-8 p-0 text-white",
-                      currentPage === page ? "bg-blue-600" : "text-slate-600",
-                    )}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
                   >
-                    {page}
-                  </Button>
+                    {pageNum}</Button>
                 ),
               )}
             </div>
@@ -258,7 +255,7 @@ export default function DiscountManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0"
+              className={btn.paginationNav}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

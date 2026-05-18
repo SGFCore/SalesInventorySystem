@@ -10,8 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox"; // Đảm bảo bạn đã cài đặt shadcn checkbox
 import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 
 import { ROLES } from "@/data/roles";
+import { btn, dialog } from "@/pages/page-classes";
 
 interface Props {
   open: boolean;
@@ -53,14 +55,14 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
-            Cập nhật nhân viên
+          <DialogTitle className={dialog.title}>
+            Thêm nhân viên mới
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           {/* ... Các trường Input cũ giữ nguyên ... */}
           <div className="grid gap-2">
             <Label htmlFor="fullname">Họ và tên</Label>
@@ -69,7 +71,7 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
               name="fullname"
               value={formData.fullname}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -80,7 +82,7 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -89,7 +91,7 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
             <Label className="text-slate-900 font-semibold">
               Phân quyền <span className="text-red-500">*</span>
             </Label>
-            <div className="grid grid-cols-2 gap-4 border p-3 rounded-md border-slate-100">
+            <div className="grid grid-cols-2 gap-3 rounded-md border border-slate-200 bg-slate-50/50 p-3">
               {ROLES.map((role) => (
                 <div key={role.RoleID} className="flex items-center space-x-2">
                   <Checkbox
@@ -117,13 +119,14 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            className={dialog.cancel}
+            onClick={() => onOpenChange(false)}
+          >
             Hủy
           </Button>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={handleSubmit}
-          >
+          <Button className={dialog.submit} onClick={handleSubmit}>
             Tạo mới
           </Button>
         </DialogFooter>

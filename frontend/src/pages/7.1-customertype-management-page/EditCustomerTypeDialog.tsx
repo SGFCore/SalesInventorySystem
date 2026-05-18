@@ -9,6 +9,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { CustomerType } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -39,9 +41,9 @@ export function EditCustomerTypeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px] bg-white rounded-none border border-slate-200">
+      <DialogContent className={cn("sm:max-w-[450px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Cập nhật thông tin nhóm
           </DialogTitle>
         </DialogHeader>
@@ -56,7 +58,7 @@ export function EditCustomerTypeDialog({
               onChange={(e) =>
                 setForm({ ...form, CustomerTypeName: e.target.value })
               }
-              className="focus:ring-blue-600 rounded-none border-slate-200"
+              className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
             />
           </div>
 
@@ -72,7 +74,7 @@ export function EditCustomerTypeDialog({
                 onChange={(e) =>
                   setForm({ ...form, Discount: Number(e.target.value) })
                 }
-                className="focus:ring-blue-600 rounded-none border-slate-200"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
               />
             </div>
 
@@ -86,7 +88,7 @@ export function EditCustomerTypeDialog({
                 onChange={(e) =>
                   setForm({ ...form, SpendingLimit: Number(e.target.value) })
                 }
-                className="focus:ring-blue-600 rounded-none border-slate-200"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
               />
             </div>
           </div>
@@ -98,7 +100,7 @@ export function EditCustomerTypeDialog({
               id="edit-detail"
               value={form.Detail || ""}
               onChange={(e) => setForm({ ...form, Detail: e.target.value })}
-              className="focus:ring-blue-600 rounded-none border-slate-200"
+              className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
             />
           </div>
         </div>
@@ -106,13 +108,13 @@ export function EditCustomerTypeDialog({
         <DialogFooter>
           <Button
             variant="outline"
-            className="rounded-none border-slate-200"
+            className="border-slate-200"
             onClick={() => onOpenChange(false)}
           >
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Lưu thay đổi

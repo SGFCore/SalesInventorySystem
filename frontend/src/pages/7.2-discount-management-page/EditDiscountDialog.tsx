@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import type { Discount } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
 import { MOCK_PRODUCTS } from "./DiscountManagementPage";
 
 interface EditProps {
@@ -88,9 +90,9 @@ export function EditDiscountDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[480px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Cập nhật chương trình khuyến mãi
           </DialogTitle>
         </DialogHeader>
@@ -106,7 +108,7 @@ export function EditDiscountDialog({
               value={discountName}
               onChange={(e) => setDiscountName(e.target.value)}
               placeholder="Nhập tên chương trình..."
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -119,7 +121,7 @@ export function EditDiscountDialog({
               id="edit-product"
               value={appliedProductID}
               onChange={(e) => setAppliedProductID(e.target.value)}
-              className="border-slate-200 focus:ring-blue-600 text-sm h-9"
+              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
             >
               {MOCK_PRODUCTS.map((prod) => (
                 <option key={prod.ProductID} value={prod.ProductID.toString()}>
@@ -141,7 +143,7 @@ export function EditDiscountDialog({
                 value={value}
                 onChange={(e) => setValue(Number(e.target.value))}
                 placeholder="Nhập số tiền giảm..."
-                className="border-slate-200 focus:ring-blue-600"
+                className={dialog.input}
               />
             </div>
 
@@ -152,7 +154,7 @@ export function EditDiscountDialog({
                 id="edit-cust-type"
                 value={customerTypeID}
                 onChange={(e) => setCustomerTypeID(Number(e.target.value))}
-                className="border-slate-200 focus:ring-blue-600 text-sm h-9"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
               >
                 <option value={1}>Khách hàng Phổ thông</option>
                 <option value={2}>Khách hàng Thân thiết</option>
@@ -172,7 +174,7 @@ export function EditDiscountDialog({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="border-slate-200 focus:ring-blue-600 text-slate-700"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-slate-700"
               />
             </div>
 
@@ -186,7 +188,7 @@ export function EditDiscountDialog({
                 type="date"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
-                className="border-slate-200 focus:ring-blue-600 text-slate-700"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-slate-700"
               />
             </div>
           </div>
@@ -198,7 +200,7 @@ export function EditDiscountDialog({
               id="edit-status"
               value={status}
               onChange={(e) => setStatus(Number(e.target.value))}
-              className="border-slate-200 focus:ring-blue-600 text-sm h-9"
+              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
             >
               <option value={0}>Chờ chạy</option>
               <option value={1}>Đang chạy</option>
@@ -214,17 +216,17 @@ export function EditDiscountDialog({
               value={detail}
               onChange={(e) => setDetail(e.target.value)}
               placeholder="Nhập ghi chú chi tiết hoặc điều kiện áp dụng..."
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Lưu thay đổi

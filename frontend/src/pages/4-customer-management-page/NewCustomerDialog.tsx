@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
 
 interface Props {
@@ -38,14 +40,14 @@ export function NewCustomerDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Thêm khách hàng mới
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="FirstName">Họ</Label>
@@ -54,7 +56,7 @@ export function NewCustomerDialog({ open, onOpenChange }: Props) {
                 name="FirstName"
                 value={formData.FirstName}
                 onChange={handleChange}
-                className="border-slate-200 focus:ring-blue-600"
+                className={dialog.input}
               />
             </div>
             <div className="grid gap-2">
@@ -64,7 +66,7 @@ export function NewCustomerDialog({ open, onOpenChange }: Props) {
                 name="LastName"
                 value={formData.LastName}
                 onChange={handleChange}
-                className="border-slate-200 focus:ring-blue-600"
+                className={dialog.input}
               />
             </div>
           </div>
@@ -76,7 +78,7 @@ export function NewCustomerDialog({ open, onOpenChange }: Props) {
               name="CustomerTypeID"
               value={formData.CustomerTypeID}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -87,7 +89,7 @@ export function NewCustomerDialog({ open, onOpenChange }: Props) {
               name="CompanyName"
               value={formData.CompanyName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -98,7 +100,7 @@ export function NewCustomerDialog({ open, onOpenChange }: Props) {
               name="Phone"
               value={formData.Phone}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -109,7 +111,7 @@ export function NewCustomerDialog({ open, onOpenChange }: Props) {
               name="Email"
               value={formData.Email}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -120,17 +122,17 @@ export function NewCustomerDialog({ open, onOpenChange }: Props) {
               name="Address"
               value={formData.Address}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo mới

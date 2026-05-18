@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,6 +14,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { Trash2, Plus, Search, UserPlus } from "lucide-react";
 import { NewCustomerDialog } from "@/pages/4-customer-management-page/NewCustomerDialog";
 import type { Customer } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
 
 interface NewProps {
   open: boolean;
@@ -132,9 +134,9 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[600px] bg-white border-none rounded-none max-h-[90vh] overflow-y-auto">
+        <DialogContent className={cn("sm:max-w-[600px]", dialog.content)}>
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-4">
+            <DialogTitle className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-4">
               Tạo mới Hóa đơn
             </DialogTitle>
           </DialogHeader>
@@ -159,11 +161,11 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                       placeholder="Nhập SĐT..."
                       value={phoneSearch}
                       onChange={(e) => setPhoneSearch(e.target.value)}
-                      className="border-slate-200 focus:ring-blue-600 rounded-none h-9"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
                     />
                     <Button
                       variant="outline"
-                      className="border-blue-200 text-blue-600 hover:bg-blue-50 rounded-none h-9 px-3"
+                      className="border-blue-200 text-blue-600 hover:bg-blue-50 h-9 px-3"
                       onClick={handleSearchCustomer}
                     >
                       <Search className="h-4 w-4" />
@@ -172,7 +174,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                 </div>
                 <Button
                   variant="default"
-                  className="text-indigo-600 border-indigo-200 hover:bg-indigo-50 rounded-none h-9"
+                  className="text-indigo-600 border-indigo-200 hover:bg-indigo-50 h-9"
                   onClick={() => setIsNewCustomerOpen(true)}
                 >
                   Tạo mới
@@ -213,7 +215,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                         SaleChannelCode: e.target.value,
                       })
                     }
-                    className="border-slate-200 focus:ring-blue-600 text-sm h-9 rounded-none"
+                    className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
                   >
                     <option value="0">Tại quầy</option>
                     <option value="1">Mạng xã hội / Online</option>
@@ -226,7 +228,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                     onChange={(e) =>
                       setInvoiceData({ ...invoiceData, Status: e.target.value })
                     }
-                    className="border-slate-200 focus:ring-blue-600 text-sm h-9 rounded-none"
+                    className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
                   >
                     <option value="0">Chờ thanh toán</option>
                     <option value="1">Đã thanh toán</option>
@@ -255,7 +257,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                           ),
                         )
                       }
-                      className="border-slate-200 focus:ring-blue-600 text-sm h-9 flex-1 rounded-none"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 flex-1"
                     >
                       {MOCK_PRODUCTS.map((prod) => (
                         <option key={prod.ProductID} value={prod.ProductID}>
@@ -276,14 +278,14 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                           ),
                         )
                       }
-                      className="border-slate-200 focus:ring-blue-600 h-9 w-20 rounded-none"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 w-20"
                     />
                     <Button
                       variant="outline"
                       size="sm"
                       disabled={selectedProducts.length === 1}
                       onClick={() => handleRemoveProduct(index)}
-                      className="text-red-500 border-slate-200 h-9 w-9 p-0 flex items-center justify-center rounded-none"
+                      className="text-red-500 border-slate-200 h-9 w-9 p-0 flex items-center justify-center"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -293,7 +295,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                   variant="outline"
                   size="sm"
                   onClick={handleAddProduct}
-                  className="text-slate-600 border-dashed border-slate-300 mt-2 rounded-none h-8 w-full"
+                  className="text-slate-600 border-dashed border-slate-300 mt-2 h-8 w-full"
                 >
                   <Plus className="h-4 w-4 mr-1" /> Thêm sản phẩm
                 </Button>
@@ -319,7 +321,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                           ),
                         )
                       }
-                      className="border-slate-200 focus:ring-blue-600 text-sm h-9 flex-1 rounded-none"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 flex-1"
                     >
                       {MOCK_PROMOTIONS.map((promo) => (
                         <option key={promo.PromoID} value={promo.PromoID}>
@@ -331,7 +333,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => handleRemovePromotion(index)}
-                      className="text-red-500 border-slate-200 h-9 w-9 p-0 flex items-center justify-center rounded-none"
+                      className="text-red-500 border-slate-200 h-9 w-9 p-0 flex items-center justify-center"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -341,7 +343,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                   variant="outline"
                   size="sm"
                   onClick={handleAddPromotion}
-                  className="text-slate-600 border-dashed border-slate-300 mt-1 rounded-none h-8 w-full"
+                  className="text-slate-600 border-dashed border-slate-300 mt-1 h-8 w-full"
                 >
                   <Plus className="h-4 w-4 mr-1" /> Thêm mã khuyến mãi
                 </Button>
@@ -352,13 +354,13 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
           <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
             <Button
               variant="outline"
-              className="rounded-none"
+             
               onClick={() => onOpenChange(false)}
             >
               Hủy
             </Button>
             <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+              className={btn.primary}
               onClick={handleSubmit}
             >
               Tạo Hóa Đơn

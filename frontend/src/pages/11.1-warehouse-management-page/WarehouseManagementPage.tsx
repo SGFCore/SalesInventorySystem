@@ -15,6 +15,7 @@ import { DetailWarehouseDialog } from "@/pages/11.1-warehouse-management-page/De
 import { EditWarehouseDialog } from "@/pages/11.1-warehouse-management-page/EditWarehouseDialog";
 import { ReportWarehouseDialog } from "@/pages/11.1-warehouse-management-page/ReportWarehouseDialog";
 import { NewWarehouseDialog } from "@/pages/11.1-warehouse-management-page/NewWarehouseDialog";
+import { page, input, btn } from "@/pages/page-classes";
 
 // Mock dữ liệu 25 kho hàng mẫu phục vụ hiển thị prototype
 const MOCK_WAREHOUSES: Warehouse[] = Array.from({ length: 25 }, (_, i) => ({
@@ -85,18 +86,18 @@ export default function WarehouseManagementPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-white min-h-screen">
+    <div className={page.shell}>
       <div ref={topRef} />
 
-      <div className="flex items-center justify-between mb-6">
+      <div className={page.header}>
         <Input
           placeholder="Tìm kiếm kho hàng..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm border-slate-200 focus:ring-blue-600 rounded-none"
+          className={input.search}
         />
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+          className={btn.primary}
           onClick={() => setIsNewOpen(true)}
         >
           Thêm kho hàng mới
@@ -109,7 +110,7 @@ export default function WarehouseManagementPage() {
             {paginatedWarehouses.map((w) => (
               <TableRow
                 key={w.WareHouseID}
-                className="hover:bg-slate-50/50 border-b border-slate-100 transition-none"
+                className="hover:bg-slate-50 border-b border-slate-100 transition-none"
               >
                 {/* Mã kho hàng */}
                 <TableCell className="w-16 font-medium text-slate-500">
@@ -154,22 +155,22 @@ export default function WarehouseManagementPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="bg-white rounded-none border border-slate-200 min-w-[140px]"
+                      className="bg-white border border-slate-200 min-w-[140px]"
                     >
                       <DropdownMenuItem
-                        className="text-slate-700 hover:bg-slate-100 rounded-none cursor-pointer text-xs py-2"
+                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2"
                         onClick={() => openAction(w, "detail")}
                       >
                         Xem chi tiết
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-slate-700 hover:bg-slate-100 rounded-none cursor-pointer text-xs py-2"
+                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2"
                         onClick={() => openAction(w, "edit")}
                       >
                         Cập nhật
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-slate-700 hover:bg-slate-100 rounded-none cursor-pointer text-xs py-2"
+                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2"
                         onClick={() => openAction(w, "report")}
                       >
                         Báo cáo thiếu hụt
@@ -183,8 +184,8 @@ export default function WarehouseManagementPage() {
         </Table>
 
         {/* Thanh phân trang dữ liệu */}
-        <div className="flex items-center justify-between px-4 py-4 bg-white border-t border-slate-100">
-          <div className="text-sm text-slate-500">
+        <div className={page.pagination}>
+          <div className={page.paginationText}>
             Hiển thị{" "}
             <span className="font-medium">{paginatedWarehouses.length}</span>{" "}
             trên <span className="font-medium">{filtered.length}</span> kho hàng
@@ -196,28 +197,22 @@ export default function WarehouseManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 rounded-none transition-none"
+              className="h-8 w-8 p-0 transition-none"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
+                (pageNum) => (
                   <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className={cn(
-                      "h-8 w-8 p-0 rounded-none transition-none",
-                      currentPage === page
-                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
-                        : "text-slate-600 border-slate-200",
-                    )}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
                   >
-                    {page}
-                  </Button>
+                    {pageNum}</Button>
                 ),
               )}
             </div>
@@ -229,7 +224,7 @@ export default function WarehouseManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0 rounded-none transition-none"
+              className="h-8 w-8 p-0 transition-none"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

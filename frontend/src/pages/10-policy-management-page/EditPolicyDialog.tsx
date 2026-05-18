@@ -9,6 +9,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { ReturnPolicy } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -42,9 +44,9 @@ export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px] bg-white rounded-none border border-slate-200">
+      <DialogContent className={cn("sm:max-w-[450px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Cập nhật thông tin chính sách
           </DialogTitle>
         </DialogHeader>
@@ -56,7 +58,7 @@ export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
               id="edit-policyName"
               value={form.PolicyName || ""}
               onChange={(e) => setForm({ ...form, PolicyName: e.target.value })}
-              className="focus:ring-blue-600 rounded-none border-slate-200"
+              className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
             />
           </div>
 
@@ -70,7 +72,7 @@ export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
                 onChange={(e) =>
                   setForm({ ...form, MaxReturnDays: Number(e.target.value) })
                 }
-                className="focus:ring-blue-600 rounded-none border-slate-200"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
               />
             </div>
 
@@ -83,7 +85,7 @@ export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
                 onChange={(e) =>
                   setForm({ ...form, PenaltyFeeRate: Number(e.target.value) })
                 }
-                className="focus:ring-blue-600 rounded-none border-slate-200"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
               />
             </div>
           </div>
@@ -96,7 +98,7 @@ export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
                 type="date"
                 value={dateString}
                 onChange={(e) => setDateString(e.target.value)}
-                className="focus:ring-blue-600 rounded-none border-slate-200 px-3"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 px-3"
               />
             </div>
 
@@ -108,7 +110,7 @@ export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
                 onChange={(e) =>
                   setForm({ ...form, IsActive: Number(e.target.value) })
                 }
-                className="flex h-10 w-full rounded-none border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="flex h-10 w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
               >
                 <option value={1}>Đang hoạt động</option>
                 <option value={0}>Tạm dừng</option>
@@ -120,13 +122,13 @@ export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
         <DialogFooter>
           <Button
             variant="outline"
-            className="rounded-none border-slate-200"
+            className="border-slate-200"
             onClick={() => onOpenChange(false)}
           >
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Lưu thay đổi

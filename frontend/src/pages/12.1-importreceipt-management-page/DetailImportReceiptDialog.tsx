@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import type { ImportReceipt } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { MOCK_RECEIPT_DETAILS } from "@/pages/12.1-importreceipt-management-page/ImportReceiptManagementPage";
+import { btn, dialog } from "@/pages/page-classes";
 import { useState, useEffect } from "react";
 
 interface Props {
@@ -49,7 +50,7 @@ export function DetailImportReceiptDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px] bg-white border border-slate-200 rounded-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[550px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-blue-600">
             {mode === "approve"
@@ -192,7 +193,7 @@ export function DetailImportReceiptDialog({
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Nhập lý do từ chối phê duyệt phiếu nhập kho..."
-                className="flex min-h-[70px] w-full rounded-none border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none"
+                className="flex min-h-[70px] w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 resize-none"
               />
             </div>
           )}
@@ -203,13 +204,13 @@ export function DetailImportReceiptDialog({
             <>
               <Button
                 variant="outline"
-                className="rounded-none border-red-200 text-red-600 hover:bg-red-50"
+                className="border-red-200 text-red-600 hover:bg-red-50"
                 onClick={() => handleApprove(false)}
               >
                 Từ chối
               </Button>
               <Button
-                className="bg-green-600 hover:bg-green-700 text-white rounded-none"
+                className="bg-green-600 hover:bg-green-700 text-white"
                 onClick={() => handleApprove(true)}
               >
                 Phê duyệt
@@ -217,7 +218,7 @@ export function DetailImportReceiptDialog({
             </>
           ) : (
             <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+              className={btn.primary}
               onClick={() => onOpenChange(false)}
             >
               Đóng

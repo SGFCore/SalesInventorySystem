@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { CountSheet, CountSheetDetail } from "@/lib/types";
 import { MOCK_COUNTSHEET_DETAILS } from "@/pages/15-countsheet-management-page/CountsheetManagementPage";
+import { dialog } from "@/pages/page-classes";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -100,9 +102,9 @@ export function EditCountsheetDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[620px] bg-white border border-slate-200 rounded-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[620px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Cập nhật nội dung kiểm kê phiếu #{countsheet.CountSheetId}
           </DialogTitle>
         </DialogHeader>
@@ -117,7 +119,7 @@ export function EditCountsheetDialog({
               variant="outline"
               size="sm"
               onClick={handleAddRow}
-              className="text-blue-600 border-blue-200 rounded-none flex items-center gap-1 h-8 text-xs"
+              className="text-blue-600 border-blue-200 flex items-center gap-1 h-8 text-xs"
             >
               <Plus className="h-3.5 w-3.5" /> Thêm hàng hóa
             </Button>
@@ -132,7 +134,7 @@ export function EditCountsheetDialog({
               >
                 {/* WarehouseID Input */}
                 <div className="grid gap-1 w-16">
-                  <Label className="text-[10px] text-slate-500 font-medium">
+                  <Label className="text-xs text-slate-500 font-medium">
                     Mã Kho
                   </Label>
                   <Input
@@ -141,13 +143,13 @@ export function EditCountsheetDialog({
                     onChange={(e) =>
                       handleRowChange(index, "WarehouseID", e.target.value)
                     }
-                    className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                    className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                   />
                 </div>
 
                 {/* ProductId Input */}
                 <div className="grid gap-1 w-24">
-                  <Label className="text-[10px] text-slate-500 font-medium">
+                  <Label className="text-xs text-slate-500 font-medium">
                     Mã Vật Tư
                   </Label>
                   <Input
@@ -157,13 +159,13 @@ export function EditCountsheetDialog({
                     onChange={(e) =>
                       handleRowChange(index, "ProductId", e.target.value)
                     }
-                    className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                    className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                   />
                 </div>
 
                 {/* Quantity Input */}
                 <div className="grid gap-1 w-20">
-                  <Label className="text-[10px] text-slate-500 font-medium">
+                  <Label className="text-xs text-slate-500 font-medium">
                     SL Thực Tế
                   </Label>
                   <Input
@@ -172,13 +174,13 @@ export function EditCountsheetDialog({
                     onChange={(e) =>
                       handleRowChange(index, "Quantity", e.target.value)
                     }
-                    className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                    className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                   />
                 </div>
 
                 {/* Note Input */}
                 <div className="grid gap-1 flex-1">
-                  <Label className="text-[10px] text-slate-500 font-medium">
+                  <Label className="text-xs text-slate-500 font-medium">
                     Ghi chú kiểm kê
                   </Label>
                   <Input
@@ -187,7 +189,7 @@ export function EditCountsheetDialog({
                     onChange={(e) =>
                       handleRowChange(index, "Note", e.target.value)
                     }
-                    className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                    className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                   />
                 </div>
 
@@ -197,7 +199,7 @@ export function EditCountsheetDialog({
                   variant="outline"
                   onClick={() => handleRemoveRow(index)}
                   disabled={items.length === 1}
-                  className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-500 rounded-none bg-white"
+                  className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-500 bg-white"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -210,13 +212,13 @@ export function EditCountsheetDialog({
         <DialogFooter className="gap-2 sm:gap-0 mt-2">
           <Button
             variant="outline"
-            className="rounded-none border-slate-200 text-slate-500"
+            className="border-slate-200 text-slate-500"
             onClick={() => onOpenChange(false)}
           >
             Hủy bỏ
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none px-6"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6"
             onClick={handleSaveUpdate}
           >
             Lưu cập nhật

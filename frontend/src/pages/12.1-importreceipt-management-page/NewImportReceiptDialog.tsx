@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { btn, dialog } from "@/pages/page-classes";
 import { Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -112,9 +114,9 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-white border-none max-h-[90vh] overflow-y-auto rounded-none">
+      <DialogContent className={cn("sm:max-w-[600px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Tạo phiếu nhập kho mới
           </DialogTitle>
         </DialogHeader>
@@ -135,7 +137,7 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
                 placeholder="Nhập mã YC..."
                 value={requestId}
                 onChange={(e) => setRequestId(e.target.value)}
-                className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none text-xs"
+                className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-xs"
               />
             </div>
             <div className="grid gap-1">
@@ -150,7 +152,7 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
                 type="number"
                 value={warehouseId}
                 onChange={(e) => setWarehouseId(e.target.value)}
-                className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none text-xs"
+                className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-xs"
               />
             </div>
           </div>
@@ -161,7 +163,7 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
               id="hasDiscrepancy"
               checked={hasDiscrepancy}
               onCheckedChange={(checked) => setHasDiscrepancy(!!checked)}
-              className="rounded-none border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+              className="border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
             />
             <Label
               htmlFor="hasDiscrepancy"
@@ -181,7 +183,7 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
                   value={discrepancyReason}
                   onChange={(e) => setDiscrepancyReason(e.target.value)}
                   placeholder="Ghi chi tiết lý do lệch..."
-                  className="flex min-h-[50px] w-full rounded-none border border-slate-200 bg-white px-3 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none"
+                  className="flex min-h-[50px] w-full border border-slate-200 bg-white px-3 py-1 text-xs focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 resize-none"
                 />
               </div>
               <div className="grid gap-1">
@@ -192,7 +194,7 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
                   value={discrepancyImageURL}
                   onChange={(e) => setDiscrepancyImageURL(e.target.value)}
                   placeholder="https://example.com/image.jpg"
-                  className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none text-xs"
+                  className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-xs"
                 />
               </div>
             </div>
@@ -209,7 +211,7 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
                 variant="outline"
                 size="sm"
                 onClick={addItemRow}
-                className="text-blue-600 border-blue-200 rounded-none flex items-center gap-1 h-8 text-xs"
+                className="text-blue-600 border-blue-200 flex items-center gap-1 h-8 text-xs"
               >
                 <Plus className="h-3.5 w-3.5" /> Thêm dòng
               </Button>
@@ -222,19 +224,19 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
                   className="flex items-end gap-2 bg-slate-50 p-2 border border-slate-100 relative"
                 >
                   <div className="grid gap-1 w-16">
-                    <Label className="text-[10px] text-slate-500">Mã SP</Label>
+                    <Label className="text-xs text-slate-500">Mã SP</Label>
                     <Input
                       type="number"
                       value={item.ProductID}
                       onChange={(e) =>
                         handleItemChange(index, "ProductID", e.target.value)
                       }
-                      className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                     />
                   </div>
 
                   <div className="grid gap-1 flex-1">
-                    <Label className="text-[10px] text-slate-500">
+                    <Label className="text-xs text-slate-500">
                       Tên sản phẩm
                     </Label>
                     <Input
@@ -242,12 +244,12 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
                       onChange={(e) =>
                         handleItemChange(index, "ProductName", e.target.value)
                       }
-                      className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                     />
                   </div>
 
                   <div className="grid gap-1 w-16">
-                    <Label className="text-[10px] text-slate-500">SL Y/C</Label>
+                    <Label className="text-xs text-slate-500">SL Y/C</Label>
                     <Input
                       type="number"
                       value={item.ExpectedQuantity}
@@ -258,12 +260,12 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
                           e.target.value,
                         )
                       }
-                      className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                     />
                   </div>
 
                   <div className="grid gap-1 w-16">
-                    <Label className="text-[10px] text-slate-500">
+                    <Label className="text-xs text-slate-500">
                       SL Thực
                     </Label>
                     <Input
@@ -276,7 +278,7 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
                           e.target.value,
                         )
                       }
-                      className="h-8 border-slate-200 bg-white focus:ring-blue-600 rounded-none px-2 text-xs"
+                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
                     />
                   </div>
 
@@ -285,7 +287,7 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
                     variant="outline"
                     onClick={() => removeItemRow(index)}
                     disabled={items.length === 1}
-                    className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-500 rounded-none bg-white"
+                    className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-500 bg-white"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
@@ -298,7 +300,7 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
         <DialogFooter className="gap-2 sm:gap-0">
           <Button
             variant="outline"
-            className="rounded-none border-slate-200 text-slate-500"
+            className="border-slate-200 text-slate-500"
             onClick={() => onOpenChange(false)}
           >
             Hủy
@@ -306,13 +308,13 @@ export function NewImportReceiptDialog({ open, onOpenChange }: Props) {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              className="rounded-none border-amber-200 text-amber-600 hover:bg-amber-50"
+              className="border-amber-200 text-amber-600 hover:bg-amber-50"
               onClick={() => handleSubmit(true)}
             >
               Lưu bản nháp
             </Button>
             <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+              className={btn.primary}
               onClick={() => handleSubmit(false)}
             >
               Hoàn thành nhập

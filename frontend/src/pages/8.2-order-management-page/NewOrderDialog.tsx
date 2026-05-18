@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
+import { btn, dialog } from "@/pages/page-classes";
 import { Trash2, Plus } from "lucide-react";
 
 interface NewProps {
@@ -50,9 +52,9 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-white border-none rounded-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[600px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-4">
+          <DialogTitle className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-4">
             Tạo mới Đơn Hàng
           </DialogTitle>
         </DialogHeader>
@@ -72,7 +74,7 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                   onChange={(e) =>
                     setOrderData({ ...orderData, CustomerName: e.target.value })
                   }
-                  className="border-slate-200 focus:ring-blue-600 rounded-none h-9"
+                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
                 />
               </div>
               <div className="grid gap-2">
@@ -85,7 +87,7 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                   onChange={(e) =>
                     setOrderData({ ...orderData, InvoiceID: e.target.value })
                   }
-                  className="border-slate-200 focus:ring-blue-600 rounded-none h-9"
+                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
                 />
               </div>
               <div className="grid gap-2">
@@ -100,7 +102,7 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                       ShipCompanyID: e.target.value,
                     })
                   }
-                  className="border-slate-200 focus:ring-blue-600 text-sm h-9 rounded-none"
+                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
                 >
                   <option value="1">Giao Hàng Tiết Kiệm</option>
                   <option value="2">Viettel Post</option>
@@ -120,7 +122,7 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                       ShippingFee: Number(e.target.value),
                     })
                   }
-                  className="border-slate-200 focus:ring-blue-600 rounded-none h-9"
+                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
                 />
               </div>
               <div className="grid gap-2 col-span-2">
@@ -133,7 +135,7 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                   onChange={(e) =>
                     setOrderData({ ...orderData, ShipmentNote: e.target.value })
                   }
-                  className="border-slate-200 focus:ring-blue-600 rounded-none h-9"
+                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
                 />
               </div>
             </div>
@@ -158,7 +160,7 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                         ),
                       )
                     }
-                    className="border-slate-200 focus:ring-blue-600 text-sm h-9 flex-1 rounded-none"
+                    className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 flex-1"
                   >
                     {MOCK_PRODUCTS.map((prod) => (
                       <option key={prod.ProductID} value={prod.ProductID}>
@@ -179,14 +181,14 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                         ),
                       )
                     }
-                    className="border-slate-200 focus:ring-blue-600 h-9 w-20 rounded-none"
+                    className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 w-20"
                   />
                   <Button
                     variant="outline"
                     size="sm"
                     disabled={selectedProducts.length === 1}
                     onClick={() => handleRemoveProduct(index)}
-                    className="text-red-500 border-slate-200 h-9 w-9 p-0 flex items-center justify-center rounded-none"
+                    className="text-red-500 border-slate-200 h-9 w-9 p-0 flex items-center justify-center"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -196,7 +198,7 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleAddProduct}
-                className="text-slate-600 border-dashed border-slate-300 mt-2 rounded-none h-8 w-full"
+                className="text-slate-600 border-dashed border-slate-300 mt-2 h-8 w-full"
               >
                 <Plus className="h-4 w-4 mr-1" /> Thêm sản phẩm
               </Button>
@@ -207,13 +209,13 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
         <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             variant="outline"
-            className="rounded-none"
+           
             onClick={() => onOpenChange(false)}
           >
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo Đơn Hàng

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,7 @@ import React, { useState } from "react";
 
 import { ROLES } from "@/data/roles";
 import type { Employee } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
 
 interface Props {
   open: boolean;
@@ -51,14 +53,14 @@ export function EditRoleDialog({ open, onOpenChange, emp }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Cập nhật phân quyền
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-3">
             <Label className="text-slate-900 font-semibold">
               Quyền <span className="text-red-500">*</span>
@@ -91,11 +93,11 @@ export function EditRoleDialog({ open, onOpenChange, emp }: Props) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Cập nhật

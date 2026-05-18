@@ -8,6 +8,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import type { Customer } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
+import { cn } from "@/lib/utils";
 
 interface Props {
   open: boolean;
@@ -23,13 +25,13 @@ export function DetailCustomerDialog({ open, onOpenChange, customer }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-white border border-slate-200">
+      <DialogContent className={cn("sm:max-w-[500px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-blue-600">
             Thông tin khách hàng
           </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-slate-500 text-xs">Mã khách hàng</Label>
@@ -75,7 +77,7 @@ export function DetailCustomerDialog({ open, onOpenChange, customer }: Props) {
         </div>
         <DialogFooter>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={() => onOpenChange(false)}
           >
             Đóng

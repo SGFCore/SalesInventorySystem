@@ -5,6 +5,7 @@ import type { OrderReturn } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { DetailOrderReturnDialog } from "@/pages/9-orderreturn-management-page/DetailOrderReturnDialog";
 import { NewOrderReturnDialog } from "@/pages/9-orderreturn-management-page/NewOrderReturnDialog";
+import { page, btn, entity, input } from "@/pages/page-classes";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -80,21 +81,21 @@ export default function OrderReturnManagementPage() {
   }, [currentPage]);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-white min-h-screen">
+    <div className={page.shell}>
       <div ref={topRef} />
 
       {/* Header Controls */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex w-full max-w-sm items-center space-x-2">
+      <div className={page.header}>
+        <div className={page.searchWrap}>
           <Input
             placeholder="Tìm kiếm theo mã hoàn tiền..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border-slate-200 focus:ring-blue-600"
+            className={input.search}
           />
         </div>
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className={btn.primary}
           onClick={() => setIsNewOpen(true)}
         >
           Tạo yêu cầu hoàn tiền
@@ -102,13 +103,13 @@ export default function OrderReturnManagementPage() {
       </div>
 
       {/* Order Return Table */}
-      <div className="border border-slate-200 rounded-lg overflow-hidden">
+      <div className={page.tableWrap}>
         <Table>
           <TableBody>
             {paginatedReturns.map((item) => (
               <TableRow
                 key={item.ReturnID}
-                className="hover:bg-slate-50/50 border-b border-slate-100"
+                className={page.tableRow}
               >
                 {/* Thông tin Mã và Ngày hoàn tiền */}
                 <TableCell>
@@ -125,10 +126,10 @@ export default function OrderReturnManagementPage() {
                 {/* Thông tin tổng tiền hoàn tiền */}
                 <TableCell>
                   <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium text-xs text-slate-500">
+                    <span className={entity.cellMeta}>
                       Tổng tiền hoàn tiền
                     </span>
-                    <span className="font-semibold text-blue-600 mt-0.5">
+                    <span className={cn(entity.price, 'mt-0.5')}>
                       {item.TotalRefund.toLocaleString("vi-VN")} đ
                     </span>
                   </div>
@@ -140,7 +141,7 @@ export default function OrderReturnManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-slate-600 hover:bg-slate-100 w-full"
+                      className={cn(btn.actionSecondary, "w-full")}
                       onClick={() => handleDetailClick(item)}
                     >
                       Xem chi tiết
@@ -160,8 +161,8 @@ export default function OrderReturnManagementPage() {
         </Table>
 
         {/* Bộ điều khiển Phân trang */}
-        <div className="flex items-center justify-between px-4 py-4">
-          <div className="text-sm text-slate-500">
+        <div className={page.pagination}>
+          <div className={page.paginationText}>
             Hiển thị{" "}
             <span className="font-medium">{paginatedReturns.length}</span> trên{" "}
             <span className="font-medium">{filteredReturns.length}</span> đơn
@@ -173,26 +174,22 @@ export default function OrderReturnManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0"
+              className={btn.paginationNav}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
+                (pageNum) => (
                   <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className={cn(
-                      "h-8 w-8 p-0 text-white",
-                      currentPage === page ? "bg-blue-600" : "text-slate-600",
-                    )}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
                   >
-                    {page}
-                  </Button>
+                    {pageNum}</Button>
                 ),
               )}
             </div>
@@ -204,7 +201,7 @@ export default function OrderReturnManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0"
+              className={btn.paginationNav}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

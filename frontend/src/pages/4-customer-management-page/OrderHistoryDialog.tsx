@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import type { Customer, Order } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { badge, dialog, entity, page } from "@/pages/page-classes";
 
 const MOCK_ORDERS: Order[] = [
   {
@@ -58,47 +60,58 @@ export function OrderHistoryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] bg-white max-h-[80vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[800px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className={dialog.title}>
             Lịch sử giao dịch: {customer.FirstName} {customer.LastName}
           </DialogTitle>
         </DialogHeader>
-        <Table>
-          <TableHeader className="bg-slate-50">
-            <TableRow>
-              <TableCell className="font-bold">Mã Đơn</TableCell>
-              <TableCell className="font-bold">Mã Ship</TableCell>
-              <TableCell className="font-bold">Tổng tiền</TableCell>
-              <TableCell className="font-bold">Trạng thái</TableCell>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {MOCK_ORDERS.map((o) => (
-              <TableRow key={o.OrderID}>
-                <TableCell>#{o.OrderID}</TableCell>
-                <TableCell className="text-blue-600 font-medium">
-                  {o.ShipCode}
+        <div className={page.tableWrap}>
+          <Table>
+            <TableHeader className="bg-slate-50">
+              <TableRow>
+                <TableCell className="text-xs font-semibold text-slate-700">
+                  Mã đơn
                 </TableCell>
-                <TableCell>{o.TotalAmount.toLocaleString()} đ</TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={
-                      o.ShippingStatus === 2
-                        ? "text-green-600 border-green-200"
-                        : "text-blue-600 border-blue-200"
-                    }
-                  >
-                    {o.ShippingStatus === 2 ? "Đã giao" : "Đang xử lý"}
-                  </Badge>
+                <TableCell className="text-xs font-semibold text-slate-700">
+                  Mã ship
+                </TableCell>
+                <TableCell className="text-xs font-semibold text-slate-700">
+                  Tổng tiền
+                </TableCell>
+                <TableCell className="text-xs font-semibold text-slate-700">
+                  Trạng thái
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {MOCK_ORDERS.map((o) => (
+                <TableRow key={o.OrderID} className={page.tableRow}>
+                  <TableCell className={entity.id}>#{o.OrderID}</TableCell>
+                  <TableCell className={entity.price}>{o.ShipCode}</TableCell>
+                  <TableCell className={entity.cellValue}>
+                    {o.TotalAmount.toLocaleString()} đ
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        badge.base,
+                        o.ShippingStatus === 2
+                          ? badge.success
+                          : badge.info,
+                      )}
+                    >
+                      {o.ShippingStatus === 2 ? "Đã giao" : "Đang xử lý"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
         {MOCK_ORDERS.length === 0 && (
-          <div className="text-center py-10 text-slate-400 font-medium italic">
+          <div className="py-10 text-center text-sm text-slate-400">
             Không có dữ liệu giao dịch
           </div>
         )}

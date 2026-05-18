@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Product } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
 
 interface EditProps {
   open: boolean;
@@ -64,14 +66,14 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Cập nhật sản phẩm
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="productName">
               Tên sản phẩm <span className="text-red-500">*</span>
@@ -81,7 +83,7 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
               name="productName"
               value={formData.productName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -93,7 +95,7 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
               type="number"
               value={formData.productPrice}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -106,7 +108,7 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
               name="categoryName"
               value={formData.categoryName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -117,7 +119,7 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
               name="productTypeName"
               value={formData.productTypeName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -128,7 +130,7 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
               name="detail"
               value={formData.detail}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -150,11 +152,11 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Lưu thay đổi

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { DetailCustomerTypeDialog } from "@/pages/7.1-customertype-management-page/DetailCustomerTypeDialog";
 import { EditCustomerTypeDialog } from "@/pages/7.1-customertype-management-page/EditCustomerTypeDialog";
 import { NewCustomerTypeDialog } from "@/pages/7.1-customertype-management-page/NewCustomerTypeDialog";
+import { page, input, btn, entity } from "@/pages/page-classes";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -69,18 +70,18 @@ export default function CustomerTypeManagementPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-white min-h-screen">
+    <div className={page.shell}>
       <div ref={topRef} />
 
-      <div className="flex items-center justify-between mb-6">
+      <div className={page.header}>
         <Input
           placeholder="Tìm kiếm nhóm khách hàng..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm border-slate-200 focus:ring-blue-600 rounded-none"
+          className={input.search}
         />
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+          className={btn.primary}
           onClick={() => setIsNewOpen(true)}
         >
           Thêm nhóm khách hàng mới
@@ -93,12 +94,12 @@ export default function CustomerTypeManagementPage() {
             {paginatedTypes.map((t) => (
               <TableRow
                 key={t.CustomerTypeID}
-                className="hover:bg-slate-50/50 border-b border-slate-100"
+                className={page.tableRow}
               >
-                <TableCell className="w-20 font-medium text-slate-500">
+                <TableCell className={cn("w-20", entity.id)}>
                   {t.CustomerTypeID}
                 </TableCell>
-                <TableCell className="font-semibold text-left">
+                <TableCell className={cn("text-left", entity.name)}>
                   {t.CustomerTypeName}
                 </TableCell>
                 <TableCell className="text-blue-600 font-medium">
@@ -110,7 +111,7 @@ export default function CustomerTypeManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 w-32 rounded-none"
+                      className="text-blue-600 border-blue-200 w-32"
                       onClick={() => openAction(t, "detail")}
                     >
                       Xem chi tiết
@@ -118,7 +119,7 @@ export default function CustomerTypeManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 w-32 rounded-none"
+                      className="text-blue-600 border-blue-200 w-32"
                       onClick={() => openAction(t, "edit")}
                     >
                       Cập nhật
@@ -131,8 +132,8 @@ export default function CustomerTypeManagementPage() {
         </Table>
 
         {/* Bộ điều khiển Phân trang */}
-        <div className="flex items-center justify-between px-4 py-4 bg-white border-t border-slate-100">
-          <div className="text-sm text-slate-500">
+        <div className={page.pagination}>
+          <div className={page.paginationText}>
             Hiển thị{" "}
             <span className="font-medium">{paginatedTypes.length}</span> trên{" "}
             <span className="font-medium">{filtered.length}</span> nhóm khách
@@ -145,28 +146,22 @@ export default function CustomerTypeManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 rounded-none"
+              className={btn.paginationNav}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
+                (pageNum) => (
                   <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className={cn(
-                      "h-8 w-8 p-0 transition-none rounded-none",
-                      currentPage === page
-                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
-                        : "text-slate-600 border-slate-200",
-                    )}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
                   >
-                    {page}
-                  </Button>
+                    {pageNum}</Button>
                 ),
               )}
             </div>
@@ -178,7 +173,7 @@ export default function CustomerTypeManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0 rounded-none"
+              className={btn.paginationNav}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

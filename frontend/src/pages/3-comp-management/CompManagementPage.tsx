@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { DetailCompDialog } from "@/pages/3-comp-management/DetailCompDialog";
 import { EditCompDialog } from "@/pages/3-comp-management/EditCompDialog";
 import { NewCompDialog } from "@/pages/3-comp-management/NewCompDialog";
+import { page, btn, entity, input } from "@/pages/page-classes";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -80,21 +81,21 @@ export default function CompManagementPage() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-white min-h-screen">
+    <div className={page.shell}>
       <div ref={topRef} />
 
       {/* Thanh điều khiển phía trên */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex w-full max-w-sm items-center space-x-2">
+      <div className={page.header}>
+        <div className={page.searchWrap}>
           <Input
             placeholder="Tìm kiếm theo tên đối tác..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border-slate-200 focus:ring-blue-600"
+            className={input.search}
           />
         </div>
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className={btn.primary}
           onClick={() => setIsNewOpen(true)}
         >
           Thêm đối tác mới
@@ -102,33 +103,28 @@ export default function CompManagementPage() {
       </div>
 
       {/* Bảng danh sách đối tác */}
-      <div className="border border-slate-200 rounded-lg overflow-hidden">
+      <div className={page.tableWrap}>
         <Table>
           <TableBody>
             {paginatedCompanies.map((comp) => (
               <TableRow
                 key={comp.ShipCompanyID}
-                className="hover:bg-slate-50/50 border-b border-slate-100"
+                className={page.tableRow}
               >
                 {/* Thông tin định danh & Tên */}
                 <TableCell>
                   <div className="flex flex-col items-start">
-                    <div className="flex items-center gap-2 text-xs text-slate-300 mb-0.5">
-                      <div className="text-black">{comp.ShipCompanyID}</div> -
+                    <div className={entity.rowMeta}>
+                      <span className={entity.id}>{comp.ShipCompanyID}</span>
+                      <span className={entity.separator}>·</span>
                       <span
-                        className={cn(
-                          "font-bold text-sm",
-                          comp.Status === 1 && "text-black",
-                        )}
+                        className={cn(entity.name, comp.Status === 0 && entity.nameInactive)}
                       >
                         {comp.ShipCompanyName}
                       </span>
                     </div>
                     <div
-                      className={cn(
-                        "italic text-[10px]",
-                        comp.Status === 1 ? "text-green-500" : "text-slate-300",
-                      )}
+                      className={cn(comp.Status === 1 ? entity.statusActive : entity.statusInactive)}
                     >
                       {comp.Status === 1 ? "Đang hợp tác" : "Ngưng hợp tác"}
                     </div>
@@ -155,7 +151,7 @@ export default function CompManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-slate-600 hover:bg-slate-100 w-full"
+                      className={cn(btn.actionSecondary, "w-full")}
                       onClick={() => handleActionClick(comp, "detail")}
                     >
                       Xem chi tiết
@@ -166,7 +162,7 @@ export default function CompManagementPage() {
                       disabled={comp.Status === 0}
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-100 hover:bg-blue-50 w-full"
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50 w-full"
                       onClick={() => handleActionClick(comp, "edit")}
                     >
                       Cập nhật
@@ -179,7 +175,7 @@ export default function CompManagementPage() {
                       className={cn(
                         "w-full",
                         comp.Status === 1
-                          ? "text-red-500 hover:bg-red-100 hover:text-red-600 border-red-500"
+                          ? "text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
                           : "text-slate-600 hover:bg-slate-100",
                       )}
                       onClick={() => toggleStatus(comp.ShipCompanyID)}
@@ -194,8 +190,8 @@ export default function CompManagementPage() {
         </Table>
 
         {/* Phân trang hệ thống */}
-        <div className="flex items-center justify-between px-4 py-4">
-          <div className="text-sm text-slate-500">
+        <div className={page.pagination}>
+          <div className={page.paginationText}>
             Hiển thị{" "}
             <span className="font-medium">{paginatedCompanies.length}</span>{" "}
             trên <span className="font-medium">{filteredCompanies.length}</span>{" "}
@@ -207,26 +203,22 @@ export default function CompManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0"
+              className={btn.paginationNav}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
+                (pageNum) => (
                   <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className={cn(
-                      "h-8 w-8 p-0 text-white",
-                      currentPage === page ? "bg-blue-600" : "text-slate-600",
-                    )}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
                   >
-                    {page}
-                  </Button>
+                    {pageNum}</Button>
                 ),
               )}
             </div>
@@ -238,7 +230,7 @@ export default function CompManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0"
+              className={btn.paginationNav}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

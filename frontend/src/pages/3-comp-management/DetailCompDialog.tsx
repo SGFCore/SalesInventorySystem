@@ -9,6 +9,7 @@ import {
 import { Label } from "@/components/ui/label";
 import type { ShipCompany } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { btn, dialog } from "@/pages/page-classes";
 
 interface DetailProps {
   open: boolean;
@@ -21,9 +22,9 @@ export function DetailCompDialog({ open, onOpenChange, comp }: DetailProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[500px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Chi tiết đối tác vận chuyển
           </DialogTitle>
         </DialogHeader>
@@ -79,7 +80,7 @@ export function DetailCompDialog({ open, onOpenChange, comp }: DetailProps) {
             <span
               className={cn(
                 "col-span-2 font-bold",
-                comp.Status === 1 ? "text-green-500" : "text-red-500",
+                comp.Status === 1 ? "text-green-600" : "text-red-500",
               )}
             >
               {comp.Status === 1 ? "Đang hợp tác" : "Ngưng hợp tác"}
@@ -89,7 +90,7 @@ export function DetailCompDialog({ open, onOpenChange, comp }: DetailProps) {
 
         <DialogFooter>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={() => onOpenChange(false)}
           >
             Đóng

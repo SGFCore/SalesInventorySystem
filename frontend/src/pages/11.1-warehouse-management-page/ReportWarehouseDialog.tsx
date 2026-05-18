@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/table";
 import type { DetailInventory, Warehouse } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { btn } from "@/pages/page-classes";
+import { dialog } from "@/pages/page-classes";
 
 // Mock dữ liệu tồn kho chi tiết cho mục đích hiển thị mẫu prototype
 const MOCK_INVENTORY_DETAILS: DetailInventory[] = Array.from(
@@ -60,7 +62,7 @@ export function ReportWarehouseDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] bg-white border border-slate-200 rounded-none max-h-[85vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[800px] max-h-[85vh]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-red-600">
             Báo cáo thiếu hụt vật tư - {warehouse.WareHouseName}
@@ -112,7 +114,7 @@ export function ReportWarehouseDialog({
                           "border-b border-slate-100 transition-none",
                           isShortage
                             ? "bg-red-50 hover:bg-red-50 text-red-600 font-medium"
-                            : "hover:bg-slate-50/50",
+                            : "hover:bg-slate-50",
                         )}
                       >
                         <TableCell>{item.ProductID}</TableCell>
@@ -148,7 +150,7 @@ export function ReportWarehouseDialog({
 
         <DialogFooter>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={() => onOpenChange(false)}
           >
             Đóng báo cáo

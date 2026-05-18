@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import type { Product } from "@/lib/types";
+import { dialog } from "@/pages/page-classes";
 
 interface DetailProps {
   open: boolean;
@@ -24,9 +26,9 @@ export function DetailProductDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px] bg-white border-none max-h-[90vh] overflow-y-auto(1)">
+      <DialogContent className={cn("sm:max-w-[450px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Chi tiết sản phẩm
           </DialogTitle>
         </DialogHeader>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
+import { btn, dialog } from "@/pages/page-classes";
 import { Trash2, Plus } from "lucide-react";
 
 interface NewProps {
@@ -95,14 +97,14 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[500px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Tạo mới gói combo
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           {/* Nhập Giá bán combo */}
           <div className="grid gap-2">
             <Label htmlFor="comboPrice">
@@ -114,7 +116,7 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
               value={comboPrice}
               onChange={(e) => setComboPrice(Number(e.target.value))}
               placeholder="Nhập tổng giá gói..."
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -141,7 +143,7 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
                           Number(e.target.value),
                         )
                       }
-                      className="border-slate-200 focus:ring-blue-600 text-sm h-9 w-full"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 w-full"
                     >
                       {MOCK_PRODUCTS_LIST.map((prod) => (
                         <option key={prod.ProductID} value={prod.ProductID}>
@@ -165,7 +167,7 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
                         )
                       }
                       placeholder="SL"
-                      className="border-slate-200 focus:ring-blue-600 h-9"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
                     />
                   </div>
 
@@ -196,11 +198,11 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo mới

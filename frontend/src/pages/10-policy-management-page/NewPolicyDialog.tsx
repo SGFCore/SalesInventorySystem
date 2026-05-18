@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
 
 interface Props {
@@ -47,14 +49,14 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white border-none max-h-[90vh] overflow-y-auto rounded-none">
+      <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Thêm chính sách mới
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="PolicyName">Tên chính sách</Label>
             <Input
@@ -62,7 +64,7 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
               name="PolicyName"
               value={formData.PolicyName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600 rounded-none"
+              className={dialog.input}
             />
           </div>
 
@@ -75,7 +77,7 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
                 type="number"
                 value={formData.MaxReturnDays}
                 onChange={handleChange}
-                className="border-slate-200 focus:ring-blue-600 rounded-none"
+                className={dialog.input}
               />
             </div>
             <div className="grid gap-2">
@@ -86,7 +88,7 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
                 type="number"
                 value={formData.PenaltyFeeRate}
                 onChange={handleChange}
-                className="border-slate-200 focus:ring-blue-600 rounded-none"
+                className={dialog.input}
               />
             </div>
           </div>
@@ -100,7 +102,7 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
                 type="date"
                 value={formData.EffectiveDate}
                 onChange={handleChange}
-                className="border-slate-200 focus:ring-blue-600 rounded-none px-3"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-3"
               />
             </div>
             <div className="grid gap-2">
@@ -110,7 +112,7 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
                 name="IsActive"
                 value={formData.IsActive}
                 onChange={handleChange}
-                className="flex h-10 w-full rounded-none border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="flex h-10 w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
               >
                 <option value="1">Đang hoạt động</option>
                 <option value="0">Tạm dừng</option>
@@ -122,13 +124,13 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
         <DialogFooter>
           <Button
             variant="outline"
-            className="rounded-none border-slate-200"
+            className="border-slate-200"
             onClick={() => onOpenChange(false)}
           >
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo mới

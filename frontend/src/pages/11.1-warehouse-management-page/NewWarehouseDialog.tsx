@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
 
 interface Props {
@@ -49,14 +51,14 @@ export function NewWarehouseDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] bg-white border border-slate-200 max-h-[90vh] overflow-y-auto rounded-none">
+      <DialogContent className={cn("sm:max-w-[480px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Thêm kho hàng mới
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="WareHouseName">Tên kho hàng</Label>
             <Input
@@ -64,7 +66,7 @@ export function NewWarehouseDialog({ open, onOpenChange }: Props) {
               name="WareHouseName"
               value={formData.WareHouseName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600 rounded-none"
+              className={dialog.input}
             />
           </div>
 
@@ -75,7 +77,7 @@ export function NewWarehouseDialog({ open, onOpenChange }: Props) {
               name="Address"
               value={formData.Address}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600 rounded-none"
+              className={dialog.input}
             />
           </div>
 
@@ -87,7 +89,7 @@ export function NewWarehouseDialog({ open, onOpenChange }: Props) {
                 name="ContactNumber"
                 value={formData.ContactNumber}
                 onChange={handleChange}
-                className="border-slate-200 focus:ring-blue-600 rounded-none"
+                className={dialog.input}
               />
             </div>
             <div className="grid gap-2">
@@ -98,7 +100,7 @@ export function NewWarehouseDialog({ open, onOpenChange }: Props) {
                 type="number"
                 value={formData.ManagerID}
                 onChange={handleChange}
-                className="border-slate-200 focus:ring-blue-600 rounded-none"
+                className={dialog.input}
               />
             </div>
           </div>
@@ -112,7 +114,7 @@ export function NewWarehouseDialog({ open, onOpenChange }: Props) {
                 type="number"
                 value={formData.Capacity}
                 onChange={handleChange}
-                className="border-slate-200 focus:ring-blue-600 rounded-none"
+                className={dialog.input}
               />
             </div>
             <div className="grid gap-2">
@@ -122,7 +124,7 @@ export function NewWarehouseDialog({ open, onOpenChange }: Props) {
                 name="WarehouseType"
                 value={formData.WarehouseType}
                 onChange={handleChange}
-                className="flex h-10 w-full rounded-none border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="flex h-10 w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
               >
                 <option value="1">Kho tổng</option>
                 <option value="2">Kho phân phối</option>
@@ -137,7 +139,7 @@ export function NewWarehouseDialog({ open, onOpenChange }: Props) {
               name="Status"
               value={formData.Status}
               onChange={handleChange}
-              className="flex h-10 w-full rounded-none border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="flex h-10 w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
             >
               <option value="1">Đang hoạt động</option>
               <option value="0">Tạm dừng</option>
@@ -148,13 +150,13 @@ export function NewWarehouseDialog({ open, onOpenChange }: Props) {
         <DialogFooter>
           <Button
             variant="outline"
-            className="rounded-none border-slate-200"
+            className="border-slate-200"
             onClick={() => onOpenChange(false)}
           >
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Tạo mới

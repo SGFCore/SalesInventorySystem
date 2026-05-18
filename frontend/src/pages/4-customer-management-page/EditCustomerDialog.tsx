@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import type { Customer } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
+import { cn } from "@/lib/utils";
 
 export function EditCustomerDialog({
   open,
@@ -28,7 +30,7 @@ export function EditCustomerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px] bg-white">
+      <DialogContent className={cn("sm:max-w-[450px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
             Cập nhật khách hàng
@@ -43,7 +45,7 @@ export function EditCustomerDialog({
                 onChange={(e) =>
                   setForm({ ...form, FirstName: e.target.value })
                 }
-                className="focus:ring-blue-600"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0"
               />
             </div>
             <div className="grid gap-1">
@@ -51,7 +53,7 @@ export function EditCustomerDialog({
               <Input
                 value={form.LastName || ""}
                 onChange={(e) => setForm({ ...form, LastName: e.target.value })}
-                className="focus:ring-blue-600"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0"
               />
             </div>
           </div>
@@ -87,10 +89,10 @@ export function EditCustomerDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button className={btn.primary}>
             Lưu thay đổi
           </Button>
         </DialogFooter>

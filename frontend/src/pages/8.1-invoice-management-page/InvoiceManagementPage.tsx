@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Invoice } from "@/lib/types";
 import { DetailInvoiceDialog } from "@/pages/8.1-invoice-management-page/DetailInvoiceDialog";
 import { NewInvoiceDialog } from "@/pages/8.1-invoice-management-page/NewInvoiceDialog";
+import { badge, btn, entity, input, page } from "@/pages/page-classes";
 
 // Giả lập dữ liệu mẫu gồm 45 hóa đơn để test phân trang
 const MOCK_INVOICES: Invoice[] = Array.from({ length: 45 }, (_, i) => ({
@@ -77,7 +78,7 @@ export default function InvoiceManagementPage() {
         return (
           <Badge
             variant="outline"
-            className="text-yellow-600 border-yellow-200 bg-yellow-50 rounded-none"
+            className={cn(badge.base, badge.pending)}
           >
             Chờ thanh toán
           </Badge>
@@ -86,7 +87,7 @@ export default function InvoiceManagementPage() {
         return (
           <Badge
             variant="outline"
-            className="text-green-600 border-green-200 bg-green-50 rounded-none"
+            className={cn(badge.base, badge.success)}
           >
             Đã thanh toán
           </Badge>
@@ -95,14 +96,14 @@ export default function InvoiceManagementPage() {
         return (
           <Badge
             variant="outline"
-            className="text-blue-600 border-blue-200 bg-blue-50 rounded-none"
+            className={cn(badge.base, badge.info)}
           >
             Thanh toán 1 phần
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="rounded-none">
+          <Badge variant="outline">
             Không xác định
           </Badge>
         );
@@ -110,21 +111,21 @@ export default function InvoiceManagementPage() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-white min-h-screen">
+    <div className={page.shell}>
       <div ref={topRef} />
 
       {/* Header Controls */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex w-full max-w-sm items-center space-x-2">
+      <div className={page.header}>
+        <div className={page.searchWrap}>
           <Input
             placeholder="Tìm kiếm theo mã hóa đơn..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border-slate-200 focus:ring-blue-600 rounded-none"
+            className={input.search}
           />
         </div>
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+          className={btn.primary}
           onClick={() => setIsNewOpen(true)}
         >
           Thêm hóa đơn
@@ -155,7 +156,7 @@ export default function InvoiceManagementPage() {
                 {/* Kênh bán */}
                 <TableCell>
                   <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium text-xs text-slate-500">
+                    <span className={entity.cellMeta}>
                       Kênh bán
                     </span>
                     <span className="font-medium text-slate-700 mt-0.5">
@@ -177,7 +178,7 @@ export default function InvoiceManagementPage() {
                 {/* Tổng tiền */}
                 <TableCell>
                   <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium text-xs text-slate-500">
+                    <span className={entity.cellMeta}>
                       Tổng tiền
                     </span>
                     <span className="font-bold text-slate-900 mt-0.5">
@@ -192,7 +193,7 @@ export default function InvoiceManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 hover:bg-blue-50 w-full rounded-none"
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50 w-full"
                       onClick={() => handleDetailClick(invoice)}
                     >
                       Xem chi tiết
@@ -200,7 +201,7 @@ export default function InvoiceManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 hover:bg-blue-50 w-full rounded-none"
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50 w-full"
                       // onClick={() => handleDetailClick(invoice)}
                     >
                       XN. thanh toán
@@ -213,8 +214,8 @@ export default function InvoiceManagementPage() {
         </Table>
 
         {/* Bộ điều khiển Phân trang */}
-        <div className="flex items-center justify-between px-4 py-4 border-t border-slate-200">
-          <div className="text-sm text-slate-500">
+        <div className={page.pagination}>
+          <div className={page.paginationText}>
             Hiển thị{" "}
             <span className="font-medium text-slate-900">
               {paginatedInvoices.length}
@@ -231,28 +232,27 @@ export default function InvoiceManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 rounded-none border-slate-200"
+              className="h-8 w-8 p-0 border-slate-200"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
+                (pageNum) => (
                   <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => setCurrentPage(pageNum)}
                     className={cn(
-                      "h-8 w-8 p-0 rounded-none",
-                      currentPage === page
+                      "h-8 w-8 p-0",
+                      currentPage === pageNum
                         ? "bg-blue-600 text-white"
                         : "text-slate-600 border-slate-200",
                     )}
                   >
-                    {page}
-                  </Button>
+                    {pageNum}</Button>
                 ),
               )}
             </div>
@@ -264,7 +264,7 @@ export default function InvoiceManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0 rounded-none border-slate-200"
+              className="h-8 w-8 p-0 border-slate-200"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import type { Order } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
+import { cn } from "@/lib/utils";
 
 interface EditProps {
   open: boolean;
@@ -40,14 +42,14 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-white border-none rounded-none">
+      <DialogContent className={cn("sm:max-w-[500px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900 border-b border-slate-200 pb-4">
+          <DialogTitle className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-4">
             Cập nhật Đơn Hàng #{order?.OrderID}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label className="text-xs text-slate-500">
@@ -61,7 +63,7 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
                     OrderStatus: Number(e.target.value),
                   })
                 }
-                className="border-slate-200 focus:ring-blue-600 text-sm h-9 rounded-none"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
               >
                 <option value="0">Chờ xác nhận</option>
                 <option value="1">Đã xác nhận</option>
@@ -84,7 +86,7 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
                     ShippingStatus: Number(e.target.value),
                   })
                 }
-                className="border-slate-200 focus:ring-blue-600 text-sm h-9 rounded-none"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
               >
                 <option value="0">Cần lên lịch giao</option>
                 <option value="1">Đang đóng gói</option>
@@ -104,7 +106,7 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
               onChange={(e) =>
                 setFormData({ ...formData, ShipCode: e.target.value })
               }
-              className="border-slate-200 focus:ring-blue-600 rounded-none h-9"
+              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
             />
           </div>
 
@@ -116,7 +118,7 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
               onChange={(e) =>
                 setFormData({ ...formData, ShipmentNote: e.target.value })
               }
-              className="border-slate-200 focus:ring-blue-600 rounded-none h-9"
+              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
             />
           </div>
         </div>
@@ -124,13 +126,13 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
         <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             variant="outline"
-            className="rounded-none"
+           
             onClick={() => onOpenChange(false)}
           >
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Lưu thay đổi

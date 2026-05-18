@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
+import { dialog } from "@/pages/page-classes";
+import { cn } from "@/lib/utils";
 import { Trash2, Plus } from "lucide-react";
 
 interface NewProps {
@@ -138,9 +140,9 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[550px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[550px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Tạo mới phiếu hoàn tiền
           </DialogTitle>
         </DialogHeader>
@@ -157,7 +159,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                 value={orderName}
                 onChange={(e) => setOrderName(e.target.value)}
                 placeholder="Ví dụ: #ORD-2500"
-                className="border-slate-200 focus:ring-blue-600 h-9"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
               />
             </div>
             <div className="grid gap-1.5">
@@ -169,7 +171,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                 value={returnRefCode}
                 onChange={(e) => setReturnRefCode(e.target.value)}
                 placeholder="Ví dụ: REF-8000"
-                className="border-slate-200 focus:ring-blue-600 h-9"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
               />
             </div>
           </div>
@@ -185,7 +187,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                 value={employeeName}
                 onChange={(e) => setEmployeeName(e.target.value)}
                 placeholder="Nhập tên nhân viên..."
-                className="border-slate-200 focus:ring-blue-600 h-9"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
               />
             </div>
             <div className="grid gap-1.5">
@@ -198,7 +200,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                 value={totalRefund}
                 onChange={(e) => setTotalRefund(Number(e.target.value))}
                 placeholder="Nhập số tiền..."
-                className="border-slate-200 focus:ring-blue-600 h-9"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
               />
             </div>
           </div>
@@ -211,7 +213,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Nhập chi tiết lý do khách hàng hoàn tiền..."
-              className="border-slate-200 focus:ring-blue-600 text-sm"
+              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm"
               rows={2}
             />
           </div>
@@ -241,7 +243,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                             Number(e.target.value),
                           )
                         }
-                        className="border-slate-200 focus:ring-blue-600 text-xs h-8 w-full"
+                        className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-xs h-8 w-full"
                       >
                         {MOCK_PRODUCTS_LIST.map((prod) => (
                           <option key={prod.ProductID} value={prod.ProductID}>
@@ -265,7 +267,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                           )
                         }
                         placeholder="SL"
-                        className="border-slate-200 focus:ring-blue-600 h-8 text-xs"
+                        className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-8 text-xs"
                       />
                     </div>
 
@@ -290,7 +292,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                       onChange={(e) =>
                         handleProductChange(index, "qcStatus", e.target.value)
                       }
-                      className="border-slate-200 focus:ring-blue-600 h-7 text-xs"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-7 text-xs"
                     />
                     <Input
                       type="text"
@@ -303,7 +305,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                           e.target.value,
                         )
                       }
-                      className="border-slate-200 focus:ring-blue-600 h-7 text-xs"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-7 text-xs"
                     />
                   </div>
                 </div>

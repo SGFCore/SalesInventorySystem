@@ -9,6 +9,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEmp } from "@/context/empContext";
+import { cn } from "@/lib/utils";
+import { dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
 
 export function EditEmpDialog({
@@ -20,7 +22,6 @@ export function EditEmpDialog({
 }) {
   const { emp } = useEmp();
 
-  // Giả lập dữ liệu ban đầu từ ID
   const [formData, setFormData] = useState({
     email: emp.Email,
     phone: emp.Phone,
@@ -35,16 +36,14 @@ export function EditEmpDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] rounded-2xl bg-white">
+      <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-slate-900">
-            Chỉnh sửa hồ sơ
-          </DialogTitle>
+          <DialogTitle className={dialog.title}>Chỉnh sửa hồ sơ</DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-6 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-2">
-            <Label htmlFor="email" className="text-slate-700 font-medium">
+            <Label htmlFor="email" className={dialog.label}>
               Email
             </Label>
             <Input
@@ -52,12 +51,12 @@ export function EditEmpDialog({
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="focus-visible:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="phone" className="text-slate-700 font-medium">
+            <Label htmlFor="phone" className={dialog.label}>
               Số điện thoại
             </Label>
             <Input
@@ -65,37 +64,37 @@ export function EditEmpDialog({
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="focus-visible:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="newPassword" className="text-slate-700 font-medium">
+            <Label htmlFor="newPassword" className={dialog.label}>
               Mật khẩu mới
             </Label>
             <Input
               id="newPassword"
               name="newPassword"
-              type="newPassword"
+              type="password"
               placeholder="Để trống nếu không đổi"
               value={formData.newPassword}
               onChange={handleChange}
-              className="focus-visible:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="newPassword" className="text-slate-700 font-medium">
-              Mật khẩu
+            <Label htmlFor="oldPassword" className={dialog.label}>
+              Mật khẩu hiện tại
             </Label>
             <Input
               id="oldPassword"
               name="oldPassword"
-              type="oldPassword"
-              placeholder="Nhập mật khẩu (cũ) để xác nhận"
+              type="password"
+              placeholder="Nhập mật khẩu để xác nhận"
               value={formData.oldPassword}
               onChange={handleChange}
-              className="focus-visible:ring-blue-600"
+              className={dialog.input}
             />
           </div>
         </div>
@@ -104,14 +103,12 @@ export function EditEmpDialog({
           <Button
             type="button"
             variant="outline"
+            className={dialog.cancel}
             onClick={() => onOpenChange(false)}
           >
             Hủy
           </Button>
-          <Button
-            type="button"
-            className="bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-          >
+          <Button type="button" className={dialog.submit}>
             Cập nhật thay đổi
           </Button>
         </DialogFooter>

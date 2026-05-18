@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChangeProductDialog } from "@/pages/8.2-order-management-page/ChangeProductDialog";
 import { ReturnProductDialog } from "@/pages/8.2-order-management-page/ReturnProductDialog";
+import { page, btn, entity, input } from "@/pages/page-classes";
 
 const MOCK_ORDERS: Order[] = Array.from({ length: 45 }, (_, i) => ({
   OrderID: 5000 + i,
@@ -132,7 +133,7 @@ export default function OrderManagementPage() {
     return (
       <Badge
         variant="outline"
-        className={cn("rounded-none whitespace-nowrap", current.className)}
+        className={cn("whitespace-nowrap", current.className)}
       >
         {current.text}
       </Badge>
@@ -165,7 +166,7 @@ export default function OrderManagementPage() {
     return (
       <Badge
         variant="outline"
-        className={cn("rounded-none whitespace-nowrap", current.className)}
+        className={cn("whitespace-nowrap", current.className)}
       >
         {current.text}
       </Badge>
@@ -173,20 +174,20 @@ export default function OrderManagementPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-white min-h-screen">
+    <div className={page.shell}>
       <div ref={topRef} />
 
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex w-full max-w-sm items-center space-x-2">
+      <div className={page.header}>
+        <div className={page.searchWrap}>
           <Input
             placeholder="Tìm kiếm theo mã ĐH hoặc Tên KH..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border-slate-200 focus:ring-blue-600 rounded-none"
+            className={input.search}
           />
         </div>
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-none"
+          className={btn.primary}
           onClick={() => setIsNewOpen(true)}
         >
           Thêm đơn hàng
@@ -232,7 +233,7 @@ export default function OrderManagementPage() {
 
                 <TableCell>
                   <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium text-xs text-slate-500">
+                    <span className={entity.cellMeta}>
                       Tổng tiền
                     </span>
                     <span className="font-bold text-blue-600 mt-0.5">
@@ -246,17 +247,17 @@ export default function OrderManagementPage() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="h-8 w-8 p-0 rounded-none hover:bg-slate-100"
+                        className="h-8 w-8 p-0 hover:bg-slate-100"
                       >
                         <MoreHorizontal className="h-4 w-4 text-slate-600" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="bg-white rounded-none border border-slate-200 min-w-[140px]"
+                      className="bg-white border border-slate-200 min-w-[140px]"
                     >
                       <DropdownMenuItem
-                        className="text-slate-700 hover:bg-slate-100 rounded-none cursor-pointer text-xs py-2"
+                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2"
                         onClick={() => handleAction(order, "detail")}
                       >
                         Xem chi tiết
@@ -265,7 +266,7 @@ export default function OrderManagementPage() {
                         disabled={
                           order.OrderStatus === 4 || order.ShippingStatus >= 2
                         }
-                        className="text-slate-700 hover:bg-slate-100 rounded-none cursor-pointer text-xs py-2 disabled:opacity-50"
+                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50"
                         onClick={() => handleAction(order, "edit")}
                       >
                         Cập nhật
@@ -274,7 +275,7 @@ export default function OrderManagementPage() {
                         disabled={
                           order.OrderStatus === 4 || order.ShippingStatus >= 2
                         }
-                        className="text-slate-700 hover:bg-slate-100 rounded-none cursor-pointer text-xs py-2 disabled:opacity-50"
+                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50"
                         onClick={() => handleAction(order, "change")}
                       >
                         Đổi hàng
@@ -283,7 +284,7 @@ export default function OrderManagementPage() {
                         disabled={
                           order.OrderStatus === 4 || order.ShippingStatus >= 2
                         }
-                        className="text-slate-700 hover:bg-slate-100 rounded-none cursor-pointer text-xs py-2 disabled:opacity-50"
+                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50"
                         onClick={() => handleAction(order, "return")}
                       >
                         Trả hàng
@@ -292,7 +293,7 @@ export default function OrderManagementPage() {
                         disabled={
                           order.OrderStatus === 4 || order.ShippingStatus >= 2
                         }
-                        className="text-slate-700 hover:bg-slate-100 rounded-none cursor-pointer text-xs py-2 disabled:opacity-50"
+                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50"
                         onClick={() => handleAction(order, "ship")}
                       >
                         Giao vận
@@ -301,7 +302,7 @@ export default function OrderManagementPage() {
                         disabled={
                           order.OrderStatus === 4 || order.ShippingStatus >= 2
                         }
-                        className="text-red-600 hover:bg-red-50 rounded-none cursor-pointer text-xs py-2 font-medium disabled:opacity-50"
+                        className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-medium disabled:opacity-50"
                         onClick={() => handleAction(order, "cancel")}
                       >
                         Hủy đơn hàng
@@ -310,7 +311,7 @@ export default function OrderManagementPage() {
                         disabled={
                           order.OrderStatus === 4 || order.ShippingStatus >= 2
                         }
-                        className="text-red-600 hover:bg-red-50 rounded-none cursor-pointer text-xs py-2 font-medium disabled:opacity-50"
+                        className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-medium disabled:opacity-50"
                         onClick={() => handleAction(order, "cancelshipping")}
                       >
                         Hủy giao vận
@@ -319,7 +320,7 @@ export default function OrderManagementPage() {
                         disabled={
                           order.OrderStatus === 4 || order.ShippingStatus >= 2
                         }
-                        className="text-slate-700 hover:bg-slate-100 rounded-none cursor-pointer text-xs py-2 disabled:opacity-50"
+                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50"
                         onClick={() => handleAction(order, "packeted")}
                       >
                         Đóng gói xong
@@ -332,8 +333,8 @@ export default function OrderManagementPage() {
           </TableBody>
         </Table>
 
-        <div className="flex items-center justify-between px-4 py-4 border-t border-slate-200">
-          <div className="text-sm text-slate-500">
+        <div className={page.pagination}>
+          <div className={page.paginationText}>
             Hiển thị{" "}
             <span className="font-medium text-slate-900">
               {paginatedOrders.length}
@@ -350,27 +351,26 @@ export default function OrderManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 rounded-none border-slate-200"
+              className="h-8 w-8 p-0 border-slate-200"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
+                (pageNum) => (
                   <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
+                    key={pageNum}
+                    variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => setCurrentPage(pageNum)}
                     className={cn(
-                      "h-8 w-8 p-0 rounded-none",
-                      currentPage === page
+                      "h-8 w-8 p-0",
+                      currentPage === pageNum
                         ? "bg-blue-600 text-white"
                         : "text-slate-600 border-slate-200",
                     )}
                   >
-                    {page}
-                  </Button>
+                    {pageNum}</Button>
                 ),
               )}
             </div>
@@ -381,7 +381,7 @@ export default function OrderManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0 rounded-none border-slate-200"
+              className="h-8 w-8 p-0 border-slate-200"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

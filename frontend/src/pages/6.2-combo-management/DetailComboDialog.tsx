@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import type { Combo, ComboDetail } from "@/lib/types";
+import { dialog } from "@/pages/page-classes";
 
 interface DetailProps {
   open: boolean;
@@ -31,9 +33,9 @@ export function DetailComboDialog({ open, onOpenChange, combo }: DetailProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[450px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Chi tiết gói sản phẩm (Combo)
           </DialogTitle>
         </DialogHeader>

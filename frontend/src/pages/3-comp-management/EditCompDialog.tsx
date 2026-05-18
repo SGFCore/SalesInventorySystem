@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { ShipCompany } from "@/lib/types";
+import { btn, dialog } from "@/pages/page-classes";
 
 interface EditProps {
   open: boolean;
@@ -57,14 +59,14 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px] bg-white border-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className={cn("sm:max-w-[450px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+          <DialogTitle className={dialog.title}>
             Cập nhật đối tác vận chuyển
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="edit-shipCompanyName">
               Tên công ty <span className="text-red-500">*</span>
@@ -74,7 +76,7 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               name="shipCompanyName"
               value={formData.shipCompanyName}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -85,7 +87,7 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               name="supportedRegion"
               value={formData.supportedRegion}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -99,7 +101,7 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -112,7 +114,7 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -123,7 +125,7 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               name="address"
               value={formData.address}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
 
@@ -134,17 +136,17 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               name="notes"
               value={formData.notes}
               onChange={handleChange}
-              className="border-slate-200 focus:ring-blue-600"
+              className={dialog.input}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={btn.primary}
             onClick={handleSubmit}
           >
             Lưu thay đổi
