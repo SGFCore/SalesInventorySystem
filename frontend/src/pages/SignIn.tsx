@@ -1,106 +1,95 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock } from "lucide-react";
+import { Lock, UserCircle2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export function SignIn() {
-  const [email, setEmail] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual authentication
-    navigate("/");
+
+    // Logic "Đăng nhập bậy bạ": Chỉ cần không để trống là cho qua
+    if (employeeId.trim().length > 0 && password.trim().length > 0) {
+      toast.success("Đăng nhập thành công!");
+      login();
+      navigate("/");
+    } else {
+      toast.error("Vui lòng nhập đầy đủ thông tin.");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-main to-supporting flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-2xl p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-main mb-2">SGF Management</h1>
-          <p className="text-foreground">Đăng nhập vào hệ thống</p>
-        </div>
+    <div className="fixed inset-0 flex items-center justify-center p-4">
+      <Card className="w-full max-w-[400px] shadow-2xl border-none">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-bold text-blue-600 tracking-tight">
+            SGFMS
+          </CardTitle>
+          <CardDescription className="text-slate-500"></CardDescription>
+        </CardHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email Input */}
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-foreground mb-2"
-            >
-              Email
-            </label>
-            <div className="relative">
-              <Mail
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-main"
-                size={20}
-              />
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Nhập email của bạn"
-                className="w-full pl-10 pr-4 py-2 border-2 border-supporting rounded-lg focus:outline-none focus:border-main transition"
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            {/* Employee ID Input */}
+            <div className="space-y-2">
+              <Label htmlFor="employeeId" className="text-slate-700">
+                Mã nhân viên
+              </Label>
+              <Input
+                id="employeeId"
+                placeholder="Nhập mã nhân viên..."
+                value={employeeId}
+                onChange={(e) => setEmployeeId(e.target.value)}
                 required
               />
             </div>
-          </div>
 
-          {/* Password Input */}
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-foreground mb-2"
-            >
-              Mật khẩu
-            </label>
-            <div className="relative">
-              <Lock
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-main"
-                size={20}
-              />
-              <input
+            {/* Password Input */}
+            <div className="space-y-2">
+              <Label htmlFor="password" text-slate-700>
+                Mật khẩu
+              </Label>
+              <Input
                 id="password"
                 type="password"
+                placeholder="Nhập mật khẩu..."
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Nhập mật khẩu"
-                className="w-full pl-10 pr-4 py-2 border-2 border-supporting rounded-lg focus:outline-none focus:border-main transition"
                 required
               />
             </div>
-          </div>
 
-          {/* Remember & Forgot */}
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 accent-main" />
-              <span className="text-sm text-foreground">Nhớ tôi</span>
-            </label>
-            <a href="#" className="text-sm text-main hover:underline">
-              Quên mật khẩu?
-            </a>
-          </div>
+            <div className="flex flex-col gap-4 pb-8 mt-5">
+              <Button
+                type="submit"
+                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+              >
+                Đăng nhập ngay
+              </Button>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-main text-white font-semibold py-2 rounded-lg hover:opacity-90 transition"
-          >
-            Đăng nhập
-          </button>
+              <div className="text-center text-sm text-slate-500">
+                Nếu bạn gặp sự cố khi đăng nhập, vui lòng liên hệ với phòng IT.
+              </div>
+            </div>
+          </CardContent>
         </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-foreground">
-            Chưa có tài khoản?{" "}
-            <a href="#" className="text-main font-semibold hover:underline">
-              Đăng ký
-            </a>
-          </p>
-        </div>
-      </div>
+      </Card>
     </div>
   );
 }

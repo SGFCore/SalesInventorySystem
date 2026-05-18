@@ -5,6 +5,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1000,
     height: 700,
+    title: "SGFMS",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
@@ -16,9 +17,6 @@ function createWindow() {
 
   // Ẩn menu bar
   Menu.setApplicationMenu(null);
-
-  // Mở DevTools để kiểm tra lỗi
-  win.webContents.openDevTools();
 
   // Log lỗi nếu có
   win.webContents.on("crashed", () => {

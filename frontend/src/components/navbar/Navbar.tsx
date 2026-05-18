@@ -1,12 +1,12 @@
-import { Search, Bell } from "lucide-react";
-import { navbarData } from "@/data/navigation";
-import UserAvatar from "@/components/UserAvatar";
+import { Button } from "@/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Button } from "@/components/ui/button";
+import UserMenu from "@/components/navbar/UserMenu";
+import { navbarData } from "@/data/navigation";
+import { Bell, Search } from "lucide-react";
 
 export function Navbar() {
   return (
@@ -47,9 +47,8 @@ export function Navbar() {
         >
           <Bell size={18} />
         </Button>
-        <div className="h-8 w-8">
-          <UserAvatar username={"CN"} />
-        </div>
+
+        <UserMenu />
       </div>
     </nav>
   );
