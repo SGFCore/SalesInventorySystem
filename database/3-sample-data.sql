@@ -4473,7 +4473,7 @@ insert into importreceipt (
    hasdiscrepancy
 ) values ( 2,
            1,
-           N'Đã nhập kho',
+           N'Đã hoàn thành',
            date '2024-05-20',
            null,
            0 );
@@ -4486,7 +4486,7 @@ insert into importreceipt (
    hasdiscrepancy
 ) values ( 4,
            1,
-           N'Đã nhập kho',
+           N'Đã hoàn thành',
            date '2024-05-15',
            4,
            0 );
@@ -4499,7 +4499,7 @@ insert into importreceipt (
    hasdiscrepancy
 ) values ( 3,
            2,
-           N'Đã nhập kho',
+           N'Đã hoàn thành',
            date '2024-05-17',
            6,
            1 );
@@ -4512,7 +4512,7 @@ insert into importreceipt (
    hasdiscrepancy
 ) values ( 4,
            2,
-           N'Chờ duyệt',
+           N'Bản nháp',
            date '2024-05-18',
            7,
            0 );
@@ -4525,7 +4525,7 @@ insert into importreceipt (
    hasdiscrepancy
 ) values ( 1,
            1,
-           N'Đã nhập kho',
+           N'Đã hoàn thành',
            date '2024-05-21',
            10,
            0 );
@@ -4538,7 +4538,7 @@ insert into importreceipt (
    hasdiscrepancy
 ) values ( 2,
            1,
-           N'Đã nhập kho',
+           N'Đã hoàn thành',
            date '2024-04-10',
            null,
            0 );
@@ -4551,7 +4551,7 @@ insert into importreceipt (
    hasdiscrepancy
 ) values ( 4,
            1,
-           N'Đã nhập kho',
+           N'Đã hoàn thành',
            date '2024-04-15',
            null,
            1 );
@@ -4577,7 +4577,7 @@ insert into importreceipt (
    hasdiscrepancy
 ) values ( 2,
            2,
-           N'Đã nhập kho',
+           N'Đã hoàn thành',
            date '2024-05-23',
            null,
            0 );
