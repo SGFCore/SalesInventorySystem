@@ -133,13 +133,13 @@ export default function InvoiceManagementPage() {
       </div>
 
       {/* Invoice Table */}
-      <div className="border border-slate-200 overflow-hidden">
+      <div className={page.tableWrap}>
         <Table>
           <TableBody>
             {paginatedInvoices.map((invoice) => (
               <TableRow
                 key={invoice.InvoiceID}
-                className="hover:bg-slate-50 border-b border-slate-200"
+                className={page.tableRow}
               >
                 {/* ID Hóa đơn */}
                 <TableCell>
@@ -187,13 +187,13 @@ export default function InvoiceManagementPage() {
                   </div>
                 </TableCell>
 
-                {/* Các nút hành động có grid ngang bằng nhau */}
+                {/* Các nút hành động */}
                 <TableCell className="text-right">
-                  <div className="grid grid-cols-2 gap-2 w-full max-w-[260px] ml-auto">
+                  <div className="flex gap-2 justify-end">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 hover:bg-blue-50 w-full"
+                      className={cn(btn.actionSecondary, "w-32")}
                       onClick={() => handleDetailClick(invoice)}
                     >
                       Xem chi tiết
@@ -201,8 +201,7 @@ export default function InvoiceManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 hover:bg-blue-50 w-full"
-                      // onClick={() => handleDetailClick(invoice)}
+                      className={cn(btn.actionPrimary, "w-32")}
                     >
                       XN. thanh toán
                     </Button>
@@ -232,7 +231,7 @@ export default function InvoiceManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 border-slate-200"
+              className={btn.paginationNav}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -245,12 +244,7 @@ export default function InvoiceManagementPage() {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={cn(
-                      "h-8 w-8 p-0",
-                      currentPage === pageNum
-                        ? "bg-blue-600 text-white"
-                        : "text-slate-600 border-slate-200",
-                    )}
+                    className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
                   >
                     {pageNum}</Button>
                 ),
@@ -264,7 +258,7 @@ export default function InvoiceManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0 border-slate-200"
+              className={btn.paginationNav}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

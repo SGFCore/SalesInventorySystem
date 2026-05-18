@@ -89,12 +89,14 @@ export default function RequestManagementPage() {
       <div ref={topRef} />
 
       <div className={page.header}>
-        <Input
-          placeholder="Tìm kiếm theo mã yêu cầu, mã NV..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className={input.search}
-        />
+        <div className={page.searchWrap}>
+          <Input
+            placeholder="Tìm kiếm theo mã yêu cầu, mã NV..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={input.search}
+          />
+        </div>
         <Button
           className={btn.primary}
           onClick={() => setIsNewOpen(true)}
@@ -103,7 +105,7 @@ export default function RequestManagementPage() {
         </Button>
       </div>
 
-      <div className="border border-slate-200 overflow-hidden">
+      <div className={page.tableWrap}>
         <Table>
           <TableBody>
             {paginatedRequests.map((r) => (
@@ -140,7 +142,7 @@ export default function RequestManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 w-32"
+                      className={cn(btn.actionPrimary, "w-32")}
                       onClick={() => openAction(r, "view")}
                     >
                       Xem chi tiết
@@ -148,7 +150,7 @@ export default function RequestManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 w-32"
+                      className={cn(btn.actionPrimary, "w-32")}
                       onClick={() => openAction(r, "approve")}
                     >
                       Phê duyệt
@@ -187,12 +189,7 @@ export default function RequestManagementPage() {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={cn(
-                      "h-8 w-8 p-0",
-                      currentPage === pageNum
-                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
-                        : "text-slate-600 border-slate-200",
-                    )}
+                    className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
                   >
                     {pageNum}</Button>
                 ),

@@ -77,12 +77,14 @@ export default function PolicyManagementPage() {
       <div ref={topRef} />
 
       <div className={page.header}>
-        <Input
-          placeholder="Tìm kiếm chính sách..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className={input.search}
-        />
+        <div className={page.searchWrap}>
+          <Input
+            placeholder="Tìm kiếm chính sách..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={input.search}
+          />
+        </div>
         <Button
           className={btn.primary}
           onClick={() => setIsNewOpen(true)}
@@ -91,7 +93,7 @@ export default function PolicyManagementPage() {
         </Button>
       </div>
 
-      <div className="border border-slate-200 overflow-hidden">
+      <div className={page.tableWrap}>
         <Table>
           <TableBody>
             {paginatedPolicies.map((p) => (
@@ -120,7 +122,7 @@ export default function PolicyManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 w-32"
+                      className={cn(btn.actionPrimary, "w-32")}
                       onClick={() => openAction(p, "detail")}
                     >
                       Xem chi tiết
@@ -128,7 +130,7 @@ export default function PolicyManagementPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-blue-600 border-blue-200 w-32"
+                      className={cn(btn.actionPrimary, "w-32")}
                       onClick={() => openAction(p, "edit")}
                     >
                       Cập nhật
@@ -167,12 +169,7 @@ export default function PolicyManagementPage() {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={cn(
-                      "h-8 w-8 p-0",
-                      currentPage === pageNum
-                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
-                        : "text-slate-600 border-slate-200",
-                    )}
+                    className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
                   >
                     {pageNum}</Button>
                 ),

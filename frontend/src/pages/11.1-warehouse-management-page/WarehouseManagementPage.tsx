@@ -90,12 +90,14 @@ export default function WarehouseManagementPage() {
       <div ref={topRef} />
 
       <div className={page.header}>
-        <Input
-          placeholder="Tìm kiếm kho hàng..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className={input.search}
-        />
+        <div className={page.searchWrap}>
+          <Input
+            placeholder="Tìm kiếm kho hàng..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={input.search}
+          />
+        </div>
         <Button
           className={btn.primary}
           onClick={() => setIsNewOpen(true)}
@@ -104,13 +106,13 @@ export default function WarehouseManagementPage() {
         </Button>
       </div>
 
-      <div className="border border-slate-200 overflow-hidden">
+      <div className={page.tableWrap}>
         <Table>
           <TableBody>
             {paginatedWarehouses.map((w) => (
               <TableRow
                 key={w.WareHouseID}
-                className="hover:bg-slate-50 border-b border-slate-100 transition-none"
+                className={page.tableRow}
               >
                 {/* Mã kho hàng */}
                 <TableCell className="w-16 font-medium text-slate-500">
@@ -197,7 +199,7 @@ export default function WarehouseManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 transition-none"
+              className={btn.paginationNav}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -210,7 +212,7 @@ export default function WarehouseManagementPage() {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
+                    className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
                   >
                     {pageNum}</Button>
                 ),
@@ -224,7 +226,7 @@ export default function WarehouseManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0 transition-none"
+              className={btn.paginationNav}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

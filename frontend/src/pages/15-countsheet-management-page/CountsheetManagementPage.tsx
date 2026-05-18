@@ -92,12 +92,14 @@ export default function CountsheetManagementPage() {
 
       {/* Bộ lọc tìm kiếm & Thêm mới */}
       <div className={page.header}>
-        <Input
-          placeholder="Tìm kiếm theo mã phiếu kiểm kê..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className={input.search}
-        />
+        <div className={page.searchWrap}>
+          <Input
+            placeholder="Tìm kiếm theo mã phiếu kiểm kê..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={input.search}
+          />
+        </div>
         <Button
           className={btn.primary}
           onClick={() => setIsNewOpen(true)}
@@ -107,7 +109,7 @@ export default function CountsheetManagementPage() {
       </div>
 
       {/* Bảng danh sách chính */}
-      <div className="border border-slate-200 overflow-hidden">
+      <div className={page.tableWrap}>
         <Table>
           <TableBody>
             {paginatedCountsheets.map((c) => {
@@ -137,12 +139,12 @@ export default function CountsheetManagementPage() {
                     </span>
                   </TableCell>
                   <TableCell>
-                    {/* Grid nút thao tác: Chiều ngang bằng nhau cố định (w-28) */}
+                    {/* Grid nút thao tác: Đẹu đằng như các page khác */}
                     <div className="flex gap-2 justify-end">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-blue-600 border-blue-200 w-28"
+                        className={cn(btn.actionPrimary, "w-28")}
                         onClick={() => {
                           setSelectedCountsheet(c);
                           setDialogMode("view");
@@ -154,7 +156,7 @@ export default function CountsheetManagementPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-blue-600 border-blue-200 w-28"
+                        className={cn(btn.actionPrimary, "w-28")}
                         onClick={() => {
                           setSelectedCountsheet(c);
                           setDialogMode("approve");
@@ -166,7 +168,7 @@ export default function CountsheetManagementPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-blue-600 border-blue-200 w-28"
+                        className={cn(btn.actionPrimary, "w-28")}
                         onClick={() => {
                           setSelectedCountsheet(c);
                           setIsEditOpen(true);
@@ -210,12 +212,7 @@ export default function CountsheetManagementPage() {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={cn(
-                      "h-8 w-8 p-0",
-                      currentPage === pageNum
-                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
-                        : "text-slate-600 border-slate-200",
-                    )}
+                    className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
                   >
                     {pageNum}</Button>
                 ),

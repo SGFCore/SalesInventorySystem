@@ -135,20 +135,20 @@ export default function OrderReturnManagementPage() {
                   </div>
                 </TableCell>
 
-                {/* Grid các button hành động có chiều ngang bằng nhau */}
+                {/* Các button hành động */}
                 <TableCell>
-                  <div className="grid grid-cols-2 gap-2 w-56 ml-auto">
+                  <div className="flex gap-2 justify-end">
                     <Button
                       variant="outline"
                       size="sm"
-                      className={cn(btn.actionSecondary, "w-full")}
+                      className={cn(btn.actionSecondary, "w-32")}
                       onClick={() => handleDetailClick(item)}
                     >
                       Xem chi tiết
                     </Button>
                     <Button
                       size="sm"
-                      className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                      className={cn(btn.primary, "w-32")}
                       onClick={() => handleAcceptClick(item.ReturnID)}
                     >
                       Chấp nhận
@@ -187,7 +187,7 @@ export default function OrderReturnManagementPage() {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
+                    className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
                   >
                     {pageNum}</Button>
                 ),

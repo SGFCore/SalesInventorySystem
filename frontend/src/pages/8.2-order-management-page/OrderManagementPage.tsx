@@ -194,7 +194,7 @@ export default function OrderManagementPage() {
         </Button>
       </div>
 
-      <div className="border border-slate-200 overflow-hidden">
+      <div className={page.tableWrap}>
         <Table>
           <TableBody>
             {paginatedOrders.map((order) => (
@@ -351,7 +351,7 @@ export default function OrderManagementPage() {
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 border-slate-200"
+              className={btn.paginationNav}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -363,12 +363,7 @@ export default function OrderManagementPage() {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={cn(
-                      "h-8 w-8 p-0",
-                      currentPage === pageNum
-                        ? "bg-blue-600 text-white"
-                        : "text-slate-600 border-slate-200",
-                    )}
+                    className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
                   >
                     {pageNum}</Button>
                 ),
@@ -381,7 +376,7 @@ export default function OrderManagementPage() {
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8 p-0 border-slate-200"
+              className={btn.paginationNav}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
