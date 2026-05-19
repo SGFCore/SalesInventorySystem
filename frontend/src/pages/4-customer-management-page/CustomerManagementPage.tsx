@@ -1,41 +1,47 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { useEmp } from "@/context/empContext";
 import type { Customer } from "@/lib/types";
-import { cn } from "@/lib/utils"; // Import cn để xử lý class
-import { ChevronLeft, ChevronRight } from "lucide-react"; // Import icon
+import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { DetailCustomerDialog } from "./DetailCustomerDialog";
 import { EditCustomerDialog } from "./EditCustomerDialog";
 import { FeedbackDialog } from "./FeedbackDialog";
 import { OrderHistoryDialog } from "./OrderHistoryDialog";
-import { NewCustomerDialog } from "@/pages/4-customer-management-page/NewCustomerDialog";
+import { NewCustomerDialog } from "./NewCustomerDialog";
 import { page, input, btn, entity } from "@/pages/page-classes";
-
-const MOCK_CUSTOMERS: Customer[] = Array.from({ length: 45 }, (_, i) => ({
-  CustomerID: 2000 + i,
-  CustomerTypeID: (i % 2) + 1,
-  FirstName: i % 2 === 0 ? "Nguyễn" : "Trần",
-  LastName: i % 2 === 0 ? "Văn A" : "Thị B",
-  CompanyName: i % 3 === 0 ? "Công ty Giải pháp Công nghệ" : "",
-  Phone: `090${1000000 + i}`,
-  Address: "123 Đường số 1, Quận 1, TP.HCM",
-  Email: `customer${i}@example.com`,
-  CreatedDate: new Date(),
-  TotalAccumulatedSpent: 5000000 + i * 100000,
-}));
+import { api } from "@/lib/api";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function CustomerManagementPage() {
-  const { hasRole } = useEmp();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null,
   );
+  const [customers, setCustomers] = useState<Customer[]>([]); // Khởi tạo mảng rỗng thay vì undefined
+
+  // SỬA LỖI: Gọi hàm init() bên trong useEffect
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const data = await api.customers.list();
+        if (!data) {
+          alert("KHÔNG CÓ DATA!");
+          setCustomers([]);
+        } else {
+          setCustomers(data);
+        }
+      } catch (error) {
+        console.error("Lỗi lấy dữ liệu khách hàng:", error);
+        setCustomers([]);
+      }
+    };
+    init(); // Phải gọi hàm này ở đây!
+  }, []);
 
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -56,7 +62,7 @@ export default function CustomerManagementPage() {
   const [isOrderOpen, setIsOrderOpen] = useState(false);
   const [isNewOpen, setIsNewOpen] = useState(false);
 
-  const filtered = MOCK_CUSTOMERS.filter((c) =>
+  const filtered = customers.filter((c) =>
     `${c.FirstName} ${c.LastName}`.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -78,6 +84,20 @@ export default function CustomerManagementPage() {
     if (type === "order") setIsOrderOpen(true);
   };
 
+  // Hàm cập nhật danh sách local sau khi sửa
+  const handleUpdateCustomer = (updatedCustomer: Customer) => {
+    setCustomers((prev) =>
+      prev.map((c) =>
+        c.CustomerID === updatedCustomer.CustomerID ? updatedCustomer : c,
+      ),
+    );
+  };
+
+  // Hàm thêm mới vào danh sách local
+  const handleAddCustomer = (newCustomer: Customer) => {
+    setCustomers((prev) => [newCustomer, ...prev]);
+  };
+
   return (
     <div className={page.shell}>
       <div ref={topRef} />
@@ -89,10 +109,7 @@ export default function CustomerManagementPage() {
           onChange={(e) => setSearch(e.target.value)}
           className={input.search}
         />
-        <Button
-          className={btn.primary}
-          onClick={() => setIsNewOpen(true)}
-        >
+        <Button className={btn.primary} onClick={() => setIsNewOpen(true)}>
           Thêm khách hàng mới
         </Button>
       </div>
@@ -100,106 +117,121 @@ export default function CustomerManagementPage() {
       <div className={page.tableWrap}>
         <Table>
           <TableBody>
-            {paginatedCustomers.map((c) => (
-              <TableRow
-                key={c.CustomerID}
-                className={page.tableRow}
-              >
-                <TableCell className={cn("w-20", entity.id)}>
-                  {c.CustomerID}
-                </TableCell>
-                <TableCell className={cn("text-left", entity.name)}>
-                  {c.FirstName} {c.LastName}
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2 justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={btn.actionPrimary}
-                      onClick={() => openAction(c, "detail")}
-                    >
-                      Xem chi tiết
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={btn.actionPrimary}
-                      onClick={() => openAction(c, "edit")}
-                    >
-                      Cập nhật
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={btn.actionPrimary}
-                      onClick={() => openAction(c, "feedback")}
-                    >
-                      Phản hồi
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={btn.actionPrimary}
-                      onClick={() => openAction(c, "order")}
-                    >
-                      Lịch sử
-                    </Button>
-                  </div>
+            {paginatedCustomers.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={3}
+                  className="text-center py-8 text-slate-400"
+                >
+                  Không tìm thấy khách hàng nào hợp lệ.
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              paginatedCustomers.map((c) => (
+                <TableRow key={c.CustomerID} className={page.tableRow}>
+                  <TableCell className={cn("w-20", entity.id)}>
+                    {c.CustomerID}
+                  </TableCell>
+                  <TableCell className={cn("text-left", entity.name)}>
+                    {c.FirstName} {c.LastName}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={btn.actionPrimary}
+                        onClick={() => openAction(c, "detail")}
+                      >
+                        Xem chi tiết
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={btn.actionPrimary}
+                        onClick={() => openAction(c, "edit")}
+                      >
+                        Cập nhật
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={btn.actionPrimary}
+                        onClick={() => openAction(c, "feedback")}
+                      >
+                        Phản hồi
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={btn.actionPrimary}
+                        onClick={() => openAction(c, "order")}
+                      >
+                        Lịch sử
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
 
-        {/* Bộ điều khiển Phân trang Refactored */}
-        <div className={page.pagination}>
-          <div className={page.paginationText}>
-            Hiển thị{" "}
-            <span className="font-medium">{paginatedCustomers.length}</span>{" "}
-            trên <span className="font-medium">{filtered.length}</span> khách
-            hàng
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={btn.paginationNav}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (pageNum) => (
-                  <Button
-                    key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
-                  >
-                    {pageNum}</Button>
-                ),
-              )}
+        {/* Phân trang */}
+        {totalPages > 0 && (
+          <div className={page.pagination}>
+            <div className={page.paginationText}>
+              Hiển thị{" "}
+              <span className="font-medium">{paginatedCustomers.length}</span>{" "}
+              trên <span className="font-medium">{filtered.length}</span> khách
+              hàng
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages || totalPages === 0}
-              className={btn.paginationNav}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={btn.paginationNav}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (pageNum) => (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={cn(
+                        currentPage === pageNum
+                          ? btn.paginationActive
+                          : btn.paginationInactive,
+                      )}
+                    >
+                      {pageNum}
+                    </Button>
+                  ),
+                )}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages || totalPages === 0}
+                className={btn.paginationNav}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Dialogs */}
@@ -208,22 +240,31 @@ export default function CustomerManagementPage() {
         onOpenChange={setIsDetailOpen}
         customer={selectedCustomer}
       />
+
       <EditCustomerDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         customer={selectedCustomer}
+        onSave={handleUpdateCustomer}
       />
+
       <FeedbackDialog
         open={isFeedbackOpen}
         onOpenChange={setIsFeedbackOpen}
         customer={selectedCustomer}
       />
+
       <OrderHistoryDialog
         open={isOrderOpen}
         onOpenChange={setIsOrderOpen}
         customer={selectedCustomer}
       />
-      <NewCustomerDialog open={isNewOpen} onOpenChange={setIsNewOpen} />
+
+      <NewCustomerDialog
+        open={isNewOpen}
+        onOpenChange={setIsNewOpen}
+        onSave={handleAddCustomer}
+      />
     </div>
   );
 }

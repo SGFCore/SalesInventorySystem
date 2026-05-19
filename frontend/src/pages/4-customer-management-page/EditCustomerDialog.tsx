@@ -13,20 +13,32 @@ import type { Customer } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
 
+interface EditCustomerProps {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  customer: Customer | null;
+  onSave: (updated: Customer) => void;
+}
+
 export function EditCustomerDialog({
   open,
   onOpenChange,
   customer,
-}: {
-  open: boolean;
-  onOpenChange: (o: boolean) => void;
-  customer: Customer | null;
-}) {
+  onSave,
+}: EditCustomerProps) {
   const [form, setForm] = useState<Partial<Customer>>({});
 
   useEffect(() => {
     if (customer) setForm(customer);
   }, [customer]);
+
+  const handleSubmit = () => {
+    if (customer) {
+      // Gộp data cũ và mới rồi gửi ra ngoài
+      onSave({ ...customer, ...form } as Customer);
+      onOpenChange(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -89,10 +101,14 @@ export function EditCustomerDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            className={dialog.cancel}
+            onClick={() => onOpenChange(false)}
+          >
             Hủy
           </Button>
-          <Button className={btn.primary}>
+          <Button className={btn.primary} onClick={handleSubmit}>
             Lưu thay đổi
           </Button>
         </DialogFooter>

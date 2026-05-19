@@ -11,15 +11,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
+import type { Customer } from "@/lib/types";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: (newCustomer: Customer) => void;
 }
 
-export function NewCustomerDialog({ open, onOpenChange }: Props) {
+export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
   const [formData, setFormData] = useState({
-    CustomerTypeID: "",
+    CustomerTypeID: "1",
     FirstName: "",
     LastName: "",
     CompanyName: "",
@@ -34,7 +36,35 @@ export function NewCustomerDialog({ open, onOpenChange }: Props) {
   };
 
   const handleSubmit = () => {
-    console.log("Dữ liệu gửi đi:", formData);
+    if (!formData.FirstName || !formData.LastName) {
+      alert("Vui lòng điền họ và tên!");
+      return;
+    }
+
+    const newCustomer: Customer = {
+      CustomerID: Math.floor(Math.random() * 8000) + 3000, // Mock ID ngẫu nhiên
+      CustomerTypeID: Number(formData.CustomerTypeID) || 1,
+      FirstName: formData.FirstName,
+      LastName: formData.LastName,
+      CompanyName: formData.CompanyName,
+      Phone: formData.Phone,
+      Email: formData.Email,
+      Address: formData.Address,
+      CreatedDate: new Date(),
+      TotalAccumulatedSpent: 0, // Mới tạo chi tiêu bằng 0
+    };
+
+    onSave(newCustomer);
+    // Reset form
+    setFormData({
+      CustomerTypeID: "1",
+      FirstName: "",
+      LastName: "",
+      CompanyName: "",
+      Phone: "",
+      Email: "",
+      Address: "",
+    });
     onOpenChange(false);
   };
 
@@ -128,13 +158,14 @@ export function NewCustomerDialog({ open, onOpenChange }: Props) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            className={dialog.cancel}
+            onClick={() => onOpenChange(false)}
+          >
             Hủy
           </Button>
-          <Button
-            className={btn.primary}
-            onClick={handleSubmit}
-          >
+          <Button className={btn.primary} onClick={handleSubmit}>
             Tạo mới
           </Button>
         </DialogFooter>
