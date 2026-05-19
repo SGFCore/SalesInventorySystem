@@ -3234,7 +3234,7 @@ insert into orderdetail (
    discountamount,
    totalamount
 ) values ( 2,
-           null,
+           2,
            2,
            1,
            150000,
@@ -3365,7 +3365,7 @@ insert into orderdetail (
    discountamount,
    totalamount
 ) values ( 8,
-           null,
+           3,
            5,
            1,
            300000,
