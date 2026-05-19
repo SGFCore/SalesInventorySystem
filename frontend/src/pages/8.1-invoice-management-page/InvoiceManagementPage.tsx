@@ -76,37 +76,24 @@ export default function InvoiceManagementPage() {
     switch (status) {
       case "0":
         return (
-          <Badge
-            variant="outline"
-            className={cn(badge.base, badge.pending)}
-          >
+          <Badge variant="outline" className={cn(badge.base, badge.pending)}>
             Chờ thanh toán
           </Badge>
         );
       case "1":
         return (
-          <Badge
-            variant="outline"
-            className={cn(badge.base, badge.success)}
-          >
+          <Badge variant="outline" className={cn(badge.base, badge.success)}>
             Đã thanh toán
           </Badge>
         );
       case "2":
         return (
-          <Badge
-            variant="outline"
-            className={cn(badge.base, badge.info)}
-          >
+          <Badge variant="outline" className={cn(badge.base, badge.info)}>
             Thanh toán 1 phần
           </Badge>
         );
       default:
-        return (
-          <Badge variant="outline">
-            Không xác định
-          </Badge>
-        );
+        return <Badge variant="outline">Không xác định</Badge>;
     }
   };
 
@@ -124,10 +111,7 @@ export default function InvoiceManagementPage() {
             className={input.search}
           />
         </div>
-        <Button
-          className={btn.primary}
-          onClick={() => setIsNewOpen(true)}
-        >
+        <Button className={btn.primary} onClick={() => setIsNewOpen(true)}>
           Thêm hóa đơn
         </Button>
       </div>
@@ -137,16 +121,11 @@ export default function InvoiceManagementPage() {
         <Table>
           <TableBody>
             {paginatedInvoices.map((invoice) => (
-              <TableRow
-                key={invoice.InvoiceID}
-                className={page.tableRow}
-              >
+              <TableRow key={invoice.InvoiceID} className={page.tableRow}>
                 {/* ID Hóa đơn */}
                 <TableCell>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm font-bold text-slate-900">
-                      #{invoice.InvoiceID}
-                    </span>
+                    <span className={entity.id}>{invoice.InvoiceID}</span>
                     <span className="text-xs text-slate-500 mt-0.5">
                       {invoice.InvoiceDate.toLocaleDateString("vi-VN")}
                     </span>
@@ -156,9 +135,6 @@ export default function InvoiceManagementPage() {
                 {/* Kênh bán */}
                 <TableCell>
                   <div className="flex flex-col items-start text-sm">
-                    <span className={entity.cellMeta}>
-                      Kênh bán
-                    </span>
                     <span className="font-medium text-slate-700 mt-0.5">
                       {renderChannel(invoice.SaleChannelCode)}
                     </span>
@@ -168,9 +144,6 @@ export default function InvoiceManagementPage() {
                 {/* Trạng thái */}
                 <TableCell>
                   <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium text-xs text-slate-500 mb-1">
-                      Trạng thái
-                    </span>
                     {renderStatus(invoice.Status)}
                   </div>
                 </TableCell>
@@ -178,9 +151,7 @@ export default function InvoiceManagementPage() {
                 {/* Tổng tiền */}
                 <TableCell>
                   <div className="flex flex-col items-start text-sm">
-                    <span className={entity.cellMeta}>
-                      Tổng tiền
-                    </span>
+                    <span className={entity.cellMeta}>Tổng tiền</span>
                     <span className="font-bold text-slate-900 mt-0.5">
                       {invoice.FinalAmount.toLocaleString("vi-VN")} đ
                     </span>
@@ -244,9 +215,14 @@ export default function InvoiceManagementPage() {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
+                    className={
+                      currentPage === pageNum
+                        ? btn.paginationActive
+                        : btn.paginationInactive
+                    }
                   >
-                    {pageNum}</Button>
+                    {pageNum}
+                  </Button>
                 ),
               )}
             </div>

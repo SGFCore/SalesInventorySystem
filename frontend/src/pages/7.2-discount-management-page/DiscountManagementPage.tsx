@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
@@ -6,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { DetailDiscountDialog } from "@/pages/7.2-discount-management-page/DetailDiscountDialog";
 import { EditDiscountDialog } from "@/pages/7.2-discount-management-page/EditDiscountDialog";
 import { NewDiscountDialog } from "@/pages/7.2-discount-management-page/NewDiscountDialog";
-import { page, btn, entity, input } from "@/pages/page-classes";
+import { page, btn, entity, input, badge } from "@/pages/page-classes";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -124,10 +125,7 @@ export default function DiscountManagementPage() {
             className={input.search}
           />
         </div>
-        <Button
-          className={btn.primary}
-          onClick={() => setIsNewOpen(true)}
-        >
+        <Button className={btn.primary} onClick={() => setIsNewOpen(true)}>
           Thêm khuyến mãi mới
         </Button>
       </div>
@@ -142,15 +140,12 @@ export default function DiscountManagementPage() {
               );
 
               return (
-                <TableRow
-                  key={discount.DiscountID}
-                  className={page.tableRow}
-                >
+                <TableRow key={discount.DiscountID} className={page.tableRow}>
                   {/* Thông tin chung (Mã & Tên) */}
                   <TableCell>
                     <div className="flex flex-col items-start">
-                      <div className="flex items-center gap-2 text-xs text-slate-400 mb-0.5">
-                        <span>#{discount.DiscountID}</span>
+                      <div className="flex items-center gap-2 text-xs mb-0.5">
+                        <span className={entity.id}>{discount.DiscountID}</span>
                         <span>•</span>
                         <span className="text-slate-500 font-medium">
                           SP:{" "}
@@ -168,10 +163,8 @@ export default function DiscountManagementPage() {
                   {/* Giá trị giảm giá */}
                   <TableCell>
                     <div className="flex flex-col items-start text-sm">
-                      <span className={entity.cellMeta}>
-                        Mức giảm giá
-                      </span>
-                      <span className={cn(entity.price, 'mt-0.5')}>
+                      <span className={entity.cellMeta}>Mức giảm giá</span>
+                      <span className={cn(entity.price, "mt-0.5")}>
                         {discount.Value.toLocaleString("vi-VN")} đ
                       </span>
                     </div>
@@ -181,9 +174,21 @@ export default function DiscountManagementPage() {
                   <TableCell>
                     <div className="flex flex-col items-start text-xs">
                       <span className="text-slate-400 mb-0.5">Trạng thái</span>
-                      <span className={getStatusClass(discount.Status)}>
-                        {getStatusLabel(discount.Status)}
-                      </span>
+                      {discount.Status === 1 ? (
+                        <Badge
+                          variant="outline"
+                          className={cn(badge.base, badge.success)}
+                        >
+                          {getStatusLabel(discount.Status)}
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className={cn(badge.base, badge.danger)}
+                        >
+                          {getStatusLabel(discount.Status)}
+                        </Badge>
+                      )}
                     </div>
                   </TableCell>
 
@@ -241,9 +246,14 @@ export default function DiscountManagementPage() {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
+                    className={cn(
+                      currentPage === pageNum
+                        ? btn.paginationActive
+                        : btn.paginationInactive,
+                    )}
                   >
-                    {pageNum}</Button>
+                    {pageNum}
+                  </Button>
                 ),
               )}
             </div>

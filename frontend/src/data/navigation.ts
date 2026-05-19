@@ -50,11 +50,6 @@ export const sidebarData: SidebarItem[] = [
     availableRole: [1, 2, 3, 4],
   },
   {
-    directionTo: "/combo-management",
-    label: "Quản lý gói sản phẩm",
-    availableRole: [1],
-  },
-  {
     directionTo: "/discount-management",
     label: "Quản lý khuyến mãi",
     availableRole: [1],
@@ -73,11 +68,6 @@ export const sidebarData: SidebarItem[] = [
     directionTo: "/orderreturn-management",
     label: "Quản lý hoàn tiền",
     availableRole: [4],
-  },
-  {
-    directionTo: "/policy-management",
-    label: "Quản lý chính sách đổi trả",
-    availableRole: [1],
   },
   {
     directionTo: "/warehouse-management",

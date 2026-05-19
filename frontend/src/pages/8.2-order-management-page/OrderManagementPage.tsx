@@ -186,10 +186,7 @@ export default function OrderManagementPage() {
             className={input.search}
           />
         </div>
-        <Button
-          className={btn.primary}
-          onClick={() => setIsNewOpen(true)}
-        >
+        <Button className={btn.primary} onClick={() => setIsNewOpen(true)}>
           Thêm đơn hàng
         </Button>
       </div>
@@ -204,9 +201,7 @@ export default function OrderManagementPage() {
               >
                 <TableCell>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm font-bold text-slate-900">
-                      #{order.OrderID}
-                    </span>
+                    <span className={entity.id}>{order.OrderID}</span>
                     <span className="text-xs font-medium text-slate-500 mt-0.5">
                       {order.CustomerName}
                     </span>
@@ -233,9 +228,7 @@ export default function OrderManagementPage() {
 
                 <TableCell>
                   <div className="flex flex-col items-start text-sm">
-                    <span className={entity.cellMeta}>
-                      Tổng tiền
-                    </span>
+                    <span className={entity.cellMeta}>Tổng tiền</span>
                     <span className="font-bold text-blue-600 mt-0.5">
                       {order.TotalAmount.toLocaleString("vi-VN")} đ
                     </span>
@@ -363,9 +356,14 @@ export default function OrderManagementPage() {
                     variant={currentPage === pageNum ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
+                    className={
+                      currentPage === pageNum
+                        ? btn.paginationActive
+                        : btn.paginationInactive
+                    }
                   >
-                    {pageNum}</Button>
+                    {pageNum}
+                  </Button>
                 ),
               )}
             </div>
