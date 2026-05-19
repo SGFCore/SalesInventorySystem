@@ -1,7 +1,0 @@
-package dev.uit.project.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import dev.uit.project.entities.Invoice;
-
-public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
-}

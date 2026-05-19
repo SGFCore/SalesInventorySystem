@@ -1,114 +1,52 @@
 package dev.uit.project.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.uit.project.entity.Orderdetail;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 
-public class OrderdetailDTO {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderDetailDTO {
+
+    @JsonProperty("OrderDetailID")
     private Long id;
+
+    @JsonProperty("OrderID")
     private Long orderid;
+
+    @JsonProperty("ProductID")
     private Long productid;
+
+    @JsonProperty("ComboID")
     private Long comboid;
+
+    @JsonProperty("Quantity")
     private Long quantity;
+
+    @JsonProperty("UnitPrice")
     private BigDecimal unitprice;
+
+    @JsonProperty("DiscountAmount")
     private BigDecimal discountamount;
+
+    @JsonProperty("TotalAmount")
     private BigDecimal totalamount;
 
-    // constructor khong tham so
-    public OrderdetailDTO() {
-    }
-
-    // constructor day dy tham so
-    public OrderdetailDTO(Long id, Long orderid, Long productid, Long comboid,
-                          Long quantity, BigDecimal unitprice, BigDecimal discountamount,
-                          BigDecimal totalamount) {
-        this.id = id;
-        this.orderid = orderid;
-        this.productid = productid;
-        this.comboid = comboid;
-        this.quantity = quantity;
-        this.unitprice = unitprice;
-        this.discountamount = discountamount;
-        this.totalamount = totalamount;
-    }
-
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getOrderid() {
-        return orderid;
-    }
-
-    public void setOrderid(Long orderid) {
-        this.orderid = orderid;
-    }
-
-    public Long getProductid() {
-        return productid;
-    }
-
-    public void setProductid(Long productid) {
-        this.productid = productid;
-    }
-
-    public Long getComboid() {
-        return comboid;
-    }
-
-    public void setComboid(Long comboid) {
-        this.comboid = comboid;
-    }
-
-    public Long getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Long quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getUnitprice() {
-        return unitprice;
-    }
-
-    public void setUnitprice(BigDecimal unitprice) {
-        this.unitprice = unitprice;
-    }
-
-    public BigDecimal getDiscountamount() {
-        return discountamount;
-    }
-
-    public void setDiscountamount(BigDecimal discountamount) {
-        this.discountamount = discountamount;
-    }
-
-    public BigDecimal getTotalamount() {
-        return totalamount;
-    }
-
-    public void setTotalamount(BigDecimal totalamount) {
-        this.totalamount = totalamount;
-    }
-
-    // Static fromEntity method
-    public static OrderdetailDTO fromEntity(Orderdetail entity) {
-        if (entity == null) {
-            return null;
-        }
-        Long orderId = entity.getOrderid() != null ? entity.getOrderid().getId() : null;
-        Long productId = entity.getProductid() != null ? entity.getProductid().getId() : null;
-        Long comboId = entity.getComboid() != null ? entity.getComboid().getId() : null;
-        return new OrderdetailDTO(
+    public static OrderDetailDTO fromEntity(Orderdetail entity) {
+        if (entity == null) return null;
+        Long orderIdVal = entity.getOrderid() != null ? entity.getOrderid().getId() : null;
+        Long productIdVal = entity.getProductid() != null ? entity.getProductid().getId() : null;
+        Long comboIdVal = entity.getComboid() != null ? entity.getComboid().getId() : null;
+        return new OrderDetailDTO(
                 entity.getId(),
-                orderId,
-                productId,
-                comboId,
+                orderIdVal,
+                productIdVal,
+                comboIdVal,
                 entity.getQuantity(),
                 entity.getUnitprice(),
                 entity.getDiscountamount(),

@@ -1,54 +1,28 @@
 package dev.uit.project.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.uit.project.entity.Paymentmethod;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public class PaymentmethodDTO {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PaymentMethodDTO {
+
+    @JsonProperty("PaymentMethodID")
     private Long id;
+
+    @JsonProperty("PaymentName")
     private String paymentname;
+
+    @JsonProperty("Status")
     private Integer status;
 
-    // Constructor không tham số
-    public PaymentmethodDTO() {
-    }
-
-    // Constructor có tham số
-    public PaymentmethodDTO(Long id, String paymentname, Integer status) {
-        this.id = id;
-        this.paymentname = paymentname;
-        this.status = status;
-    }
-
-    // Getter và Setter
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPaymentname() {
-        return paymentname;
-    }
-
-    public void setPaymentname(String paymentname) {
-        this.paymentname = paymentname;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    // Phương thức fromEntity
-    public static PaymentmethodDTO fromEntity(Paymentmethod entity) {
-        if (entity == null) {
-            return null;
-        }
-        return new PaymentmethodDTO(
+    public static PaymentMethodDTO fromEntity(Paymentmethod entity) {
+        if (entity == null) return null;
+        return new PaymentMethodDTO(
                 entity.getId(),
                 entity.getPaymentname(),
                 entity.getStatus()

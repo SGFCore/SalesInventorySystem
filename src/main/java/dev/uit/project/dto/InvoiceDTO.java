@@ -1,123 +1,54 @@
 package dev.uit.project.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.uit.project.entity.Invoice;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class InvoiceDTO {
+
+    @JsonProperty("InvoiceID")
     private Long id;
+
+    @JsonProperty("CustomerID")
     private Long customerid;
+
+    @JsonProperty("EmployeeID")
     private Long employeeid;
+
+    @JsonProperty("SaleChannelCode")
     private Long salechannelcode;
+
+    @JsonProperty("TotalAmount")
     private BigDecimal totalamount;
+
+    @JsonProperty("TaxAmount")
     private BigDecimal taxamount;
+
+    @JsonProperty("FinalAmount")
     private BigDecimal finalamount;
+
+    @JsonProperty("Status")
     private String status;
+
+    @JsonProperty("InvoiceDate")
     private LocalDate invoicedate;
 
-    // Constructor không tham số
-    public InvoiceDTO() {
-    }
-
-    // Constructor đầy đủ tham số
-    public InvoiceDTO(Long id, Long customerid, Long employeeid, Long salechannelcode,
-                      BigDecimal totalamount, BigDecimal taxamount, BigDecimal finalamount,
-                      String status, LocalDate invoicedate) {
-        this.id = id;
-        this.customerid = customerid;
-        this.employeeid = employeeid;
-        this.salechannelcode = salechannelcode;
-        this.totalamount = totalamount;
-        this.taxamount = taxamount;
-        this.finalamount = finalamount;
-        this.status = status;
-        this.invoicedate = invoicedate;
-    }
-
-    // Getter và Setter
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getCustomerid() {
-        return customerid;
-    }
-
-    public void setCustomerid(Long customerid) {
-        this.customerid = customerid;
-    }
-
-    public Long getEmployeeid() {
-        return employeeid;
-    }
-
-    public void setEmployeeid(Long employeeid) {
-        this.employeeid = employeeid;
-    }
-
-    public Long getSalechannelcode() {
-        return salechannelcode;
-    }
-
-    public void setSalechannelcode(Long salechannelcode) {
-        this.salechannelcode = salechannelcode;
-    }
-
-    public BigDecimal getTotalamount() {
-        return totalamount;
-    }
-
-    public void setTotalamount(BigDecimal totalamount) {
-        this.totalamount = totalamount;
-    }
-
-    public BigDecimal getTaxamount() {
-        return taxamount;
-    }
-
-    public void setTaxamount(BigDecimal taxamount) {
-        this.taxamount = taxamount;
-    }
-
-    public BigDecimal getFinalamount() {
-        return finalamount;
-    }
-
-    public void setFinalamount(BigDecimal finalamount) {
-        this.finalamount = finalamount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDate getInvoicedate() {
-        return invoicedate;
-    }
-
-    public void setInvoicedate(LocalDate invoicedate) {
-        this.invoicedate = invoicedate;
-    }
-
-    // Phương thức fromEntity
     public static InvoiceDTO fromEntity(Invoice entity) {
-        if (entity == null) {
-            return null;
-        }
-        Long customerIdVal = entity.getCustomerid() != null ? entity.getCustomerid().getId() : null;
-        Long employeeIdVal = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
+        if (entity == null) return null;
+        Long customerVal = entity.getCustomerid() != null ? entity.getCustomerid().getId() : null;
+        Long employeeVal = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
         return new InvoiceDTO(
                 entity.getId(),
-                customerIdVal,
-                employeeIdVal,
+                customerVal,
+                employeeVal,
                 entity.getSalechannelcode(),
                 entity.getTotalamount(),
                 entity.getTaxamount(),

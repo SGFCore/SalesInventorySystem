@@ -4,6 +4,7 @@ import dev.uit.project.dto.EmployeeDTO;
 import dev.uit.project.entity.Employee;
 import dev.uit.project.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Lấy danh sách tất cả nhân viên
@@ -39,6 +41,9 @@ public class EmployeeService {
     public EmployeeDTO create(EmployeeDTO employeeDTO) {
         Employee employee = convertToEntity(employeeDTO);
         employee.setId(null); // đảm bảo tạo mới
+        if (employeeDTO.getPasswordhash() != null && !employeeDTO.getPasswordhash().isEmpty()) {
+            employee.setPasswordhash(encodePassword(employeeDTO.getPasswordhash()));
+        }
         Employee saved = employeeRepository.save(employee);
         return convertToDTO(saved);
     }
@@ -53,7 +58,11 @@ public class EmployeeService {
         existing.setFullname(employeeDTO.getFullname());
         existing.setEmail(employeeDTO.getEmail());
         existing.setPhone(employeeDTO.getPhone());
-        existing.setPasswordhash(employeeDTO.getPasswordhash()); // nên mã hóa mật khẩu trong thực tế
+        
+        if (employeeDTO.getPasswordhash() != null && !employeeDTO.getPasswordhash().isEmpty()) {
+            existing.setPasswordhash(encodePassword(employeeDTO.getPasswordhash()));
+        }
+        
         existing.setStatus(employeeDTO.getStatus());
 
         Employee updated = employeeRepository.save(existing);
@@ -70,6 +79,18 @@ public class EmployeeService {
         employeeRepository.deleteById(id);
     }
 
+    // Helper method to encode password securely
+    private String encodePassword(String password) {
+        if (password == null) {
+            return null;
+        }
+        // Avoid double-hashing BCrypt passwords
+        if (password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$")) {
+            return password;
+        }
+        return passwordEncoder.encode(password);
+    }
+
     // ------------------ Chuyển đổi Entity <-> DTO ------------------
 
     private EmployeeDTO convertToDTO(Employee entity) {
@@ -81,8 +102,8 @@ public class EmployeeService {
         employee.setFullname(dto.getFullname());
         employee.setEmail(dto.getEmail());
         employee.setPhone(dto.getPhone());
-        employee.setPasswordhash(dto.getPasswordhash()); // nên mã hóa trước khi lưu
+        employee.setPasswordhash(dto.getPasswordhash()); // convertToEntity maps raw, Service.create/update handles encoding
         employee.setStatus(dto.getStatus());
         return employee;
     }
-}
+}

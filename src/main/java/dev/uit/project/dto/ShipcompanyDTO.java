@@ -1,105 +1,42 @@
 package dev.uit.project.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.uit.project.entity.Shipcompany;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShipcompanyDTO {
+
+    @JsonProperty("ShipCompanyID")
     private Long id;
+
+    @JsonProperty("ShipCompanyName")
     private String shipcompanyname;
+
+    @JsonProperty("SupportedRegion")
     private String supportedregion;
+
+    @JsonProperty("Phone")
     private String phone;
+
+    @JsonProperty("Email")
     private String email;
+
+    @JsonProperty("Address")
     private String address;
+
+    @JsonProperty("Notes")
     private String notes;
+
+    @JsonProperty("Status")
     private Integer status;
 
-    // Constructor không tham số
-    public ShipcompanyDTO() {
-    }
-
-    // Constructor đầy đủ tham số
-    public ShipcompanyDTO(Long id, String shipcompanyname, String supportedregion,
-                          String phone, String email, String address, String notes,
-                          Integer status) {
-        this.id = id;
-        this.shipcompanyname = shipcompanyname;
-        this.supportedregion = supportedregion;
-        this.phone = phone;
-        this.email = email;
-        this.address = address;
-        this.notes = notes;
-        this.status = status;
-    }
-
-    // Getter và Setter
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getShipcompanyname() {
-        return shipcompanyname;
-    }
-
-    public void setShipcompanyname(String shipcompanyname) {
-        this.shipcompanyname = shipcompanyname;
-    }
-
-    public String getSupportedregion() {
-        return supportedregion;
-    }
-
-    public void setSupportedregion(String supportedregion) {
-        this.supportedregion = supportedregion;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    // Phương thức fromEntity
     public static ShipcompanyDTO fromEntity(Shipcompany entity) {
-        if (entity == null) {
-            return null;
-        }
+        if (entity == null) return null;
         return new ShipcompanyDTO(
                 entity.getId(),
                 entity.getShipcompanyname(),

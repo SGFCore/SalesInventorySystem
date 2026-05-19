@@ -1,92 +1,45 @@
 package dev.uit.project.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.uit.project.entity.Payment;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentDTO {
+
+    @JsonProperty("PaymentID")
     private Long id;
+
+    @JsonProperty("InvoiceID")
     private Long invoiceId;
+
+    @JsonProperty("PaymentMethodID")
     private Long paymentMethodId;
+
+    @JsonProperty("AmountPaid")
     private BigDecimal amountPaid;
+
+    @JsonProperty("ReferenceCode")
     private String referenceCode;
+
+    @JsonProperty("PaymentDate")
     private Instant paymentDate;
 
-    // Constructor không tham số
-    public PaymentDTO() {
-    }
-
-    // Constructor đầy đủ tham số
-    public PaymentDTO(Long id, Long invoiceId, Long paymentMethodId, BigDecimal amountPaid,
-                      String referenceCode, Instant paymentDate) {
-        this.id = id;
-        this.invoiceId = invoiceId;
-        this.paymentMethodId = paymentMethodId;
-        this.amountPaid = amountPaid;
-        this.referenceCode = referenceCode;
-        this.paymentDate = paymentDate;
-    }
-
-    // Getter và Setter
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getInvoiceId() {
-        return invoiceId;
-    }
-
-    public void setInvoiceId(Long invoiceId) {
-        this.invoiceId = invoiceId;
-    }
-
-    public Long getPaymentMethodId() {
-        return paymentMethodId;
-    }
-
-    public void setPaymentMethodId(Long paymentMethodId) {
-        this.paymentMethodId = paymentMethodId;
-    }
-
-    public BigDecimal getAmountPaid() {
-        return amountPaid;
-    }
-
-    public void setAmountPaid(BigDecimal amountPaid) {
-        this.amountPaid = amountPaid;
-    }
-
-    public String getReferenceCode() {
-        return referenceCode;
-    }
-
-    public void setReferenceCode(String referenceCode) {
-        this.referenceCode = referenceCode;
-    }
-
-    public Instant getPaymentDate() {
-        return paymentDate;
-    }
-
-    public void setPaymentDate(Instant paymentDate) {
-        this.paymentDate = paymentDate;
-    }
-
-    // Phương thức fromEntity
     public static PaymentDTO fromEntity(Payment entity) {
-        if (entity == null) {
-            return null;
-        }
-        Long invoiceId = entity.getInvoiceid() != null ? entity.getInvoiceid().getId() : null;
-        Long paymentMethodId = entity.getPaymentmethodid() != null ? entity.getPaymentmethodid().getId() : null;
+        if (entity == null) return null;
+        Long invoiceVal = entity.getInvoiceid() != null ? entity.getInvoiceid().getId() : null;
+        Long paymentMethodVal = entity.getPaymentmethodid() != null ? entity.getPaymentmethodid().getId() : null;
         return new PaymentDTO(
                 entity.getId(),
-                invoiceId,
-                paymentMethodId,
+                invoiceVal,
+                paymentMethodVal,
                 entity.getAmountpaid(),
                 entity.getReferencecode(),
                 entity.getPaymentdate()
