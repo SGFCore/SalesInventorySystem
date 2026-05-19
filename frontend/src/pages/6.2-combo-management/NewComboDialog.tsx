@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,11 +12,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { btn, dialog } from "@/pages/page-classes";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Loader2 } from "lucide-react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+import type { Product } from "@/lib/types";
 
 interface NewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
 interface ProductItem {
@@ -24,28 +28,37 @@ interface ProductItem {
   quantity: number;
 }
 
-// Mockup dữ liệu danh sách sản phẩm để chọn trong dropdown
-const MOCK_PRODUCTS_LIST = [
-  { ProductID: 201, ProductName: "Sản phẩm mẫu 1" },
-  { ProductID: 202, ProductName: "Sản phẩm mẫu 2" },
-  { ProductID: 203, ProductName: "Sản phẩm mẫu 3" },
-  { ProductID: 204, ProductName: "Sản phẩm mẫu 4" },
-  { ProductID: 205, ProductName: "Sản phẩm mẫu 5" },
-];
-
-export function NewComboDialog({ open, onOpenChange }: NewProps) {
+export function NewComboDialog({ open, onOpenChange, onSave }: NewProps) {
+  const [loading, setLoading] = useState(false);
+  const [productList, setProductList] = useState<Product[]>([]);
   const [comboPrice, setComboPrice] = useState<number>(0);
 
   // Khởi tạo danh sách sản phẩm luôn có ít nhất 1 dòng mặc định
-  const [selectedProducts, setSelectedProducts] = useState<ProductItem[]>([
-    { productID: MOCK_PRODUCTS_LIST[0].ProductID, quantity: 1 },
-  ]);
+  const [selectedProducts, setSelectedProducts] = useState<ProductItem[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      const loadProducts = async () => {
+        try {
+          const list = await api.products.list();
+          setProductList(list);
+          if (list.length > 0) {
+            setSelectedProducts([{ productID: list[0].ProductID, quantity: 1 }]);
+          }
+        } catch (e) {
+          console.error("Lỗi tải danh sách sản phẩm:", e);
+        }
+      };
+      loadProducts();
+    }
+  }, [open]);
 
   // Thêm dòng sản phẩm mới
   const handleAddProduct = () => {
+    if (productList.length === 0) return;
     setSelectedProducts((prev) => [
       ...prev,
-      { productID: MOCK_PRODUCTS_LIST[0].ProductID, quantity: 1 },
+      { productID: productList[0].ProductID, quantity: 1 },
     ]);
   };
 
@@ -67,32 +80,54 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
   };
 
   // Submit form dữ liệu
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (comboPrice <= 0) {
-      alert("Vui lòng nhập giá bán combo hợp lệ!");
+      toast.error("Vui lòng nhập giá bán combo hợp lệ!");
       return;
     }
 
     // Kiểm tra tính hợp lệ của số lượng
     const hasInvalidQuantity = selectedProducts.some((p) => p.quantity <= 0);
     if (hasInvalidQuantity) {
-      alert("Số lượng của từng sản phẩm phải lớn hơn hoặc bằng 1!");
+      toast.error("Số lượng của từng sản phẩm phải lớn hơn hoặc bằng 1!");
       return;
     }
 
-    const finalData = {
-      comboPrice,
-      products: selectedProducts,
-    };
+    setLoading(true);
+    try {
+      const comboId = Math.floor(Math.random() * 9000) + 1000;
+      // 1. Tạo combo
+      await api.combos.create({
+        ComboID: comboId,
+        ComboPrice: comboPrice,
+      });
 
-    console.log("Dữ liệu tạo combo mới gửi đi:", finalData);
+      // 2. Tạo chi tiết combo
+      await Promise.all(
+        selectedProducts.map((p) =>
+          api.comboDetails.create({
+            ComboID: comboId,
+            ProductID: p.productID,
+            Quantity: p.quantity,
+          }),
+        ),
+      );
 
-    // Reset toàn bộ state về trạng thái mặc định ban đầu
-    setComboPrice(0);
-    setSelectedProducts([
-      { productID: MOCK_PRODUCTS_LIST[0].ProductID, quantity: 1 },
-    ]);
-    onOpenChange(false);
+      toast.success("Tạo mới combo và chi tiết combo thành công!");
+      // Reset
+      setComboPrice(0);
+      if (productList.length > 0) {
+        setSelectedProducts([{ productID: productList[0].ProductID, quantity: 1 }]);
+      } else {
+        setSelectedProducts([]);
+      }
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Tạo mới combo thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -117,6 +152,7 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
               onChange={(e) => setComboPrice(Number(e.target.value))}
               placeholder="Nhập tổng giá gói..."
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -144,8 +180,9 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
                         )
                       }
                       className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 w-full"
+                      disabled={loading}
                     >
-                      {MOCK_PRODUCTS_LIST.map((prod) => (
+                      {productList.map((prod) => (
                         <option key={prod.ProductID} value={prod.ProductID}>
                           {prod.ProductName} (#{prod.ProductID})
                         </option>
@@ -168,6 +205,7 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
                       }
                       placeholder="SL"
                       className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+                      disabled={loading}
                     />
                   </div>
 
@@ -175,7 +213,7 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={selectedProducts.length === 1}
+                    disabled={selectedProducts.length === 1 || loading}
                     onClick={() => handleRemoveProduct(index)}
                     className="text-red-500 hover:bg-red-50 border-slate-200 h-9 w-9 p-0 flex items-center justify-center disabled:opacity-40"
                   >
@@ -190,6 +228,7 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
               variant="outline"
               size="sm"
               onClick={handleAddProduct}
+              disabled={loading || productList.length === 0}
               className="text-blue-600 border-blue-200 hover:bg-blue-50 mt-4 w-full flex items-center justify-center gap-1"
             >
               <Plus className="h-4 w-4" /> Thêm sản phẩm
@@ -198,14 +237,15 @@ export function NewComboDialog({ open, onOpenChange }: NewProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Tạo mới
+            {loading ? "Đang tạo..." : "Tạo mới"}
           </Button>
         </DialogFooter>
       </DialogContent>

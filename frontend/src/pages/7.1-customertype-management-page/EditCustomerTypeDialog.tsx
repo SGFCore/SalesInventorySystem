@@ -12,18 +12,23 @@ import type { CustomerType } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   customerType: CustomerType | null;
+  onSave: () => void;
 }
 
 export function EditCustomerTypeDialog({
   open,
   onOpenChange,
   customerType,
+  onSave,
 }: Props) {
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Partial<CustomerType>>({});
 
   // Cập nhật lại dữ liệu form mỗi khi đối tượng khách hàng truyền vào thay đổi
@@ -33,10 +38,29 @@ export function EditCustomerTypeDialog({
     }
   }, [customerType]);
 
-  const handleSubmit = () => {
-    console.log("Dữ liệu cập nhật nhóm khách hàng gửi đi:", form);
-    // Xử lý logic API lưu thay đổi ở đây nếu có
-    onOpenChange(false);
+  const handleSubmit = async () => {
+    if (!customerType) return;
+    if (!form.CustomerTypeName?.trim()) {
+      toast.error("Vui lòng nhập tên nhóm khách hàng!");
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.customerTypes.update(customerType.CustomerTypeID, {
+        ...customerType,
+        CustomerTypeName: form.CustomerTypeName,
+        Discount: form.Discount || 0,
+        SpendingLimit: form.SpendingLimit || 0,
+        Detail: form.Detail || "",
+      });
+      toast.success("Cập nhật nhóm khách hàng thành công!");
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Cập nhật thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,6 +83,7 @@ export function EditCustomerTypeDialog({
                 setForm({ ...form, CustomerTypeName: e.target.value })
               }
               className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
+              disabled={loading}
             />
           </div>
 
@@ -75,6 +100,7 @@ export function EditCustomerTypeDialog({
                   setForm({ ...form, Discount: Number(e.target.value) })
                 }
                 className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
+                disabled={loading}
               />
             </div>
 
@@ -89,6 +115,7 @@ export function EditCustomerTypeDialog({
                   setForm({ ...form, SpendingLimit: Number(e.target.value) })
                 }
                 className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
+                disabled={loading}
               />
             </div>
           </div>
@@ -101,6 +128,7 @@ export function EditCustomerTypeDialog({
               value={form.Detail || ""}
               onChange={(e) => setForm({ ...form, Detail: e.target.value })}
               className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
+              disabled={loading}
             />
           </div>
         </div>
@@ -110,14 +138,16 @@ export function EditCustomerTypeDialog({
             variant="outline"
             className="border-slate-200"
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Lưu thay đổi
+            {loading ? "Đang lưu..." : "Lưu thay đổi"}
           </Button>
         </DialogFooter>
       </DialogContent>

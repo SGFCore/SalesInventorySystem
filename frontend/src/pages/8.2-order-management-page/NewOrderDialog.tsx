@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,18 +13,20 @@ import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { btn, dialog } from "@/pages/page-classes";
 import { Trash2, Plus } from "lucide-react";
+import { api } from "@/lib/api";
+import type { Product, ShipCompany } from "@/lib/types";
+import { toast } from "sonner";
+import { useEmp } from "@/context/empContext";
 
 interface NewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
-const MOCK_PRODUCTS = [
-  { ProductID: 201, ProductName: "Sản phẩm A", Price: 150000 },
-  { ProductID: 202, ProductName: "Sản phẩm B", Price: 200000 },
-];
-
-export function NewOrderDialog({ open, onOpenChange }: NewProps) {
+export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
+  const { emp } = useEmp();
+  const [loading, setLoading] = useState(false);
   const [orderData, setOrderData] = useState({
     CustomerName: "",
     InvoiceID: "",
@@ -33,21 +35,117 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
     ShipmentNote: "",
   });
 
-  const [selectedProducts, setSelectedProducts] = useState([
-    { productID: MOCK_PRODUCTS[0].ProductID, quantity: 1 },
-  ]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [shipCompanies, setShipCompanies] = useState<ShipCompany[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<{ productID: number; quantity: number }[]>([]);
 
-  const handleAddProduct = () =>
+  useEffect(() => {
+    if (open) {
+      const loadOptions = async () => {
+        try {
+          const [allProducts, allShip] = await Promise.all([
+            api.products.list(),
+            api.shipCompanies.list(),
+          ]);
+          setProducts(allProducts);
+          setShipCompanies(allShip);
+
+          if (allProducts.length > 0) {
+            setSelectedProducts([{ productID: allProducts[0].ProductID, quantity: 1 }]);
+          }
+          if (allShip.length > 0) {
+            setOrderData((prev) => ({
+              ...prev,
+              ShipCompanyID: allShip[0].ShipCompanyID.toString(),
+            }));
+          }
+        } catch (e) {
+          console.error("Lỗi tải danh mục tạo đơn hàng:", e);
+        }
+      };
+      loadOptions();
+    }
+  }, [open]);
+
+  const handleAddProduct = () => {
+    if (products.length === 0) return;
     setSelectedProducts((prev) => [
       ...prev,
-      { productID: MOCK_PRODUCTS[0].ProductID, quantity: 1 },
+      { productID: products[0].ProductID, quantity: 1 },
     ]);
-  const handleRemoveProduct = (index: number) =>
-    setSelectedProducts((prev) => prev.filter((_, i) => i !== index));
+  };
 
-  const handleSubmit = () => {
-    console.log("Tạo đơn hàng:", { orderData, selectedProducts });
-    onOpenChange(false);
+  const handleRemoveProduct = (index: number) => {
+    if (selectedProducts.length === 1) return;
+    setSelectedProducts((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async () => {
+    if (!orderData.CustomerName.trim()) {
+      toast.error("Vui lòng nhập tên khách hàng!");
+      return;
+    }
+    if (selectedProducts.length === 0) {
+      toast.error("Vui lòng chọn ít nhất một sản phẩm!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const orderId = Math.floor(Math.random() * 900000) + 100000;
+      const shipCode = "SHIP" + Math.floor(Math.random() * 900000 + 100000);
+
+      // Calculate Total Amount
+      let totalAmount = 0;
+      selectedProducts.forEach((item) => {
+        const prod = products.find((p) => p.ProductID === item.productID);
+        if (prod) {
+          totalAmount += prod.Price * item.quantity;
+        }
+      });
+
+      // 1. Create Order
+      await api.orders.create({
+        OrderID: orderId,
+        CustomerName: orderData.CustomerName,
+        EmployeeID: emp?.EmployeeID || 1,
+        InvoiceID: orderData.InvoiceID ? Number(orderData.InvoiceID) : 0,
+        ShipCode: shipCode,
+        ShipCompanyID: Number(orderData.ShipCompanyID),
+        TotalAmount: totalAmount + orderData.ShippingFee,
+        OrderStatus: 0, // 0: Chờ xác nhận, 1: Đang chuẩn bị, 2: Đang giao, 3: Đã giao, 4: Đã hủy
+        ShippingStatus: 0, // 0: Chưa giao, 1: Đang giao, 2: Đã giao thành công, 3: Trả về
+        ShipmentNote: orderData.ShipmentNote,
+        ShippingFee: orderData.ShippingFee,
+        ExportReceiptID: 0,
+      });
+
+      // 2. Create OrderDetails
+      await Promise.all(
+        selectedProducts.map((item, index) => {
+          const prod = products.find((p) => p.ProductID === item.productID);
+          const price = prod ? prod.Price : 0;
+          return api.orderDetails.create({
+            OrderDetailID: Math.floor(Math.random() * 900000) + 100000 + index,
+            OrderID: orderId,
+            ProductID: item.productID,
+            ComboID: 0,
+            Quantity: item.quantity,
+            UnitPrice: price,
+            DiscountAmount: 0,
+            TotalAmount: price * item.quantity,
+          });
+        })
+      );
+
+      toast.success("Tạo đơn hàng thành công!");
+      onOpenChange(false);
+      onSave();
+    } catch (e: any) {
+      toast.error(e.message || "Tạo đơn hàng thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,7 +157,7 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-6 py-2">
+        <div className="grid gap-6 py-2 max-h-[70vh] overflow-y-auto pr-2">
           {/* Thông tin chung */}
           <div className="grid gap-3">
             <Label className="text-blue-600 font-bold uppercase text-xs tracking-wider">
@@ -67,18 +165,19 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
             </Label>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label className="text-xs text-slate-500">Tên khách hàng</Label>
+                <Label className="text-xs text-slate-500 font-medium">Tên khách hàng</Label>
                 <Input
                   placeholder="Nhập tên khách hàng"
                   value={orderData.CustomerName}
                   onChange={(e) =>
                     setOrderData({ ...orderData, CustomerName: e.target.value })
                   }
-                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
+                  disabled={loading}
                 />
               </div>
               <div className="grid gap-2">
-                <Label className="text-xs text-slate-500">
+                <Label className="text-xs text-slate-500 font-medium">
                   Mã hóa đơn liên kết (nếu có)
                 </Label>
                 <Input
@@ -87,11 +186,12 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                   onChange={(e) =>
                     setOrderData({ ...orderData, InvoiceID: e.target.value })
                   }
-                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
+                  disabled={loading}
                 />
               </div>
               <div className="grid gap-2">
-                <Label className="text-xs text-slate-500">
+                <Label className="text-xs text-slate-500 font-medium">
                   Đối tác vận chuyển
                 </Label>
                 <NativeSelect
@@ -103,14 +203,17 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                     })
                   }
                   className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
+                  disabled={loading}
                 >
-                  <option value="1">Giao Hàng Tiết Kiệm</option>
-                  <option value="2">Viettel Post</option>
-                  <option value="3">Tự giao</option>
+                  {shipCompanies.map((ship) => (
+                    <option key={ship.ShipCompanyID} value={ship.ShipCompanyID}>
+                      {ship.ShipCompanyName}
+                    </option>
+                  ))}
                 </NativeSelect>
               </div>
               <div className="grid gap-2">
-                <Label className="text-xs text-slate-500">
+                <Label className="text-xs text-slate-500 font-medium">
                   Phí vận chuyển (đ)
                 </Label>
                 <Input
@@ -122,11 +225,12 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                       ShippingFee: Number(e.target.value),
                     })
                   }
-                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm text-center"
+                  disabled={loading}
                 />
               </div>
               <div className="grid gap-2 col-span-2">
-                <Label className="text-xs text-slate-500">
+                <Label className="text-xs text-slate-500 font-medium">
                   Ghi chú giao hàng
                 </Label>
                 <Input
@@ -135,7 +239,8 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                   onChange={(e) =>
                     setOrderData({ ...orderData, ShipmentNote: e.target.value })
                   }
-                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -161,8 +266,9 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                       )
                     }
                     className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 flex-1"
+                    disabled={loading}
                   >
-                    {MOCK_PRODUCTS.map((prod) => (
+                    {products.map((prod) => (
                       <option key={prod.ProductID} value={prod.ProductID}>
                         {prod.ProductName} - {prod.Price.toLocaleString()} đ
                       </option>
@@ -176,17 +282,18 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                       setSelectedProducts((prev) =>
                         prev.map((p, i) =>
                           i === index
-                            ? { ...p, quantity: Number(e.target.value) }
+                            ? { ...p, quantity: Math.max(1, Number(e.target.value)) }
                             : p,
                         ),
                       )
                     }
-                    className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 w-20"
+                    className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 w-20 text-sm text-center"
+                    disabled={loading}
                   />
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={selectedProducts.length === 1}
+                    disabled={selectedProducts.length === 1 || loading}
                     onClick={() => handleRemoveProduct(index)}
                     className="text-red-500 border-slate-200 h-9 w-9 p-0 flex items-center justify-center"
                   >
@@ -198,7 +305,8 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleAddProduct}
-                className="text-slate-600 border-dashed border-slate-300 mt-2 h-8 w-full"
+                className="text-slate-600 border-dashed border-slate-300 mt-2 h-8 w-full text-xs"
+                disabled={loading}
               >
                 <Plus className="h-4 w-4 mr-1" /> Thêm sản phẩm
               </Button>
@@ -209,16 +317,17 @@ export function NewOrderDialog({ open, onOpenChange }: NewProps) {
         <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             variant="outline"
-           
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Tạo Đơn Hàng
+            {loading ? "Đang tạo..." : "Tạo Đơn Hàng"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -7,33 +7,16 @@ import { DetailOrderReturnDialog } from "@/pages/9-orderreturn-management-page/D
 import { NewOrderReturnDialog } from "@/pages/9-orderreturn-management-page/NewOrderReturnDialog";
 import { page, btn, entity, input } from "@/pages/page-classes";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-
-// Giả lập dữ liệu mẫu gồm 45 đơn hoàn tiền để chạy phân trang
-const MOCK_ORDER_RETURNS: OrderReturn[] = Array.from(
-  { length: 45 },
-  (_, i) => ({
-    ReturnID: 1001 + i,
-    OrderName: `Đơn hàng #ORD-${2500 + i}`,
-    EmployeeName: i % 2 === 0 ? "Nguyễn Văn A" : "Trần Thị B",
-    ReturnDate: new Date(2026, 4, 1 + (i % 15)),
-    Reason:
-      i % 3 === 0
-        ? "Sản phẩm lỗi kỹ thuật"
-        : i % 3 === 1
-          ? "Sai màu sắc kích thước"
-          : "Khách đổi ý",
-    TotalRefund: (i + 1) * 150000,
-    ReturnRefCode: `REF-${8000 + i}`,
-    Status: i % i === 0 ? "Đã duyệt" : "Chờ xử lý",
-  }),
-);
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 20;
 
 export default function OrderReturnManagementPage() {
   const [orderReturns, setOrderReturns] = useState<OrderReturn[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedOrderReturn, setSelectedOrderReturn] =
     useState<OrderReturn | null>(null);
@@ -43,8 +26,26 @@ export default function OrderReturnManagementPage() {
   // State cho phân trang
   const [currentPage, setCurrentPage] = useState(1);
 
+  const loadOrderReturns = async () => {
+    setLoading(true);
+    try {
+      const data = await api.orderReturns.list();
+      if (!data || data.length === 0) {
+        toast.error("Không có dữ liệu hoàn trả");
+        setOrderReturns([]);
+      } else {
+        setOrderReturns(data.sort((a, b) => b.ReturnID - a.ReturnID));
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Lỗi tải danh sách hoàn tiền");
+      setOrderReturns([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setOrderReturns(MOCK_ORDER_RETURNS);
+    loadOrderReturns();
   }, []);
 
   // Reset về trang 1 khi tìm kiếm thay đổi
@@ -70,8 +71,17 @@ export default function OrderReturnManagementPage() {
     setIsDetailOpen(true);
   };
 
-  const handleAcceptClick = (returnId: number) => {
-    alert(`Đã chấp nhận đơn hoàn tiền mã: #${returnId}`);
+  const handleAcceptClick = async (item: OrderReturn) => {
+    try {
+      await api.orderReturns.update(item.ReturnID, {
+        ...item,
+        Status: "1", // 1: Đã duyệt / hoàn tất
+      });
+      toast.success(`Đã chấp nhận đơn hoàn tiền mã: #${item.ReturnID}`);
+      loadOrderReturns();
+    } catch (e: any) {
+      toast.error(e.message || "Lỗi duyệt đơn hoàn tiền");
+    }
   };
 
   const topRef = useRef<HTMLDivElement>(null);
@@ -104,109 +114,155 @@ export default function OrderReturnManagementPage() {
 
       {/* Order Return Table */}
       <div className={page.tableWrap}>
-        <Table>
-          <TableBody>
-            {paginatedReturns.map((item) => (
-              <TableRow
-                key={item.ReturnID}
-                className={page.tableRow}
-              >
-                {/* Thông tin Mã và Ngày hoàn tiền */}
-                <TableCell>
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm font-bold text-slate-900">
-                      #{item.ReturnID}
-                    </span>
-                    <span className="text-xs text-slate-500 mt-0.5">
-                      Ngày tạo: {item.ReturnDate.toLocaleDateString("vi-VN")}
-                    </span>
-                  </div>
-                </TableCell>
-
-                {/* Thông tin tổng tiền hoàn tiền */}
-                <TableCell>
-                  <div className="flex flex-col items-start text-sm">
-                    <span className={entity.cellMeta}>
-                      Tổng tiền hoàn tiền
-                    </span>
-                    <span className={cn(entity.price, 'mt-0.5')}>
-                      {item.TotalRefund.toLocaleString("vi-VN")} đ
-                    </span>
-                  </div>
-                </TableCell>
-
-                {/* Các button hành động */}
-                <TableCell>
-                  <div className="flex gap-2 justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(btn.actionSecondary, "w-32")}
-                      onClick={() => handleDetailClick(item)}
-                    >
-                      Xem chi tiết
-                    </Button>
-                    <Button
-                      size="sm"
-                      className={cn(btn.primary, "w-32")}
-                      onClick={() => handleAcceptClick(item.ReturnID)}
-                    >
-                      Chấp nhận
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        {/* Bộ điều khiển Phân trang */}
-        <div className={page.pagination}>
-          <div className={page.paginationText}>
-            Hiển thị{" "}
-            <span className="font-medium">{paginatedReturns.length}</span> trên{" "}
-            <span className="font-medium">{filteredReturns.length}</span> đơn
-            hàng
+        {loading ? (
+          <div className="flex justify-center items-center py-20 bg-white">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <span className="ml-2 text-slate-500 font-medium">Đang tải danh sách...</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={btn.paginationNav}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (pageNum) => (
-                  <Button
-                    key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
+        ) : paginatedReturns.length === 0 ? (
+          <div className="text-center py-20 text-slate-400 font-medium bg-white">
+            Không tìm thấy dữ liệu hoàn tiền nào.
+          </div>
+        ) : (
+          <>
+            <Table>
+              <TableBody>
+                {paginatedReturns.map((item) => (
+                  <TableRow
+                    key={item.ReturnID}
+                    className={page.tableRow}
                   >
-                    {pageNum}</Button>
-                ),
-              )}
-            </div>
+                    {/* Thông tin Mã và Ngày hoàn tiền */}
+                    <TableCell>
+                      <div className="flex flex-col items-start">
+                        <span className="text-sm font-bold text-slate-900">
+                          #{item.ReturnID}
+                        </span>
+                        <span className="text-xs text-slate-500 mt-0.5 font-medium">
+                          Ngày tạo: {new Date(item.ReturnDate).toLocaleDateString("vi-VN")}
+                        </span>
+                      </div>
+                    </TableCell>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages || totalPages === 0}
-              className={btn.paginationNav}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+                    <TableCell>
+                      <div className="flex flex-col items-start">
+                        <span className="text-sm font-semibold text-slate-950">
+                          {item.OrderName}
+                        </span>
+                        <span className="text-xs text-slate-400 mt-0.5">
+                          NV lập: {item.EmployeeName}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold text-slate-400">Lý do</span>
+                        <span className="text-xs font-medium text-slate-700 mt-0.5">{item.Reason}</span>
+                      </div>
+                    </TableCell>
+
+                    {/* Thông tin tổng tiền hoàn tiền */}
+                    <TableCell>
+                      <div className="flex flex-col items-start text-sm">
+                        <span className={entity.cellMeta}>
+                          Tổng tiền hoàn tiền
+                        </span>
+                        <span className={cn(entity.price, 'mt-0.5')}>
+                          {item.TotalRefund.toLocaleString("vi-VN")} đ
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex flex-col items-start text-sm">
+                        <span className="font-semibold text-xs text-slate-400 mb-1">Trạng thái</span>
+                        <span className={cn(
+                          "text-xs font-semibold px-2 py-0.5 rounded-full border",
+                          item.Status === "1" || item.Status === "Đã duyệt"
+                            ? "bg-green-50 text-green-700 border-green-200"
+                            : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                        )}>
+                          {item.Status === "1" || item.Status === "Đã duyệt" ? "Đã duyệt" : "Chờ xử lý"}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    {/* Các button hành động */}
+                    <TableCell>
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={cn(btn.actionSecondary, "w-28")}
+                          onClick={() => handleDetailClick(item)}
+                        >
+                          Xem chi tiết
+                        </Button>
+                        <Button
+                          size="sm"
+                          className={cn(btn.primary, "w-28")}
+                          disabled={item.Status === "1" || item.Status === "Đã duyệt"}
+                          onClick={() => handleAcceptClick(item)}
+                        >
+                          {item.Status === "1" || item.Status === "Đã duyệt" ? "Đã duyệt" : "Chấp nhận"}
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {totalPages > 0 && (
+              <div className={page.pagination}>
+                <div className={page.paginationText}>
+                  Hiển thị{" "}
+                  <span className="font-medium text-slate-900">{paginatedReturns.length}</span> trên{" "}
+                  <span className="font-medium text-slate-900">{filteredReturns.length}</span> đơn hoàn
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className={btn.paginationNav}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (pageNum) => (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={currentPage === pageNum ? btn.paginationActive : btn.paginationInactive}
+                        >
+                          {pageNum}</Button>
+                      ),
+                    )}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    className={btn.paginationNav}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Đăng ký các Dialog liên quan */}
@@ -216,7 +272,11 @@ export default function OrderReturnManagementPage() {
         orderReturn={selectedOrderReturn}
       />
 
-      <NewOrderReturnDialog open={isNewOpen} onOpenChange={setIsNewOpen} />
+      <NewOrderReturnDialog
+        open={isNewOpen}
+        onOpenChange={setIsNewOpen}
+        onSave={loadOrderReturns}
+      />
     </div>
   );
 }

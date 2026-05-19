@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,55 +15,57 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import type { Order, ReturnPolicy } from "@/lib/types";
+import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import type { Order, ReturnPolicy, OrderDetail, Product } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+import { useEmp } from "@/context/empContext";
 
 interface ChangeProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   order: Order;
+  onSave: () => void;
 }
-
-const MOCK_ORDER_PRODUCTS = [
-  { ProductID: 201, ProductName: "Sản phẩm A", Quantity: 2, Price: 150000 },
-  { ProductID: 202, ProductName: "Sản phẩm B", Quantity: 1, Price: 100000 },
-];
-
-const MOCK_POLICIES: ReturnPolicy[] = [
-  {
-    PolicyID: 1,
-    PolicyName: "Chính sách đổi trả tiêu chuẩn hệ thống",
-    MaxReturnDays: 7,
-    PenaltyFeeRate: 0,
-    EffectiveDate: new Date("2026-01-01"),
-    IsActive: 1,
-  },
-  {
-    PolicyID: 2,
-    PolicyName: "Chính sách đổi trả hàng sự kiện / giảm giá",
-    MaxReturnDays: 3,
-    PenaltyFeeRate: 0.1,
-    EffectiveDate: new Date("2026-01-01"),
-    IsActive: 1,
-  },
-  {
-    PolicyID: 3,
-    PolicyName: "Chính sách cũ năm 2025",
-    MaxReturnDays: 14,
-    PenaltyFeeRate: 0.05,
-    EffectiveDate: new Date("2025-01-01"),
-    IsActive: 0,
-  },
-];
 
 export function ChangeProductDialog({
   open,
   onOpenChange,
   order,
+  onSave,
 }: ChangeProps) {
+  const { emp } = useEmp();
   const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
   const [isPolicyOpen, setIsPolicyOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [policies, setPolicies] = useState<ReturnPolicy[]>([]);
+
+  useEffect(() => {
+    if (open && order) {
+      const loadData = async () => {
+        setLoading(true);
+        try {
+          const [detailsList, prodsList, polList] = await Promise.all([
+            api.orderDetails.list(),
+            api.products.list(),
+            api.returnPolicies.list(),
+          ]);
+          setOrderDetails(detailsList.filter((d) => d.OrderID === order.OrderID));
+          setProducts(prodsList);
+          setPolicies(polList.filter((p) => p.IsActive === 1));
+        } catch (e) {
+          console.error("Lỗi lấy dữ liệu đổi hàng:", e);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadData();
+    }
+  }, [open, order]);
 
   const handleToggleProduct = (productId: number) => {
     setSelectedProductIds((prev) =>
@@ -73,17 +75,78 @@ export function ChangeProductDialog({
     );
   };
 
-  const handleSubmit = () => {
-    console.log(
-      "Xử lý đổi hàng cho đơn:",
-      order.OrderID,
-      "Các sản phẩm:",
-      selectedProductIds,
-    );
-    onOpenChange(false);
+  const getProductName = (prodId: number) => {
+    const prod = products.find((p) => p.ProductID === prodId);
+    return prod ? prod.ProductName : `Sản phẩm #${prodId}`;
   };
 
-  const activePolicies = MOCK_POLICIES.filter((p) => p.IsActive === 1);
+  const getProductPrice = (prodId: number) => {
+    const detail = orderDetails.find((d) => d.ProductID === prodId);
+    return detail ? detail.UnitPrice : 0;
+  };
+
+  const getProductQty = (prodId: number) => {
+    const detail = orderDetails.find((d) => d.ProductID === prodId);
+    return detail ? detail.Quantity : 0;
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      // 1. Update order status to 5 (Đổi/trả)
+      await api.orders.update(order.OrderID, {
+        ...order,
+        OrderStatus: 5,
+      });
+
+      // 2. Compute Refund Amount
+      let refundSum = 0;
+      selectedProductIds.forEach((id) => {
+        const detail = orderDetails.find((d) => d.ProductID === id);
+        if (detail) {
+          refundSum += detail.UnitPrice * detail.Quantity;
+        }
+      });
+
+      const returnId = Math.floor(Math.random() * 900000) + 100000;
+      const refCode = "RET" + Math.floor(Math.random() * 900000 + 100000);
+
+      // 3. Create OrderReturn entry
+      await api.orderReturns.create({
+        ReturnID: returnId,
+        OrderName: `ĐH #${order.OrderID}`,
+        EmployeeName: emp ? `${emp.FirstName} ${emp.LastName}` : "Nhân viên",
+        ReturnDate: new Date(),
+        Reason: "Đổi hàng",
+        TotalRefund: refundSum,
+        ReturnRefCode: refCode,
+        Status: "1", // Completed
+      });
+
+      // 4. Create ReturnDetails entry
+      await Promise.all(
+        selectedProductIds.map((pid, idx) => {
+          const qty = getProductQty(pid);
+          return api.returnDetails.create({
+            ReturnDetailID: Math.floor(Math.random() * 900000) + 100000 + idx,
+            ReturnID: returnId,
+            ProductID: pid,
+            Quantity: qty,
+            UnitPrice: getProductPrice(pid),
+            RefundAmount: getProductPrice(pid) * qty,
+          });
+        })
+      );
+
+      toast.success("Yêu cầu đổi hàng đã được gửi thành công!");
+      onOpenChange(false);
+      onSave();
+    } catch (e: any) {
+      toast.error(e.message || "Gửi yêu cầu đổi hàng thất bại!");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -94,108 +157,120 @@ export function ChangeProductDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-2 text-sm">
-          <div className="font-medium text-slate-900 mb-1">
-            Chọn sản phẩm khách muốn đổi hàng:
+        {loading && orderDetails.length === 0 ? (
+          <div className="flex justify-center items-center py-10">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+            <span className="ml-2 text-slate-500 text-sm font-medium">Đang tải danh sách đổi hàng...</span>
           </div>
+        ) : (
+          <div className="grid gap-4 py-2 text-sm">
+            <div className="font-semibold text-slate-700 mb-1">
+              Chọn sản phẩm khách muốn đổi hàng:
+            </div>
 
-          <div className="border border-slate-200 overflow-hidden">
-            <Table>
-              <TableBody>
-                {MOCK_ORDER_PRODUCTS.map((item) => (
-                  <TableRow
-                    key={item.ProductID}
-                    className="border-b border-slate-100"
-                  >
-                    <TableCell className="w-[40px] py-3 text-center">
-                      <Checkbox
-                        className="border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                        checked={selectedProductIds.includes(item.ProductID)}
-                        onCheckedChange={() =>
-                          handleToggleProduct(item.ProductID)
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="py-3 text-xs font-medium text-slate-700">
-                      {item.ProductName} (Mã: #{item.ProductID})
-                    </TableCell>
-                    <TableCell className="py-3 text-xs text-center text-slate-600">
-                      Số lượng:{" "}
-                      <span className="font-bold">{item.Quantity}</span>
-                    </TableCell>
-                    <TableCell className="py-3 text-xs text-right text-slate-900 font-medium">
-                      {item.Price.toLocaleString("vi-VN")} đ
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+            <div className="border border-slate-200 overflow-hidden rounded-md">
+              <Table>
+                <TableBody>
+                  {orderDetails.map((item) => (
+                    <TableRow
+                      key={item.ProductID}
+                      className="border-b border-slate-100 bg-white"
+                    >
+                      <TableCell className="w-[40px] py-3 text-center">
+                        <Checkbox
+                          className="border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                          checked={selectedProductIds.includes(item.ProductID)}
+                          onCheckedChange={() =>
+                            handleToggleProduct(item.ProductID)
+                          }
+                          disabled={loading}
+                        />
+                      </TableCell>
+                      <TableCell className="py-3 text-xs font-semibold text-slate-700">
+                        {getProductName(item.ProductID)} (Mã: #{item.ProductID})
+                      </TableCell>
+                      <TableCell className="py-3 text-xs text-center text-slate-600">
+                        Số lượng:{" "}
+                        <span className="font-bold">{item.Quantity}</span>
+                      </TableCell>
+                      <TableCell className="py-3 text-xs text-right text-slate-950 font-semibold">
+                        {item.UnitPrice.toLocaleString("vi-VN")} đ
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
 
-          {/* Quy định chính sách đổi trả bằng Collapsible */}
-          <Collapsible
-            open={isPolicyOpen}
-            onOpenChange={setIsPolicyOpen}
-            className="border border-slate-200 mt-2"
-          >
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                className="flex items-center justify-between w-full px-4 py-3 font-bold text-slate-900 text-xs bg-slate-50 hover:bg-slate-100 text-left"
-              >
-                <span>CHÍNH SÁCH ĐỔI TRẢ ÁP DỤNG</span>
-                {isPolicyOpen ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="px-4 py-3 bg-white border-t border-slate-200 text-xs text-slate-600 space-y-3">
-              {activePolicies.map((policy) => (
-                <div
-                  key={policy.PolicyID}
-                  className="border-b border-slate-100 pb-2 last:border-none last:pb-0"
+            {/* Quy định chính sách đổi trả bằng Collapsible */}
+            <Collapsible
+              open={isPolicyOpen}
+              onOpenChange={setIsPolicyOpen}
+              className="border border-slate-200 mt-2 rounded-md"
+            >
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center justify-between w-full px-4 py-3 font-bold text-slate-900 text-xs bg-slate-50 hover:bg-slate-100 text-left"
                 >
-                  <div className="font-bold text-slate-800 mb-0.5">
-                    {policy.PolicyName}
-                  </div>
-                  <div>
-                    • Hạn đổi trả tối đa:{" "}
-                    <span className="font-medium text-slate-900">
-                      {policy.MaxReturnDays} ngày
-                    </span>
-                  </div>
-                  <div>
-                    • Tỷ lệ phí phạt hủy/đổi:{" "}
-                    <span className="font-medium text-slate-900">
-                      {policy.PenaltyFeeRate * 100}%
-                    </span>
-                  </div>
-                  <div>
-                    • Ngày hiệu lực công bố:{" "}
-                    {policy.EffectiveDate.toLocaleDateString("vi-VN")}
-                  </div>
-                </div>
-              ))}
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
+                  <span>CHÍNH SÁCH ĐỔI TRẢ ÁP DỤNG</span>
+                  {isPolicyOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="px-4 py-3 bg-white border-t border-slate-200 text-xs text-slate-600 space-y-3">
+                {policies.length > 0 ? (
+                  policies.map((policy) => (
+                    <div
+                      key={policy.PolicyID}
+                      className="border-b border-slate-100 pb-2 last:border-none last:pb-0"
+                    >
+                      <div className="font-bold text-slate-800 mb-0.5">
+                        {policy.PolicyName}
+                      </div>
+                      <div>
+                        • Hạn đổi trả tối đa:{" "}
+                        <span className="font-medium text-slate-900">
+                          {policy.MaxReturnDays} ngày
+                        </span>
+                      </div>
+                      <div>
+                        • Tỷ lệ phí phạt hủy/đổi:{" "}
+                        <span className="font-medium text-slate-900">
+                          {policy.PenaltyFeeRate * 100}%
+                        </span>
+                      </div>
+                      <div>
+                        • Ngày hiệu lực công bố:{" "}
+                        {new Date(policy.EffectiveDate).toLocaleDateString("vi-VN")}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-slate-400">Không có chính sách đổi trả nào đang hoạt động.</div>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+        )}
 
         <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             variant="outline"
-           
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy bỏ
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
-            disabled={selectedProductIds.length === 0}
+            disabled={selectedProductIds.length === 0 || loading}
           >
-            Xác nhận Đổi hàng
+            {loading ? "Đang xử lý..." : "Xác nhận Đổi hàng"}
           </Button>
         </DialogFooter>
       </DialogContent>

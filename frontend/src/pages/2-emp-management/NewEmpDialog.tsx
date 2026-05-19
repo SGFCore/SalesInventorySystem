@@ -8,25 +8,28 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox"; // Đảm bảo bạn đã cài đặt shadcn checkbox
+import { Checkbox } from "@/components/ui/checkbox";
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
-
 import { ROLES } from "@/data/roles";
 import { btn, dialog } from "@/pages/page-classes";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
-export function NewEmpDialog({ open, onOpenChange }: Props) {
+export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
     phone: "",
     password: "12345",
-    roleIds: [] as number[], // Lưu danh sách các ID role đã chọn
+    roleIds: [] as number[],
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,14 +46,50 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
     });
   };
 
-  const handleSubmit = () => {
-    if (formData.roleIds.length === 0) {
-      alert("Vui lòng chọn ít nhất một quyền!");
+  const handleSubmit = async () => {
+    if (!formData.fullname.trim()) {
+      toast.error("Họ và tên không được để trống!");
       return;
     }
-    console.log("Dữ liệu gửi đi:", formData);
-    // Thực hiện logic lưu ở đây
-    onOpenChange(false);
+    if (formData.roleIds.length === 0) {
+      toast.error("Vui lòng chọn ít nhất một quyền!");
+      return;
+    }
+    setLoading(true);
+    try {
+      const empId = Math.floor(Math.random() * 900000) + 100000;
+      await api.employees.create({
+        EmployeeID: empId,
+        Fullname: formData.fullname,
+        Email: formData.email,
+        Phone: formData.phone,
+        PasswordHash: formData.password,
+        Status: 1,
+      });
+
+      // Tạo employee roles
+      for (const roleId of formData.roleIds) {
+        await api.employeeRoles.create({
+          EmployeeID: empId,
+          RoleID: roleId,
+        });
+      }
+
+      toast.success("Thêm nhân viên mới thành công!");
+      setFormData({
+        fullname: "",
+        email: "",
+        phone: "",
+        password: "12345",
+        roleIds: [],
+      });
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Không thể thêm nhân viên mới!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,7 +102,6 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
         </DialogHeader>
 
         <div className={dialog.body}>
-          {/* ... Các trường Input cũ giữ nguyên ... */}
           <div className="grid gap-2">
             <Label htmlFor="fullname">Họ và tên</Label>
             <Input
@@ -72,6 +110,7 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
               value={formData.fullname}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -83,10 +122,22 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
               value={formData.email}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
-          {/* Phần danh sách vai trò */}
+          <div className="grid gap-2">
+            <Label htmlFor="phone">Số điện thoại</Label>
+            <Input
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className={dialog.input}
+              disabled={loading}
+            />
+          </div>
+
           <div className="grid gap-3">
             <Label className="text-slate-900 font-semibold">
               Phân quyền <span className="text-red-500">*</span>
@@ -100,6 +151,7 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
                     onCheckedChange={(checked) =>
                       handleRoleChange(role.RoleID, checked as boolean)
                     }
+                    disabled={loading}
                   />
                   <label
                     htmlFor={`role-${role.RoleID}`}
@@ -123,11 +175,12 @@ export function NewEmpDialog({ open, onOpenChange }: Props) {
             variant="outline"
             className={dialog.cancel}
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
-          <Button className={dialog.submit} onClick={handleSubmit}>
-            Tạo mới
+          <Button className={dialog.submit} onClick={handleSubmit} disabled={loading}>
+            {loading ? "Đang xử lý..." : "Tạo mới"}
           </Button>
         </DialogFooter>
       </DialogContent>

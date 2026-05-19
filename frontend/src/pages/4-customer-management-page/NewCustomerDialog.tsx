@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
 import type { Customer } from "@/lib/types";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
@@ -20,6 +22,7 @@ interface Props {
 }
 
 export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     CustomerTypeID: "1",
     FirstName: "",
@@ -35,37 +38,46 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.FirstName || !formData.LastName) {
-      alert("Vui lòng điền họ và tên!");
+      toast.error("Vui lòng điền họ và tên!");
       return;
     }
+    setLoading(true);
+    try {
+      const customerId = Math.floor(Math.random() * 8000) + 3000;
+      const newCustomer: Customer = {
+        CustomerID: customerId,
+        CustomerTypeID: Number(formData.CustomerTypeID) || 1,
+        FirstName: formData.FirstName,
+        LastName: formData.LastName,
+        CompanyName: formData.CompanyName,
+        Phone: formData.Phone,
+        Email: formData.Email,
+        Address: formData.Address,
+        CreatedDate: new Date(),
+        TotalAccumulatedSpent: 0,
+      };
 
-    const newCustomer: Customer = {
-      CustomerID: Math.floor(Math.random() * 8000) + 3000, // Mock ID ngẫu nhiên
-      CustomerTypeID: Number(formData.CustomerTypeID) || 1,
-      FirstName: formData.FirstName,
-      LastName: formData.LastName,
-      CompanyName: formData.CompanyName,
-      Phone: formData.Phone,
-      Email: formData.Email,
-      Address: formData.Address,
-      CreatedDate: new Date(),
-      TotalAccumulatedSpent: 0, // Mới tạo chi tiêu bằng 0
-    };
+      await api.customers.create(newCustomer);
+      toast.success("Thêm khách hàng mới thành công!");
+      onSave(newCustomer);
 
-    onSave(newCustomer);
-    // Reset form
-    setFormData({
-      CustomerTypeID: "1",
-      FirstName: "",
-      LastName: "",
-      CompanyName: "",
-      Phone: "",
-      Email: "",
-      Address: "",
-    });
-    onOpenChange(false);
+      setFormData({
+        CustomerTypeID: "1",
+        FirstName: "",
+        LastName: "",
+        CompanyName: "",
+        Phone: "",
+        Email: "",
+        Address: "",
+      });
+      onOpenChange(false);
+    } catch (error: any) {
+      toast.error(error.message || "Thêm khách hàng thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -87,6 +99,7 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
                 value={formData.FirstName}
                 onChange={handleChange}
                 className={dialog.input}
+                disabled={loading}
               />
             </div>
             <div className="grid gap-2">
@@ -97,6 +110,7 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
                 value={formData.LastName}
                 onChange={handleChange}
                 className={dialog.input}
+                disabled={loading}
               />
             </div>
           </div>
@@ -109,6 +123,7 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
               value={formData.CustomerTypeID}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -120,6 +135,7 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
               value={formData.CompanyName}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -131,6 +147,7 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
               value={formData.Phone}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -142,6 +159,7 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
               value={formData.Email}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -153,6 +171,7 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
               value={formData.Address}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
         </div>
@@ -162,11 +181,12 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
             variant="outline"
             className={dialog.cancel}
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
-          <Button className={btn.primary} onClick={handleSubmit}>
-            Tạo mới
+          <Button className={btn.primary} onClick={handleSubmit} disabled={loading}>
+            {loading ? "Đang tạo..." : "Tạo mới"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -11,13 +11,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
-export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
+export function NewCustomerTypeDialog({ open, onOpenChange, onSave }: Props) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     CustomerTypeName: "",
     Discount: "",
@@ -30,9 +34,35 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    console.log("Dữ liệu nhóm khách hàng gửi đi:", formData);
-    onOpenChange(false);
+  const handleSubmit = async () => {
+    if (!formData.CustomerTypeName.trim()) {
+      toast.error("Vui lòng nhập tên nhóm khách hàng!");
+      return;
+    }
+    setLoading(true);
+    try {
+      const typeId = Math.floor(Math.random() * 9000) + 1000;
+      await api.customerTypes.create({
+        CustomerTypeID: typeId,
+        CustomerTypeName: formData.CustomerTypeName,
+        Discount: Number(formData.Discount) || 0,
+        SpendingLimit: Number(formData.SpendingLimit) || 0,
+        Detail: formData.Detail,
+      });
+      toast.success("Tạo nhóm khách hàng thành công!");
+      setFormData({
+        CustomerTypeName: "",
+        Discount: "",
+        SpendingLimit: "",
+        Detail: "",
+      });
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Tạo nhóm khách hàng thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,6 +83,7 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
               value={formData.CustomerTypeName}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -66,6 +97,7 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
                 value={formData.Discount}
                 onChange={handleChange}
                 className={dialog.input}
+                disabled={loading}
               />
             </div>
             <div className="grid gap-2">
@@ -77,6 +109,7 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
                 value={formData.SpendingLimit}
                 onChange={handleChange}
                 className={dialog.input}
+                disabled={loading}
               />
             </div>
           </div>
@@ -89,6 +122,7 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
               value={formData.Detail}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
         </div>
@@ -96,16 +130,17 @@ export function NewCustomerTypeDialog({ open, onOpenChange }: Props) {
         <DialogFooter>
           <Button
             variant="outline"
-           
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Tạo mới
+            {loading ? "Đang tạo..." : "Tạo mới"}
           </Button>
         </DialogFooter>
       </DialogContent>

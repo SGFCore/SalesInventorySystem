@@ -1,96 +1,157 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Lock, UserCircle2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
   CardFooter,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { btn, dialog, page } from "@/pages/page-classes";
 import { toast } from "sonner";
+import { 
+  User, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  HelpCircle,
+  Key
+} from "lucide-react";
 
 export function SignIn() {
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  // Dữ liệu mẫu phục vụ Prototype chạy thử
+  const SAMPLE_CREDENTIALS = {
+    employeeId: "NV001",
+    password: "123456"
+  };
+
+  const handleFillSample = () => {
+    setEmployeeId(SAMPLE_CREDENTIALS.employeeId);
+    setPassword(SAMPLE_CREDENTIALS.password);
+    toast.success("Đã điền thông tin tài khoản mẫu!");
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Logic "Đăng nhập bậy bạ": Chỉ cần không để trống là cho qua
-    if (employeeId.trim().length > 0 && password.trim().length > 0) {
-      toast.success("Đăng nhập thành công!");
-      login();
-      navigate("/");
-    } else {
+    if (employeeId.trim().length === 0 || password.trim().length === 0) {
       toast.error("Vui lòng nhập đầy đủ thông tin.");
+      return;
     }
+
+    // Xác thực prototype: Chấp nhận mọi tài khoản hợp lệ, hoặc tài khoản mẫu
+    toast.success("Đăng nhập thành công!");
+    login();
+    navigate("/");
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-slate-50 p-6">
-      <Card className="w-full max-w-[400px] border border-slate-200 shadow-sm">
-        <CardHeader className="space-y-1 pb-4 text-center">
-          <CardTitle className="text-2xl font-semibold tracking-tight text-blue-600">
+    <div className="fixed inset-0 flex items-center justify-center bg-slate-100 p-4">
+      {/* Container thẻ đăng nhập với thiết kế siêu phẳng (flat) và tối ưu diện tích */}
+      <Card className="w-[340px] bg-white border border-slate-200 rounded-none p-0">
+        
+        {/* Header rút gọn để tiết kiệm không gian */}
+        <CardHeader className="p-4 pb-2 border-b border-slate-100 text-center">
+          <CardTitle className="text-xl font-bold tracking-tight text-blue-600">
             SGFMS
           </CardTitle>
-          <CardDescription className={page.textMuted}>
-            Đăng nhập hệ thống quản lý
+          <CardDescription className="text-[11px] text-slate-500 font-medium">
+            Hệ thống quản lý kho & bán hàng
           </CardDescription>
         </CardHeader>
 
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {/* Employee ID Input */}
-            <div className="space-y-2">
-              <Label htmlFor="employeeId" className="text-slate-700">
+          <CardContent className="p-4 pb-2 space-y-3">
+
+            {/* Input Mã nhân viên */}
+            <div className="space-y-1">
+              <Label 
+                htmlFor="employeeId" 
+                className="text-[10px] font-bold text-slate-500 uppercase tracking-wide"
+              >
                 Mã nhân viên
               </Label>
-              <Input
-                id="employeeId"
-                placeholder="Nhập mã nhân viên..."
-                value={employeeId}
-                onChange={(e) => setEmployeeId(e.target.value)}
-                className={dialog.input}
-                required
-              />
+              <div className="relative">
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400">
+                  <User className="h-3.5 w-3.5" />
+                </div>
+                <Input
+                  id="employeeId"
+                  placeholder="Nhập mã nhân viên..."
+                  value={employeeId}
+                  onChange={(e) => setEmployeeId(e.target.value)}
+                  className="pl-8 h-8.5 text-xs border-slate-200 rounded-none bg-white focus-visible:ring-0 focus-visible:border-blue-600 focus-visible:ring-offset-0 placeholder:text-slate-400"
+                  required
+                />
+              </div>
             </div>
 
-            {/* Password Input */}
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-700">
+            {/* Input Mật khẩu */}
+            <div className="space-y-1">
+              <Label 
+                htmlFor="password" 
+                className="text-[10px] font-bold text-slate-500 uppercase tracking-wide"
+              >
                 Mật khẩu
               </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Nhập mật khẩu..."
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={dialog.input}
-                required
-              />
+              <div className="relative">
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400">
+                  <Lock className="h-3.5 w-3.5" />
+                </div>
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Nhập mật khẩu..."
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-8 pr-8 h-8.5 text-xs border-slate-200 rounded-none bg-white focus-visible:ring-0 focus-visible:border-blue-600 focus-visible:ring-offset-0 placeholder:text-slate-400"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                  title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-3.5 w-3.5" />
+                  ) : (
+                    <Eye className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              </div>
             </div>
+
           </CardContent>
-          <CardFooter className="flex flex-col gap-3 px-6 pb-6">
+
+          {/* Footer hành động */}
+          <CardFooter className="flex flex-col p-4 pt-1 space-y-3 border-0">
             <Button
               type="submit"
-              className={cn(btn.primary, "h-10 w-full font-medium")}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-none border-0"
             >
               Đăng nhập
             </Button>
-            <p className="text-center text-xs text-slate-500">
-              Nếu bạn gặp sự cố khi đăng nhập, vui lòng liên hệ phòng IT.
-            </p>
+
+            {/* Hướng dẫn IT support rút gọn tối đa */}
+            <div className="p-2 bg-slate-50 border border-slate-200 flex items-start gap-1.5 w-full">
+              <HelpCircle className="h-3.5 w-3.5 text-slate-400 mt-0.5 shrink-0" />
+              <p className="text-left text-[9px] text-slate-500 leading-tight">
+                Liên hệ Phòng Kỹ thuật (IT Support) tại Hotline: <span className="font-bold text-slate-600">0785563729</span> khi cần hỗ trợ đăng nhập.
+              </p>
+            </div>
           </CardFooter>
         </form>
       </Card>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,92 +11,88 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Trash2, Plus, Search, UserPlus } from "lucide-react";
+import { Trash2, Plus, Search } from "lucide-react";
 import { NewCustomerDialog } from "@/pages/4-customer-management-page/NewCustomerDialog";
-import type { Customer } from "@/lib/types";
+import type { Customer, Product, Discount } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+import { useEmp } from "@/context/empContext";
 
 interface NewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
-// Mock Data
-const MOCK_CUSTOMERS: Customer[] = [
-  {
-    CustomerID: 301,
-    CustomerTypeID: 1,
-    FirstName: "Nguyễn",
-    LastName: "Văn A",
-    CompanyName: "",
-    Phone: "0901234567",
-    Address: "Hà Nội",
-    Email: "a@gmail.com",
-    CreatedDate: new Date(),
-    TotalAccumulatedSpent: 0,
-  },
-  {
-    CustomerID: 302,
-    CustomerTypeID: 1,
-    FirstName: "Trần",
-    LastName: "Thị B",
-    CompanyName: "",
-    Phone: "0987654321",
-    Address: "HCM",
-    Email: "b@gmail.com",
-    CreatedDate: new Date(),
-    TotalAccumulatedSpent: 0,
-  },
-];
-
-const MOCK_PRODUCTS = [
-  { ProductID: 201, ProductName: "Sản phẩm A", Price: 150000 },
-  { ProductID: 202, ProductName: "Sản phẩm B", Price: 200000 },
-];
-
-const MOCK_PROMOTIONS = [
-  { PromoID: 1, PromoName: "Giảm giá 10% (Tối đa 50k)" },
-  { PromoID: 2, PromoName: "Freeship đơn từ 200k" },
-];
-
-export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
-  // States Customer Search
+export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
+  const { emp } = useEmp();
+  const [loading, setLoading] = useState(false);
   const [phoneSearch, setPhoneSearch] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null,
-  );
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isNewCustomerOpen, setIsNewCustomerOpen] = useState(false);
 
-  // States Invoice Data
-  const [invoiceData, setInvoiceData] = useState({
-    SaleChannelCode: "0",
-    Status: "0",
-    EmployeeID: "101",
-  });
+  // Dynamic Options
+  const [products, setProducts] = useState<Product[]>([]);
+  const [discounts, setDiscounts] = useState<Discount[]>([]);
 
-  // States Dynamic Lists
-  const [selectedProducts, setSelectedProducts] = useState([
-    { productID: MOCK_PRODUCTS[0].ProductID, quantity: 1 },
-  ]);
-  const [selectedPromotions, setSelectedPromotions] = useState<
-    { promoID: number }[]
-  >([]);
+  // Invoice Fields
+  const [saleChannelCode, setSaleChannelCode] = useState<number>(0); // 0: Tại quầy, 1: Mạng xã hội/Online
+  const [status, setStatus] = useState<string>("0"); // "0": Chờ thanh toán, "1": Đã thanh toán, "2": Thanh toán 1 phần
 
-  // Actions
-  const handleSearchCustomer = () => {
-    const cust = MOCK_CUSTOMERS.find((c) => c.Phone === phoneSearch.trim());
-    if (cust) {
-      setSelectedCustomer(cust);
-    } else {
-      alert("Không tìm thấy khách hàng. Vui lòng tạo mới!");
-      setSelectedCustomer(null);
+  const [selectedProducts, setSelectedProducts] = useState<{ productID: number; quantity: number }[]>([]);
+  const [selectedPromotions, setSelectedPromotions] = useState<{ promoID: number }[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      const loadOptions = async () => {
+        try {
+          const [prodList, promoList] = await Promise.all([
+            api.products.list(),
+            api.discounts.list(),
+          ]);
+          setProducts(prodList);
+          setDiscounts(promoList);
+
+          if (prodList.length > 0) {
+            setSelectedProducts([{ productID: prodList[0].ProductID, quantity: 1 }]);
+          }
+          if (promoList.length > 0) {
+            setSelectedPromotions([]);
+          }
+        } catch (e) {
+          console.error("Lỗi lấy danh sách sản phẩm/khuyến mãi:", e);
+        }
+      };
+      loadOptions();
+    }
+  }, [open]);
+
+  const handleSearchCustomer = async () => {
+    if (!phoneSearch.trim()) {
+      toast.error("Vui lòng nhập số điện thoại cần tìm");
+      return;
+    }
+    try {
+      const customers = await api.customers.list();
+      const cust = customers.find((c) => c.Phone === phoneSearch.trim());
+      if (cust) {
+        setSelectedCustomer(cust);
+        toast.success(`Đã tìm thấy khách hàng: ${cust.FirstName} ${cust.LastName}`);
+      } else {
+        toast.error("Không tìm thấy khách hàng. Vui lòng tạo mới!");
+        setSelectedCustomer(null);
+      }
+    } catch (e) {
+      toast.error("Lỗi kết nối khi tìm kiếm khách hàng");
     }
   };
 
   const handleAddProduct = () => {
+    if (products.length === 0) return;
     setSelectedProducts((prev) => [
       ...prev,
-      { productID: MOCK_PRODUCTS[0].ProductID, quantity: 1 },
+      { productID: products[0].ProductID, quantity: 1 },
     ]);
   };
 
@@ -106,9 +102,10 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
   };
 
   const handleAddPromotion = () => {
+    if (discounts.length === 0) return;
     setSelectedPromotions((prev) => [
       ...prev,
-      { promoID: MOCK_PROMOTIONS[0].PromoID },
+      { promoID: discounts[0].DiscountID },
     ]);
   };
 
@@ -116,19 +113,95 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
     setSelectedPromotions((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedCustomer) {
-      alert("Vui lòng chọn khách hàng!");
+      toast.error("Vui lòng chọn khách hàng!");
       return;
     }
-    const finalData = {
-      Customer: selectedCustomer,
-      InvoiceInfo: invoiceData,
-      Products: selectedProducts,
-      Promotions: selectedPromotions,
-    };
-    console.log("Dữ liệu tạo hóa đơn gửi đi:", finalData);
-    onOpenChange(false);
+    if (selectedProducts.length === 0) {
+      toast.error("Vui lòng chọn ít nhất một sản phẩm!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Calculate totals
+      let totalAmount = 0;
+      selectedProducts.forEach((item) => {
+        const prod = products.find((p) => p.ProductID === item.productID);
+        if (prod) {
+          totalAmount += prod.Price * item.quantity;
+        }
+      });
+
+      // Apply promotional discounts if any
+      let discountAmount = 0;
+      selectedPromotions.forEach((item) => {
+        const promo = discounts.find((d) => d.DiscountID === item.promoID);
+        if (promo) {
+          discountAmount += promo.Value;
+        }
+      });
+
+      const taxAmount = Math.round(totalAmount * 0.1);
+      const finalAmount = Math.max(0, totalAmount + taxAmount - discountAmount);
+
+      const invoiceId = Math.floor(Math.random() * 900000) + 100000;
+
+      // 1. Create Invoice record
+      await api.invoices.create({
+        InvoiceID: invoiceId,
+        CustomerID: selectedCustomer.CustomerID,
+        EmployeeID: emp?.EmployeeID || 1,
+        SaleChannelCode: saleChannelCode,
+        TotalAmount: totalAmount,
+        TaxAmount: taxAmount,
+        FinalAmount: finalAmount,
+        Status: status,
+        InvoiceDate: new Date(),
+      });
+
+      // 2. Create InvoiceDetail records
+      await Promise.all(
+        selectedProducts.map((item, index) => {
+          const prod = products.find((p) => p.ProductID === item.productID);
+          const price = prod ? prod.Price : 0;
+          return api.invoiceDetails.create({
+            InvoiceDetailID: Math.floor(Math.random() * 900000) + 100000 + index,
+            InvoiceID: invoiceId,
+            ProductID: item.productID,
+            ComboID: 0,
+            Quantity: item.quantity,
+            UnitPrice: price,
+            DiscountAmount: 0,
+            TotalAmount: price * item.quantity,
+          });
+        })
+      );
+
+      // 3. Link Promotions to Invoice using listDiscounts if applicable
+      if (selectedPromotions.length > 0) {
+        await Promise.all(
+          selectedPromotions.map((item) => {
+            const promo = discounts.find((d) => d.DiscountID === item.promoID);
+            const val = promo ? promo.Value : 0;
+            return api.listDiscounts.create({
+              OrderID: invoiceId, // Note: listDiscounts has OrderID representing transaction ID
+              DiscountID: item.promoID,
+              AppliedValue: val,
+            });
+          })
+        );
+      }
+
+      toast.success("Tạo hóa đơn thành công!");
+      onOpenChange(false);
+      onSave();
+    } catch (e: any) {
+      toast.error(e.message || "Tạo hóa đơn thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -141,7 +214,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid gap-6 py-2">
+          <div className="grid gap-6 py-2 max-h-[70vh] overflow-y-auto pr-2">
             {/* 1. Khu vực Khách hàng */}
             <div className="grid gap-3">
               <Label className="text-blue-600 font-bold uppercase text-xs tracking-wider">
@@ -149,10 +222,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
               </Label>
               <div className="flex items-end gap-2">
                 <div className="grid gap-2 flex-1">
-                  <Label
-                    htmlFor="phoneSearch"
-                    className="text-xs text-slate-500"
-                  >
+                  <Label htmlFor="phoneSearch" className="text-xs text-slate-500">
                     Tra cứu SĐT
                   </Label>
                   <div className="flex gap-2">
@@ -161,12 +231,14 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                       placeholder="Nhập SĐT..."
                       value={phoneSearch}
                       onChange={(e) => setPhoneSearch(e.target.value)}
-                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
+                      disabled={loading}
                     />
                     <Button
                       variant="outline"
                       className="border-blue-200 text-blue-600 hover:bg-blue-50 h-9 px-3"
                       onClick={handleSearchCustomer}
+                      disabled={loading}
                     >
                       <Search className="h-4 w-4" />
                     </Button>
@@ -174,15 +246,16 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                 </div>
                 <Button
                   variant="default"
-                  className="text-indigo-600 border-indigo-200 hover:bg-indigo-50 h-9"
+                  className="text-indigo-600 border-indigo-200 hover:bg-indigo-50 h-9 text-xs"
                   onClick={() => setIsNewCustomerOpen(true)}
+                  disabled={loading}
                 >
-                  Tạo mới
+                  Tạo mới KH
                 </Button>
               </div>
 
               {selectedCustomer && (
-                <div className="bg-slate-50 border border-slate-200 p-3 text-sm mt-2">
+                <div className="bg-slate-50 border border-slate-200 p-3 rounded-md text-sm mt-2">
                   <p>
                     <span className="text-slate-500">Họ Tên:</span>{" "}
                     <strong className="text-slate-900">
@@ -191,9 +264,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                   </p>
                   <p>
                     <span className="text-slate-500">SĐT:</span>{" "}
-                    <strong className="text-slate-900">
-                      {selectedCustomer.Phone}
-                    </strong>
+                    <strong className="text-slate-900">{selectedCustomer.Phone}</strong>
                   </p>
                 </div>
               )}
@@ -208,27 +279,22 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                 <div className="grid gap-2">
                   <Label className="text-xs text-slate-500">Kênh bán</Label>
                   <NativeSelect
-                    value={invoiceData.SaleChannelCode}
-                    onChange={(e) =>
-                      setInvoiceData({
-                        ...invoiceData,
-                        SaleChannelCode: e.target.value,
-                      })
-                    }
+                    value={saleChannelCode}
+                    onChange={(e) => setSaleChannelCode(Number(e.target.value))}
                     className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
+                    disabled={loading}
                   >
-                    <option value="0">Tại quầy</option>
-                    <option value="1">Mạng xã hội / Online</option>
+                    <option value={0}>Tại quầy</option>
+                    <option value={1}>Mạng xã hội / Online</option>
                   </NativeSelect>
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-xs text-slate-500">Trạng thái</Label>
                   <NativeSelect
-                    value={invoiceData.Status}
-                    onChange={(e) =>
-                      setInvoiceData({ ...invoiceData, Status: e.target.value })
-                    }
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
                     className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
+                    disabled={loading}
                   >
                     <option value="0">Chờ thanh toán</option>
                     <option value="1">Đã thanh toán</option>
@@ -251,15 +317,14 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                       onChange={(e) =>
                         setSelectedProducts((prev) =>
                           prev.map((p, i) =>
-                            i === index
-                              ? { ...p, productID: Number(e.target.value) }
-                              : p,
-                          ),
+                            i === index ? { ...p, productID: Number(e.target.value) } : p
+                          )
                         )
                       }
                       className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 flex-1"
+                      disabled={loading}
                     >
-                      {MOCK_PRODUCTS.map((prod) => (
+                      {products.map((prod) => (
                         <option key={prod.ProductID} value={prod.ProductID}>
                           {prod.ProductName} - {prod.Price.toLocaleString()} đ
                         </option>
@@ -272,18 +337,17 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                       onChange={(e) =>
                         setSelectedProducts((prev) =>
                           prev.map((p, i) =>
-                            i === index
-                              ? { ...p, quantity: Number(e.target.value) }
-                              : p,
-                          ),
+                            i === index ? { ...p, quantity: Math.max(1, Number(e.target.value)) } : p
+                          )
                         )
                       }
-                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 w-20"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 w-20 text-sm text-center"
+                      disabled={loading}
                     />
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={selectedProducts.length === 1}
+                      disabled={selectedProducts.length === 1 || loading}
                       onClick={() => handleRemoveProduct(index)}
                       className="text-red-500 border-slate-200 h-9 w-9 p-0 flex items-center justify-center"
                     >
@@ -295,7 +359,8 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                   variant="outline"
                   size="sm"
                   onClick={handleAddProduct}
-                  className="text-slate-600 border-dashed border-slate-300 mt-2 h-8 w-full"
+                  className="text-slate-600 border-dashed border-slate-300 mt-2 h-8 w-full text-xs"
+                  disabled={loading}
                 >
                   <Plus className="h-4 w-4 mr-1" /> Thêm sản phẩm
                 </Button>
@@ -315,17 +380,16 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                       onChange={(e) =>
                         setSelectedPromotions((prev) =>
                           prev.map((p, i) =>
-                            i === index
-                              ? { ...p, promoID: Number(e.target.value) }
-                              : p,
-                          ),
+                            i === index ? { ...p, promoID: Number(e.target.value) } : p
+                          )
                         )
                       }
                       className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 flex-1"
+                      disabled={loading}
                     >
-                      {MOCK_PROMOTIONS.map((promo) => (
-                        <option key={promo.PromoID} value={promo.PromoID}>
-                          {promo.PromoName}
+                      {discounts.map((promo) => (
+                        <option key={promo.DiscountID} value={promo.DiscountID}>
+                          {promo.DiscountName} (-{promo.Value.toLocaleString()}đ)
                         </option>
                       ))}
                     </NativeSelect>
@@ -334,6 +398,7 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                       size="sm"
                       onClick={() => handleRemovePromotion(index)}
                       className="text-red-500 border-slate-200 h-9 w-9 p-0 flex items-center justify-center"
+                      disabled={loading}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -343,7 +408,8 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
                   variant="outline"
                   size="sm"
                   onClick={handleAddPromotion}
-                  className="text-slate-600 border-dashed border-slate-300 mt-1 h-8 w-full"
+                  className="text-slate-600 border-dashed border-slate-300 mt-1 h-8 w-full text-xs"
+                  disabled={loading || discounts.length === 0}
                 >
                   <Plus className="h-4 w-4 mr-1" /> Thêm mã khuyến mãi
                 </Button>
@@ -354,16 +420,17 @@ export function NewInvoiceDialog({ open, onOpenChange }: NewProps) {
           <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
             <Button
               variant="outline"
-             
               onClick={() => onOpenChange(false)}
+              disabled={loading}
             >
               Hủy
             </Button>
             <Button
               className={btn.primary}
               onClick={handleSubmit}
+              disabled={loading}
             >
-              Tạo Hóa Đơn
+              {loading ? "Đang tạo..." : "Tạo Hóa Đơn"}
             </Button>
           </DialogFooter>
         </DialogContent>

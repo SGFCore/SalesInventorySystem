@@ -18,26 +18,6 @@ export function Navbar() {
         </h1>
       </div>
 
-      {/* Center: Search Input - Thu hẹp chiều cao và giới hạn độ rộng */}
-      <div className="flex-1 flex justify-center px-4">
-        <InputGroup className="max-w-sm w-full size-sm">
-          {/* Giả sử component InputGroup của bạn hỗ trợ size "sm" hoặc bạn có thể chỉnh CSS trực tiếp */}
-          <InputGroupInput
-            placeholder="Tìm kiếm..."
-            className="h-8 text-sm bg-blue-500/20 border-none placeholder:text-blue-100 text-white"
-          />
-          <InputGroupAddon className="h-8">
-            <Search size={16} />
-          </InputGroupAddon>
-          <InputGroupAddon
-            align="inline-end"
-            className="text-xs opacity-80 h-8"
-          >
-            12 results
-          </InputGroupAddon>
-        </InputGroup>
-      </div>
-
       {/* Right: Notification & Avatar - Giảm gap và size icon */}
       <div className="flex items-center gap-2 shrink-0">
         <Button

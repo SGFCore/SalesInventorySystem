@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,10 +14,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
 import { Trash2, Plus } from "lucide-react";
+import { api } from "@/lib/api";
+import type { Product } from "@/lib/types";
+import { toast } from "sonner";
+import { useEmp } from "@/context/empContext";
 
 interface NewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
 interface NewReturnDetailItem {
@@ -28,16 +33,11 @@ interface NewReturnDetailItem {
   actionTaken: string;
 }
 
-// Mock danh sách sản phẩm mẫu để chọn trong dropdown
-const MOCK_PRODUCTS_LIST = [
-  { ProductID: 201, ProductName: "Sản phẩm mẫu 1" },
-  { ProductID: 202, ProductName: "Sản phẩm mẫu 2" },
-  { ProductID: 203, ProductName: "Sản phẩm mẫu 3" },
-  { ProductID: 204, ProductName: "Sản phẩm mẫu 4" },
-  { ProductID: 205, ProductName: "Sản phẩm mẫu 5" },
-];
+export function NewOrderReturnDialog({ open, onOpenChange, onSave }: NewProps) {
+  const { emp } = useEmp();
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
 
-export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
   // Khởi tạo các state thông tin chung của phiếu hoàn tiền
   const [orderName, setOrderName] = useState("");
   const [employeeName, setEmployeeName] = useState("");
@@ -46,26 +46,52 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
   const [totalRefund, setTotalRefund] = useState<number>(0);
 
   // Khởi tạo danh sách sản phẩm động luôn có ít nhất 1 dòng mặc định
-  const [selectedProducts, setSelectedProducts] = useState<
-    NewReturnDetailItem[]
-  >([
-    {
-      productID: MOCK_PRODUCTS_LIST[0].ProductID,
-      quantity: 1,
-      qcStatus: "Đạt chuẩn",
-      targetWarehouseID: 1,
-      actionTaken: "Tái nhập kho",
-    },
-  ]);
+  const [selectedProducts, setSelectedProducts] = useState<NewReturnDetailItem[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      // Set default employee name
+      if (emp) {
+        setEmployeeName(emp.Fullname);
+      } else {
+        setEmployeeName("Nhân viên hệ thống");
+      }
+
+      // Pre-generate a random ref code
+      setReturnRefCode("RET" + Math.floor(Math.random() * 900000 + 100000));
+
+      const loadProducts = async () => {
+        try {
+          const list = await api.products.list();
+          setProducts(list);
+          if (list.length > 0) {
+            setSelectedProducts([
+              {
+                productID: list[0].ProductID,
+                quantity: 1,
+                qcStatus: "Đạt chuẩn QC",
+                targetWarehouseID: 1,
+                actionTaken: "Tái nhập kho",
+              },
+            ]);
+          }
+        } catch (e) {
+          console.error("Lỗi lấy danh sách sản phẩm hoàn trả:", e);
+        }
+      };
+      loadProducts();
+    }
+  }, [open, emp]);
 
   // Thêm dòng sản phẩm mới vào danh sách hoàn tiền
   const handleAddProduct = () => {
+    if (products.length === 0) return;
     setSelectedProducts((prev) => [
       ...prev,
       {
-        productID: MOCK_PRODUCTS_LIST[0].ProductID,
+        productID: products[0].ProductID,
         quantity: 1,
-        qcStatus: "Đạt chuẩn",
+        qcStatus: "Đạt chuẩn QC",
         targetWarehouseID: 1,
         actionTaken: "Tái nhập kho",
       },
@@ -90,52 +116,65 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
   };
 
   // Submit form dữ liệu phiếu hoàn tiền mới
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!orderName.trim() || !employeeName.trim() || !returnRefCode.trim()) {
-      alert("Vui lòng điền đầy đủ các thông tin bắt buộc (*)");
+      toast.error("Vui lòng điền đầy đủ các thông tin bắt buộc (*)");
       return;
     }
 
     if (totalRefund <= 0) {
-      alert("Vui lòng nhập số tiền hoàn tiền hợp lệ!");
+      toast.error("Vui lòng nhập số tiền hoàn tiền hợp lệ!");
       return;
     }
 
     const hasInvalidQuantity = selectedProducts.some((p) => p.quantity <= 0);
     if (hasInvalidQuantity) {
-      alert("Số lượng của từng sản phẩm hoàn tiền phải lớn hơn hoặc bằng 1!");
+      toast.error("Số lượng của từng sản phẩm hoàn tiền phải lớn hơn hoặc bằng 1!");
       return;
     }
 
-    const finalData = {
-      orderName,
-      employeeName,
-      returnRefCode,
-      reason,
-      totalRefund,
-      returnDate: new Date(),
-      status: "Chờ xử lý",
-      products: selectedProducts,
-    };
+    setLoading(true);
+    try {
+      const returnId = Math.floor(Math.random() * 900000) + 100000;
 
-    console.log("Dữ liệu tạo đơn hoàn tiền mới gửi đi:", finalData);
+      // 1. Create OrderReturn
+      await api.orderReturns.create({
+        ReturnID: returnId,
+        OrderName: orderName,
+        EmployeeName: employeeName,
+        ReturnDate: new Date(),
+        Reason: reason || "Đổi trả hàng",
+        TotalRefund: totalRefund,
+        ReturnRefCode: returnRefCode,
+        Status: "0", // 0: Chờ xử lý
+      });
 
-    // Reset toàn bộ state về trạng thái mặc định ban đầu
-    setOrderName("");
-    setEmployeeName("");
-    setReturnRefCode("");
-    setReason("");
-    setTotalRefund(0);
-    setSelectedProducts([
-      {
-        productID: MOCK_PRODUCTS_LIST[0].ProductID,
-        quantity: 1,
-        qcStatus: "Đạt chuẩn",
-        targetWarehouseID: 1,
-        actionTaken: "Tái nhập kho",
-      },
-    ]);
-    onOpenChange(false);
+      // 2. Create ReturnDetails song song
+      await Promise.all(
+        selectedProducts.map((item, idx) => {
+          return api.returnDetails.create({
+            ReturnID: returnId,
+            ProductID: item.productID,
+            Quantity: item.quantity,
+            QC_Status: item.qcStatus || "Chưa QC",
+            TargetWarehouseID: item.targetWarehouseID || 1,
+            ActionTaken: item.actionTaken || "Tái nhập kho",
+          });
+        })
+      );
+
+      toast.success("Tạo phiếu hoàn trả thành công!");
+      // Reset toàn bộ state về trạng thái mặc định ban đầu
+      setOrderName("");
+      setReason("");
+      setTotalRefund(0);
+      onOpenChange(false);
+      onSave();
+    } catch (e: any) {
+      toast.error(e.message || "Tạo phiếu hoàn tiền thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -147,11 +186,11 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4 text-sm">
+        <div className="grid gap-4 py-2 text-sm max-h-[70vh] overflow-y-auto pr-2">
           {/* Thông tin đơn hàng và mã tham chiếu */}
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
-              <Label htmlFor="orderName">
+              <Label htmlFor="orderName" className="font-semibold text-slate-700">
                 Tên/Mã đơn hàng gốc <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -160,10 +199,11 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                 onChange={(e) => setOrderName(e.target.value)}
                 placeholder="Ví dụ: #ORD-2500"
                 className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+                disabled={loading}
               />
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="returnRefCode">
+              <Label htmlFor="returnRefCode" className="font-semibold text-slate-700">
                 Mã tham chiếu <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -172,6 +212,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                 onChange={(e) => setReturnRefCode(e.target.value)}
                 placeholder="Ví dụ: REF-8000"
                 className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+                disabled={loading}
               />
             </div>
           </div>
@@ -179,7 +220,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
           {/* Nhân viên và Số tiền hoàn */}
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
-              <Label htmlFor="employeeName">
+              <Label htmlFor="employeeName" className="font-semibold text-slate-700">
                 Nhân viên tiếp nhận <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -188,10 +229,11 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                 onChange={(e) => setEmployeeName(e.target.value)}
                 placeholder="Nhập tên nhân viên..."
                 className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+                disabled={loading}
               />
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="totalRefund">
+              <Label htmlFor="totalRefund" className="font-semibold text-slate-700">
                 Tổng tiền hoàn tiền (đ) <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -200,14 +242,15 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                 value={totalRefund}
                 onChange={(e) => setTotalRefund(Number(e.target.value))}
                 placeholder="Nhập số tiền..."
-                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-center"
+                disabled={loading}
               />
             </div>
           </div>
 
           {/* Lý do hoàn tiền */}
           <div className="grid gap-1.5">
-            <Label htmlFor="reason">Lý do hoàn tiền</Label>
+            <Label htmlFor="reason" className="font-semibold text-slate-700">Lý do hoàn tiền</Label>
             <Textarea
               id="reason"
               value={reason}
@@ -215,21 +258,21 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
               placeholder="Nhập chi tiết lý do khách hàng hoàn tiền..."
               className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm"
               rows={2}
+              disabled={loading}
             />
           </div>
 
           {/* Danh sách sản phẩm kèm theo (Style tương tự Combo) */}
           <div className="border-t border-slate-100 pt-4 mt-2">
             <Label className="text-slate-900 font-bold block mb-3">
-              Danh sách sản phẩm hoàn tiền{" "}
-              <span className="text-red-500">*</span>
+              Danh sách sản phẩm hoàn tiền <span className="text-red-500">*</span>
             </Label>
 
             <div className="grid gap-3">
               {selectedProducts.map((item, index) => (
                 <div
                   key={index}
-                  className="flex flex-col gap-2 p-3 border border-slate-100 rounded-md bg-slate-50/30"
+                  className="flex flex-col gap-2 p-3 border border-slate-200 rounded-md bg-slate-50/50"
                 >
                   <div className="flex items-center gap-2">
                     {/* Dropdown chọn sản phẩm */}
@@ -244,8 +287,9 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                           )
                         }
                         className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-xs h-8 w-full"
+                        disabled={loading}
                       >
-                        {MOCK_PRODUCTS_LIST.map((prod) => (
+                        {products.map((prod) => (
                           <option key={prod.ProductID} value={prod.ProductID}>
                             {prod.ProductName} (#{prod.ProductID})
                           </option>
@@ -263,11 +307,12 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                           handleProductChange(
                             index,
                             "quantity",
-                            Number(e.target.value),
+                            Math.max(1, Number(e.target.value)),
                           )
                         }
                         placeholder="SL"
-                        className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-8 text-xs"
+                        className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-8 text-xs text-center font-bold"
+                        disabled={loading}
                       />
                     </div>
 
@@ -275,7 +320,7 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={selectedProducts.length === 1}
+                      disabled={selectedProducts.length === 1 || loading}
                       onClick={() => handleRemoveProduct(index)}
                       className="text-red-500 hover:bg-red-50 border-slate-200 h-8 w-8 p-0 flex items-center justify-center disabled:opacity-40"
                     >
@@ -292,7 +337,8 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                       onChange={(e) =>
                         handleProductChange(index, "qcStatus", e.target.value)
                       }
-                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-7 text-xs"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-8 text-xs"
+                      disabled={loading}
                     />
                     <Input
                       type="text"
@@ -305,7 +351,8 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
                           e.target.value,
                         )
                       }
-                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-7 text-xs"
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-8 text-xs"
+                      disabled={loading}
                     />
                   </div>
                 </div>
@@ -317,26 +364,28 @@ export function NewOrderReturnDialog({ open, onOpenChange }: NewProps) {
               variant="outline"
               size="sm"
               onClick={handleAddProduct}
-              className="text-blue-600 border-blue-200 hover:bg-blue-50 mt-3 w-full flex items-center justify-center gap-1 h-8"
+              className="text-blue-600 border-blue-200 hover:bg-blue-50 mt-3 w-full flex items-center justify-center gap-1 h-8 text-xs"
+              disabled={loading}
             >
               <Plus className="h-4 w-4" /> Thêm sản phẩm hoàn tiền
             </Button>
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="h-9 text-sm"
+            disabled={loading}
           >
             Hủy
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white h-9 text-sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Tạo mới
+            {loading ? "Đang tạo..." : "Tạo mới"}
           </Button>
         </DialogFooter>
       </DialogContent>

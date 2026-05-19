@@ -14,33 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { DetailInventory, Warehouse } from "@/lib/types";
+import type { DetailInventory, Warehouse, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { btn } from "@/pages/page-classes";
 import { dialog } from "@/pages/page-classes";
-
-// Mock dữ liệu tồn kho chi tiết cho mục đích hiển thị mẫu prototype
-const MOCK_INVENTORY_DETAILS: DetailInventory[] = Array.from(
-  { length: 60 },
-  (_, i) => {
-    const warehouseId = 100 + (i % 25); // Phân bổ đều vào các kho từ 100 đến 124
-    const minStock = 50 + (i % 5) * 20; // 50, 70, 90, 110, 130
-    // Tạo tình huống thiếu hụt ngẫu nhiên bằng cách gán số lượng nhỏ hơn mức tối thiểu
-    const currentQuantity = i % 3 === 0 ? minStock - 15 : minStock + 40;
-
-    return {
-      WarehouseID: warehouseId,
-      ProductID: 5000 + i,
-      CurrentQuantity: currentQuantity,
-      RealStock: currentQuantity + 5,
-      AvailableStock: currentQuantity,
-      MinStock: minStock,
-      MaxStock: minStock * 3,
-      IsAlertEnabled: 1,
-      StorageLocation: `Khuên ${String.fromCharCode(65 + (i % 4))}-${i % 10}`,
-    };
-  },
-);
+import React, { useState, useEffect } from "react";
+import { api } from "@/lib/api";
+import { Loader2 } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -53,12 +33,37 @@ export function ReportWarehouseDialog({
   onOpenChange,
   warehouse,
 }: Props) {
+  const [loading, setLoading] = useState(false);
+  const [inventories, setInventories] = useState<DetailInventory[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    if (open && warehouse) {
+      const loadData = async () => {
+        setLoading(true);
+        try {
+          const [invList, prodList] = await Promise.all([
+            api.detailInventories.list(),
+            api.products.list(),
+          ]);
+          setInventories(invList.filter((item) => item.WarehouseID === warehouse.WareHouseID));
+          setProducts(prodList);
+        } catch (e) {
+          console.error("Lỗi lấy báo cáo thiếu hụt:", e);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadData();
+    }
+  }, [open, warehouse]);
+
   if (!warehouse) return null;
 
-  // Lọc ra các vật tư thuộc kho hàng hiện tại
-  const inventoryData = MOCK_INVENTORY_DETAILS.filter(
-    (item) => item.WarehouseID === warehouse.WareHouseID,
-  );
+  const getProductName = (productId: number) => {
+    const prod = products.find((p) => p.ProductID === productId);
+    return prod ? prod.ProductName : `Sản phẩm #${productId}`;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -69,86 +74,89 @@ export function ReportWarehouseDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="py-4">
-          <div className="border border-slate-200 overflow-hidden">
-            <Table>
-              <TableHeader className="bg-slate-50">
-                <TableRow className="border-b border-slate-200">
-                  <TableHead className="font-semibold text-slate-700">
-                    Mã sản phẩm
-                  </TableHead>
-                  <TableHead className="font-semibold text-slate-700">
-                    Vị trí lưu trữ
-                  </TableHead>
-                  <TableHead className="font-semibold text-right text-slate-700">
-                    Tồn thực tế
-                  </TableHead>
-                  <TableHead className="font-semibold text-right text-slate-700">
-                    Hiện tại
-                  </TableHead>
-                  <TableHead className="font-semibold text-right text-slate-700">
-                    Mức tối thiểu
-                  </TableHead>
-                  <TableHead className="font-semibold text-center text-slate-700">
-                    Tình trạng
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {inventoryData.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="text-center py-8 text-slate-400"
-                    >
-                      Không tìm thấy dữ liệu tồn kho cho kho hàng này.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  inventoryData.map((item) => {
-                    const isShortage = item.CurrentQuantity < item.MinStock;
-                    return (
-                      <TableRow
-                        key={item.ProductID}
-                        className={cn(
-                          "border-b border-slate-100 transition-none",
-                          isShortage
-                            ? "bg-red-50 hover:bg-red-50 text-red-600 font-medium"
-                            : "hover:bg-slate-50",
-                        )}
-                      >
-                        <TableCell>{item.ProductID}</TableCell>
-                        <TableCell>{item.StorageLocation}</TableCell>
-                        <TableCell className="text-right">
-                          {item.RealStock}
-                        </TableCell>
-                        <TableCell className="text-right font-bold">
-                          {item.CurrentQuantity}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {item.MinStock}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {isShortage ? (
-                            <span className="bg-red-200 text-red-800 px-2 py-0.5 text-xs font-bold uppercase">
-                              Thiếu hụt
-                            </span>
-                          ) : (
-                            <span className="text-slate-400 text-xs">
-                              An toàn
-                            </span>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
+        {loading ? (
+          <div className="flex justify-center items-center py-10">
+            <Loader2 className="h-6 w-6 animate-spin text-red-600" />
+            <span className="ml-2 text-slate-500 text-sm font-medium">Đang tạo báo cáo thiếu hụt...</span>
           </div>
-        </div>
+        ) : (
+          <div className="py-2 max-h-[60vh] overflow-y-auto pr-1">
+            <div className="border border-slate-200 overflow-hidden rounded-md bg-white">
+              <Table>
+                <TableHeader className="bg-slate-50">
+                  <TableRow className="border-b border-slate-200">
+                    <TableHead className="font-bold text-slate-700 text-xs">
+                      Tên sản phẩm (Mã)
+                    </TableHead>
+                    <TableHead className="font-bold text-slate-700 text-xs">
+                      Vị trí lưu trữ
+                    </TableHead>
+                    <TableHead className="font-bold text-right text-slate-700 text-xs">
+                      Tồn tối thiểu (Min)
+                    </TableHead>
+                    <TableHead className="font-bold text-right text-slate-700 text-xs">
+                      Tồn hiện tại
+                    </TableHead>
+                    <TableHead className="font-bold text-center text-slate-700 text-xs">
+                      Tình trạng
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {inventories.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="text-center py-8 text-slate-400 font-semibold text-xs"
+                      >
+                        Không tìm thấy dữ liệu tồn kho cho kho hàng này.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    inventories.map((item) => {
+                      const isShortage = item.CurrentQuantity < item.MinStock;
+                      return (
+                        <TableRow
+                          key={item.ProductID}
+                          className={cn(
+                            "border-b border-slate-100 transition-none text-xs",
+                            isShortage
+                              ? "bg-red-50 hover:bg-red-50 text-red-600 font-semibold"
+                              : "hover:bg-slate-50 text-slate-700",
+                          )}
+                        >
+                          <TableCell className="font-semibold py-3">
+                            {getProductName(item.ProductID)} (Mã: #{item.ProductID})
+                          </TableCell>
+                          <TableCell className="py-3 font-medium">{item.StorageLocation || "Chưa gán vị trí"}</TableCell>
+                          <TableCell className="text-right py-3 font-semibold text-slate-900">
+                            {item.MinStock}
+                          </TableCell>
+                          <TableCell className="text-right py-3 font-bold">
+                            {item.CurrentQuantity}
+                          </TableCell>
+                          <TableCell className="text-center py-3">
+                            {isShortage ? (
+                              <span className="bg-red-100 text-red-700 border border-red-200 px-2 py-0.5 text-[10px] font-bold rounded">
+                                THIẾU HỤT
+                              </span>
+                            ) : (
+                              <span className="bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 text-[10px] font-bold rounded">
+                                AN TOÀN
+                              </span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        )}
 
-        <DialogFooter>
+        <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             className={btn.primary}
             onClick={() => onOpenChange(false)}

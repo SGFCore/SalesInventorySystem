@@ -11,49 +11,63 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEmp } from "@/context/empContext";
 import { btn, dialog } from "@/pages/page-classes";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Loader2 } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { api } from "@/lib/api";
+import type { Product } from "@/lib/types";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
 interface DetailInput {
-  ProductId: string;
-  ProductName: string;
-  Quantity: string;
+  ProductId: number;
+  Quantity: number;
 }
 
-export function NewRequestDialog({ open, onOpenChange }: Props) {
+export function NewRequestDialog({ open, onOpenChange, onSave }: Props) {
   const { emp } = useEmp();
-  const [employeeId, setEmployeeId] = useState(emp.EmployeeID);
-  const [items, setItems] = useState<DetailInput[]>([
-    { ProductId: "", ProductName: "", Quantity: "" },
-  ]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [items, setItems] = useState<DetailInput[]>([]);
 
   useEffect(() => {
     if (open) {
-      setItems([{ ProductId: "", ProductName: "", Quantity: "" }]);
+      const loadProducts = async () => {
+        try {
+          const list = await api.products.list();
+          setProducts(list);
+          if (list.length > 0) {
+            setItems([{ ProductId: list[0].ProductID, Quantity: 1 }]);
+          }
+        } catch (e) {
+          console.error("Lỗi lấy danh sách sản phẩm:", e);
+        }
+      };
+      loadProducts();
     }
   }, [open]);
 
   const handleItemChange = (
     index: number,
     field: keyof DetailInput,
-    value: string,
+    value: number,
   ) => {
     setItems((prev) => {
       const updated = [...prev];
-      updated[index][field] = value;
+      updated[index] = { ...updated[index], [field]: value };
       return updated;
     });
   };
 
   const addItemRow = () => {
+    if (products.length === 0) return;
     setItems((prev) => [
       ...prev,
-      { ProductId: "", ProductName: "", Quantity: "" },
+      { ProductId: products[0].ProductID, Quantity: 1 },
     ]);
   };
 
@@ -62,23 +76,50 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
     setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
-    // Ép kiểu & Đóng gói dữ liệu Master-Detail
-    const payload = {
-      EmployeeID: Number(employeeId) || 0,
-      CreatedDate: new Date(),
-      Status: "Chờ duyệt",
-      ApproverID: 0,
-      RejectReason: "",
-      Details: items.map((item) => ({
-        ProductId: Number(item.ProductId) || 0,
-        ProductName: item.ProductName,
-        Quantity: Number(item.Quantity) || 0,
-      })),
-    };
+  const handleSubmit = async () => {
+    const hasInvalidQty = items.some((item) => item.Quantity <= 0);
+    if (hasInvalidQty) {
+      toast.error("Số lượng đề xuất phải lớn hơn 0!");
+      return;
+    }
 
-    console.log("Dữ liệu tạo yêu cầu mới gửi đi:", payload);
-    onOpenChange(false);
+    setLoading(true);
+    try {
+      const requestId = Math.floor(Math.random() * 900000) + 100000;
+      const empId = emp ? emp.EmployeeID : 1;
+
+      // 1. Create request form
+      await api.requestForms.create({
+        RequestID: requestId,
+        EmployeeID: empId,
+        CreatedDate: new Date(),
+        Status: "0", // "0": Chờ duyệt
+        ApproverID: 0,
+        RejectReason: "",
+      });
+
+      // 2. Create request details
+      await Promise.all(
+        items.map((item) => {
+          const prod = products.find((p) => p.ProductID === item.ProductId);
+          const prodName = prod ? prod.ProductName : "Sản phẩm";
+          return api.requestDetails.create({
+            RequestID: requestId,
+            ProductId: item.ProductId,
+            ProductName: prodName,
+            Quantity: item.Quantity,
+          });
+        })
+      );
+
+      toast.success("Tạo yêu cầu bổ sung thành công!");
+      onOpenChange(false);
+      onSave();
+    } catch (e: any) {
+      toast.error(e.message || "Tạo yêu cầu bổ sung thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -93,7 +134,7 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
         <div className={dialog.body}>
           <div className="border-t border-slate-100 pt-4">
             <div className="flex items-center justify-between mb-3">
-              <Label className="text-sm font-semibold text-slate-900">
+              <Label className="text-sm font-bold text-slate-900">
                 Danh sách vật tư hàng hóa cần nhập
               </Label>
               <Button
@@ -101,55 +142,53 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
                 variant="outline"
                 size="sm"
                 onClick={addItemRow}
-                className="text-blue-600 border-blue-200 flex items-center gap-1 h-8 text-xs"
+                disabled={loading}
+                className="text-blue-600 border-blue-200 flex items-center gap-1 h-8 text-xs font-semibold rounded-md hover:bg-blue-50"
               >
                 <Plus className="h-3.5 w-3.5" /> Thêm dòng
               </Button>
             </div>
 
             {/* Khối quản lý danh sách động dòng chi tiết */}
-            <div className="grid gap-3">
+            <div className="grid gap-3 max-h-[300px] overflow-y-auto pr-1">
               {items.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-end gap-2 bg-slate-50 p-2 border border-slate-100 relative"
+                  className="flex items-end gap-2 bg-slate-50/50 p-2.5 border border-slate-200 relative rounded-md"
                 >
-                  <div className="grid gap-1 w-20">
-                    <Label className="text-xs text-slate-500">Mã SP</Label>
-                    <Input
-                      type="number"
-                      value={item.ProductId}
-                      onChange={(e) =>
-                        handleItemChange(index, "ProductId", e.target.value)
-                      }
-                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
-                    />
-                  </div>
-
                   <div className="grid gap-1 flex-1">
-                    <Label className="text-xs text-slate-500">
+                    <Label className="text-xs text-slate-500 font-semibold">
                       Tên sản phẩm hàng hóa
                     </Label>
-                    <Input
-                      value={item.ProductName}
+                    <select
+                      value={item.ProductId}
                       onChange={(e) =>
-                        handleItemChange(index, "ProductName", e.target.value)
+                        handleItemChange(index, "ProductId", Number(e.target.value))
                       }
-                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
-                    />
+                      className="flex h-8 w-full border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 rounded-md font-medium text-slate-800"
+                      disabled={loading}
+                    >
+                      {products.map((prod) => (
+                        <option key={prod.ProductID} value={prod.ProductID}>
+                          {prod.ProductName} (Mã: #{prod.ProductID})
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
-                  <div className="grid gap-1 w-16">
-                    <Label className="text-xs text-slate-500">
+                  <div className="grid gap-1 w-20">
+                    <Label className="text-xs text-slate-500 font-semibold">
                       Số lượng
                     </Label>
                     <Input
                       type="number"
+                      min={1}
                       value={item.Quantity}
                       onChange={(e) =>
-                        handleItemChange(index, "Quantity", e.target.value)
+                        handleItemChange(index, "Quantity", Math.max(1, Number(e.target.value)))
                       }
-                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs"
+                      className="h-8 border-slate-200 bg-white focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-2 text-xs font-bold text-center rounded-md"
+                      disabled={loading}
                     />
                   </div>
 
@@ -157,8 +196,8 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
                     type="button"
                     variant="outline"
                     onClick={() => removeItemRow(index)}
-                    disabled={items.length === 1}
-                    className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-500 bg-white"
+                    disabled={items.length === 1 || loading}
+                    className="h-8 w-8 p-0 border-slate-200 text-slate-400 hover:text-red-500 bg-white rounded-md flex items-center justify-center"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
@@ -168,19 +207,21 @@ export function NewRequestDialog({ open, onOpenChange }: Props) {
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             variant="outline"
             className="border-slate-200"
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Tạo mới
+            {loading ? "Đang tạo..." : "Tạo mới"}
           </Button>
         </DialogFooter>
       </DialogContent>

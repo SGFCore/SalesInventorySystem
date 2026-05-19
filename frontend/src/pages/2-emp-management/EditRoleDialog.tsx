@@ -7,30 +7,47 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox"; // Đảm bảo bạn đã cài đặt shadcn checkbox
-import React, { useState } from "react";
-
+import { Checkbox } from "@/components/ui/checkbox";
+import React, { useState, useEffect } from "react";
 import { ROLES } from "@/data/roles";
 import type { Employee } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   emp: Employee | null;
+  onSave: () => void;
 }
 
-export function EditRoleDialog({ open, onOpenChange, emp }: Props) {
+export function EditRoleDialog({ open, onOpenChange, emp, onSave }: Props) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    roleIds: [] as number[], // Lưu danh sách các ID role đã chọn
+    roleIds: [] as number[],
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  useEffect(() => {
+    if (open && emp) {
+      const fetchRoles = async () => {
+        setLoading(true);
+        try {
+          const list = await api.employeeRoles.list();
+          const empRoles = list
+            .filter((r) => r.EmployeeID === emp.EmployeeID)
+            .map((r) => r.RoleID);
+          setFormData({ roleIds: empRoles });
+        } catch (error) {
+          toast.error("Không thể tải quyền của nhân viên!");
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchRoles();
+    }
+  }, [open, emp]);
 
   const handleRoleChange = (roleId: number, checked: boolean) => {
     setFormData((prev) => {
@@ -41,14 +58,47 @@ export function EditRoleDialog({ open, onOpenChange, emp }: Props) {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!emp) return;
     if (formData.roleIds.length === 0) {
-      alert("Vui lòng chọn ít nhất một quyền!");
+      toast.error("Vui lòng chọn ít nhất một quyền!");
       return;
     }
-    console.log("Dữ liệu gửi đi:", formData);
-    // Thực hiện logic lưu ở đây
-    onOpenChange(false);
+    setLoading(true);
+    try {
+      const currentList = await api.employeeRoles.list();
+      const currentRoles = currentList
+        .filter((r) => r.EmployeeID === emp.EmployeeID)
+        .map((r) => r.RoleID);
+
+      // Thêm các quyền mới
+      const toAdd = formData.roleIds.filter((id) => !currentRoles.includes(id));
+      for (const roleId of toAdd) {
+        await api.employeeRoles.create({
+          EmployeeID: emp.EmployeeID,
+          RoleID: roleId,
+        });
+      }
+
+      // Xóa các quyền cũ không còn chọn
+      const toDelete = currentRoles.filter((id) => !formData.roleIds.includes(id));
+      for (const roleId of toDelete) {
+        // Gọi delete theo ID (hoặc nếu là composite key, API thường hỗ trợ xóa theo RoleID hoặc EmployeeID)
+        try {
+          await api.employeeRoles.delete(roleId);
+        } catch (e) {
+          console.warn("Không thể xóa quyền cũ:", roleId, e);
+        }
+      }
+
+      toast.success("Cập nhật phân quyền thành công!");
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Cập nhật phân quyền thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,6 +124,7 @@ export function EditRoleDialog({ open, onOpenChange, emp }: Props) {
                     onCheckedChange={(checked) =>
                       handleRoleChange(role.RoleID, checked as boolean)
                     }
+                    disabled={loading}
                   />
                   <label
                     htmlFor={`role-${role.RoleID}`}
@@ -93,14 +144,15 @@ export function EditRoleDialog({ open, onOpenChange, emp }: Props) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Cập nhật
+            {loading ? "Đang cập nhật..." : "Cập nhật"}
           </Button>
         </DialogFooter>
       </DialogContent>

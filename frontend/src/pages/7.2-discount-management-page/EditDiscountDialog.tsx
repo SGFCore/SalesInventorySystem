@@ -11,21 +11,28 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import type { Discount } from "@/lib/types";
+import type { Discount, Product, CustomerType } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
-import { MOCK_PRODUCTS } from "./DiscountManagementPage";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface EditProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   discount: Discount | null;
+  onSave: () => void;
 }
 
 export function EditDiscountDialog({
   open,
   onOpenChange,
   discount,
+  onSave,
 }: EditProps) {
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [customerTypes, setCustomerTypes] = useState<CustomerType[]>([]);
+
   const [discountName, setDiscountName] = useState("");
   const [value, setValue] = useState<number>(0);
   const [customerTypeID, setCustomerTypeID] = useState<number>(1);
@@ -36,54 +43,81 @@ export function EditDiscountDialog({
   const [expiryDate, setExpiryDate] = useState("");
 
   useEffect(() => {
+    if (open) {
+      const loadOptions = async () => {
+        try {
+          const [prods, custTypes] = await Promise.all([
+            api.products.list(),
+            api.customerTypes.list(),
+          ]);
+          setProducts(prods);
+          setCustomerTypes(custTypes);
+        } catch (e) {
+          console.error("Lỗi tải thông tin lựa chọn:", e);
+        }
+      };
+      loadOptions();
+    }
+  }, [open]);
+
+  useEffect(() => {
     if (discount) {
       setDiscountName(discount.DiscountName);
       setValue(discount.Value);
       setCustomerTypeID(discount.CustomerTypeID);
-      setAppliedProductID(discount.AppliedProductID || "101");
+      setAppliedProductID(discount.AppliedProductID || "");
       setDetail(discount.Detail);
       setStatus(discount.Status);
-      setStartDate(discount.StartDate.toISOString().split("T")[0]);
-      setExpiryDate(discount.ExpiryDate.toISOString().split("T")[0]);
+      setStartDate(new Date(discount.StartDate).toISOString().split("T")[0]);
+      setExpiryDate(new Date(discount.ExpiryDate).toISOString().split("T")[0]);
     }
   }, [discount, open]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!discount) return;
     if (!discountName.trim()) {
-      alert("Vui lòng nhập tên chương trình khuyến mãi!");
+      toast.error("Vui lòng nhập tên chương trình khuyến mãi!");
       return;
     }
     if (value <= 0) {
-      alert("Mức giá trị giảm phải lớn hơn 0 đ!");
+      toast.error("Mức giá trị giảm phải lớn hơn 0 đ!");
       return;
     }
     if (!appliedProductID) {
-      alert("Vui lòng chọn sản phẩm áp dụng!");
+      toast.error("Vui lòng chọn sản phẩm áp dụng!");
       return;
     }
     if (!startDate || !expiryDate) {
-      alert("Vui lòng cấu hình đầy đủ ngày bắt đầu và ngày hết hạn!");
+      toast.error("Vui lòng cấu hình đầy đủ ngày bắt đầu và ngày hết hạn!");
       return;
     }
     if (new Date(startDate) > new Date(expiryDate)) {
-      alert("Ngày bắt đầu không được lớn hơn ngày hết hạn!");
+      toast.error("Ngày bắt đầu không được lớn hơn ngày hết hạn!");
       return;
     }
 
-    const updatedData = {
-      DiscountID: discount?.DiscountID,
-      DiscountName: discountName,
-      Value: value,
-      CustomerTypeID: customerTypeID,
-      AppliedProductID: appliedProductID,
-      Detail: detail,
-      Status: status,
-      StartDate: new Date(startDate),
-      ExpiryDate: new Date(expiryDate),
-    };
+    setLoading(true);
+    try {
+      await api.discounts.update(discount.DiscountID, {
+        ...discount,
+        DiscountName: discountName,
+        Value: value,
+        CustomerTypeID: customerTypeID,
+        AppliedProductID: appliedProductID,
+        Detail: detail,
+        Status: status,
+        StartDate: new Date(startDate),
+        ExpiryDate: new Date(expiryDate),
+      });
 
-    console.log("Dữ liệu cập nhật khuyến mãi gửi đi:", updatedData);
-    onOpenChange(false);
+      toast.success("Cập nhật khuyến mãi thành công!");
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Cập nhật thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!discount) return null;
@@ -109,6 +143,7 @@ export function EditDiscountDialog({
               onChange={(e) => setDiscountName(e.target.value)}
               placeholder="Nhập tên chương trình..."
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -122,10 +157,11 @@ export function EditDiscountDialog({
               value={appliedProductID}
               onChange={(e) => setAppliedProductID(e.target.value)}
               className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
+              disabled={loading}
             >
-              {MOCK_PRODUCTS.map((prod) => (
+              {products.map((prod) => (
                 <option key={prod.ProductID} value={prod.ProductID.toString()}>
-                  {prod.ProductName}
+                  {prod.ProductName} (#{prod.ProductID})
                 </option>
               ))}
             </NativeSelect>
@@ -144,6 +180,7 @@ export function EditDiscountDialog({
                 onChange={(e) => setValue(Number(e.target.value))}
                 placeholder="Nhập số tiền giảm..."
                 className={dialog.input}
+                disabled={loading}
               />
             </div>
 
@@ -155,10 +192,13 @@ export function EditDiscountDialog({
                 value={customerTypeID}
                 onChange={(e) => setCustomerTypeID(Number(e.target.value))}
                 className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
+                disabled={loading}
               >
-                <option value={1}>Khách hàng Phổ thông</option>
-                <option value={2}>Khách hàng Thân thiết</option>
-                <option value={3}>Khách hàng VIP</option>
+                {customerTypes.map((t) => (
+                  <option key={t.CustomerTypeID} value={t.CustomerTypeID}>
+                    {t.CustomerTypeName}
+                  </option>
+                ))}
               </NativeSelect>
             </div>
           </div>
@@ -174,7 +214,8 @@ export function EditDiscountDialog({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-slate-700"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-slate-700 h-9"
+                disabled={loading}
               />
             </div>
 
@@ -188,7 +229,8 @@ export function EditDiscountDialog({
                 type="date"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
-                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-slate-700"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-slate-700 h-9"
+                disabled={loading}
               />
             </div>
           </div>
@@ -201,6 +243,7 @@ export function EditDiscountDialog({
               value={status}
               onChange={(e) => setStatus(Number(e.target.value))}
               className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
+              disabled={loading}
             >
               <option value={0}>Chờ chạy</option>
               <option value={1}>Đang chạy</option>
@@ -217,19 +260,21 @@ export function EditDiscountDialog({
               onChange={(e) => setDetail(e.target.value)}
               placeholder="Nhập ghi chú chi tiết hoặc điều kiện áp dụng..."
               className={dialog.input}
+              disabled={loading}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Lưu thay đổi
+            {loading ? "Đang lưu..." : "Lưu thay đổi"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -11,13 +11,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
-export function NewPolicyDialog({ open, onOpenChange }: Props) {
+export function NewPolicyDialog({ open, onOpenChange, onSave }: Props) {
   const [formData, setFormData] = useState({
     PolicyName: "",
     MaxReturnDays: "",
@@ -25,6 +28,7 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
     EffectiveDate: "",
     IsActive: "1",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -33,18 +37,42 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    const payload = {
-      PolicyName: formData.PolicyName,
-      MaxReturnDays: Number(formData.MaxReturnDays),
-      PenaltyFeeRate: Number(formData.PenaltyFeeRate),
-      EffectiveDate: formData.EffectiveDate
-        ? new Date(formData.EffectiveDate)
-        : new Date(),
-      IsActive: Number(formData.IsActive),
-    };
-    console.log("Dữ liệu chính sách mới gửi đi:", payload);
-    onOpenChange(false);
+  const handleSubmit = async () => {
+    if (!formData.PolicyName.trim()) {
+      toast.error("Vui lòng điền tên chính sách!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const policyId = Math.floor(Math.random() * 9000) + 1000;
+      await api.returnPolicies.create({
+        PolicyID: policyId,
+        PolicyName: formData.PolicyName,
+        MaxReturnDays: Number(formData.MaxReturnDays) || 7,
+        PenaltyFeeRate: (Number(formData.PenaltyFeeRate) || 0) / 100, // Convert percentage to fraction
+        EffectiveDate: formData.EffectiveDate
+          ? new Date(formData.EffectiveDate)
+          : new Date(),
+        IsActive: Number(formData.IsActive),
+      });
+
+      toast.success("Tạo chính sách đổi trả thành công!");
+      // Reset form
+      setFormData({
+        PolicyName: "",
+        MaxReturnDays: "",
+        PenaltyFeeRate: "",
+        EffectiveDate: "",
+        IsActive: "1",
+      });
+      onOpenChange(false);
+      onSave();
+    } catch (e: any) {
+      toast.error(e.message || "Tạo chính sách thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,19 +86,21 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
 
         <div className={dialog.body}>
           <div className="grid gap-2">
-            <Label htmlFor="PolicyName">Tên chính sách</Label>
+            <Label htmlFor="PolicyName" className="font-semibold text-slate-700">Tên chính sách</Label>
             <Input
               id="PolicyName"
               name="PolicyName"
               value={formData.PolicyName}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
+              placeholder="VD: Chính sách mùa hè..."
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="MaxReturnDays">Số ngày đổi tối đa</Label>
+              <Label htmlFor="MaxReturnDays" className="font-semibold text-slate-700">Số ngày đổi tối đa</Label>
               <Input
                 id="MaxReturnDays"
                 name="MaxReturnDays"
@@ -78,10 +108,12 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
                 value={formData.MaxReturnDays}
                 onChange={handleChange}
                 className={dialog.input}
+                disabled={loading}
+                placeholder="VD: 7"
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="PenaltyFeeRate">Phí phạt (%)</Label>
+              <Label htmlFor="PenaltyFeeRate" className="font-semibold text-slate-700">Phí phạt (%)</Label>
               <Input
                 id="PenaltyFeeRate"
                 name="PenaltyFeeRate"
@@ -89,30 +121,34 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
                 value={formData.PenaltyFeeRate}
                 onChange={handleChange}
                 className={dialog.input}
+                disabled={loading}
+                placeholder="VD: 10"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="EffectiveDate">Ngày hiệu lực</Label>
+              <Label htmlFor="EffectiveDate" className="font-semibold text-slate-700">Ngày hiệu lực</Label>
               <Input
                 id="EffectiveDate"
                 name="EffectiveDate"
                 type="date"
                 value={formData.EffectiveDate}
                 onChange={handleChange}
-                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-3"
+                className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-3 h-10 rounded-md"
+                disabled={loading}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="IsActive">Trạng thái</Label>
+              <Label htmlFor="IsActive" className="font-semibold text-slate-700">Trạng thái</Label>
               <select
                 id="IsActive"
                 name="IsActive"
                 value={formData.IsActive}
                 onChange={handleChange}
-                className="flex h-10 w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
+                className="flex h-10 w-full border border-slate-200 rounded-md bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
+                disabled={loading}
               >
                 <option value="1">Đang hoạt động</option>
                 <option value="0">Tạm dừng</option>
@@ -121,19 +157,21 @@ export function NewPolicyDialog({ open, onOpenChange }: Props) {
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             variant="outline"
             className="border-slate-200"
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Tạo mới
+            {loading ? "Đang lưu..." : "Tạo mới"}
           </Button>
         </DialogFooter>
       </DialogContent>

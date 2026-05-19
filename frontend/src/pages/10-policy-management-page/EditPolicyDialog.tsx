@@ -12,34 +12,57 @@ import type { ReturnPolicy } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  policy: ReturnPolicy | null;
+  policy: ReturnPolicy;
+  onSave: () => void;
 }
 
-export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
+export function EditPolicyDialog({ open, onOpenChange, policy, onSave }: Props) {
   const [form, setForm] = useState<Partial<ReturnPolicy>>({});
   const [dateString, setDateString] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (policy) {
       setForm(policy);
       if (policy.EffectiveDate) {
-        // Chuyển đổi Date sang định dạng YYYY-MM-DD cho thẻ input type="date"
-        setDateString(policy.EffectiveDate.toISOString().split("T")[0]);
+        const d = new Date(policy.EffectiveDate);
+        if (!isNaN(d.getTime())) {
+          setDateString(d.toISOString().split("T")[0]);
+        }
       }
     }
   }, [policy]);
 
-  const handleSubmit = () => {
-    const updatedData = {
-      ...form,
-      EffectiveDate: dateString ? new Date(dateString) : form.EffectiveDate,
-    };
-    console.log("Dữ liệu cập nhật chính sách gửi đi:", updatedData);
-    onOpenChange(false);
+  const handleSubmit = async () => {
+    if (!form.PolicyName?.trim()) {
+      toast.error("Vui lòng nhập tên chính sách!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const updatedData = {
+        ...policy,
+        ...form,
+        EffectiveDate: dateString ? new Date(dateString) : new Date(policy.EffectiveDate),
+        PenaltyFeeRate: form.PenaltyFeeRate !== undefined ? Number(form.PenaltyFeeRate) / 100 : policy.PenaltyFeeRate,
+      };
+
+      await api.returnPolicies.update(policy.PolicyID, updatedData);
+      toast.success("Cập nhật chính sách thành công!");
+      onOpenChange(false);
+      onSave();
+    } catch (e: any) {
+      toast.error(e.message || "Cập nhật chính sách thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,18 +76,19 @@ export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
 
         <div className="grid gap-3 py-4">
           <div className="grid gap-1">
-            <Label htmlFor="edit-policyName">Tên chính sách</Label>
+            <Label htmlFor="edit-policyName" className="font-semibold text-slate-700">Tên chính sách</Label>
             <Input
               id="edit-policyName"
               value={form.PolicyName || ""}
               onChange={(e) => setForm({ ...form, PolicyName: e.target.value })}
-              className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
+              className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 h-10 rounded-md"
+              disabled={loading}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-1">
-              <Label htmlFor="edit-maxReturnDays">Số ngày trả tối đa</Label>
+              <Label htmlFor="edit-maxReturnDays" className="font-semibold text-slate-700">Số ngày trả tối đa</Label>
               <Input
                 id="edit-maxReturnDays"
                 type="number"
@@ -72,45 +96,49 @@ export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
                 onChange={(e) =>
                   setForm({ ...form, MaxReturnDays: Number(e.target.value) })
                 }
-                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 h-10 rounded-md"
+                disabled={loading}
               />
             </div>
 
             <div className="grid gap-1">
-              <Label htmlFor="edit-penaltyFee">Tỷ lệ phí phạt (%)</Label>
+              <Label htmlFor="edit-penaltyFee" className="font-semibold text-slate-700">Tỷ lệ phí phạt (%)</Label>
               <Input
                 id="edit-penaltyFee"
                 type="number"
-                value={form.PenaltyFeeRate ?? ""}
+                value={form.PenaltyFeeRate !== undefined ? Math.round(Number(form.PenaltyFeeRate) * 100) : ""}
                 onChange={(e) =>
                   setForm({ ...form, PenaltyFeeRate: Number(e.target.value) })
                 }
-                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 h-10 rounded-md"
+                disabled={loading}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-1">
-              <Label htmlFor="edit-effectiveDate">Ngày hiệu lực</Label>
+              <Label htmlFor="edit-effectiveDate" className="font-semibold text-slate-700">Ngày hiệu lực</Label>
               <Input
                 id="edit-effectiveDate"
                 type="date"
                 value={dateString}
                 onChange={(e) => setDateString(e.target.value)}
-                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 px-3"
+                className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200 px-3 h-10 rounded-md"
+                disabled={loading}
               />
             </div>
 
             <div className="grid gap-1">
-              <Label htmlFor="edit-isActive">Trạng thái</Label>
+              <Label htmlFor="edit-isActive" className="font-semibold text-slate-700">Trạng thái</Label>
               <select
                 id="edit-isActive"
                 value={form.IsActive ?? 1}
                 onChange={(e) =>
                   setForm({ ...form, IsActive: Number(e.target.value) })
                 }
-                className="flex h-10 w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
+                className="flex h-10 w-full border border-slate-200 rounded-md bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0"
+                disabled={loading}
               >
                 <option value={1}>Đang hoạt động</option>
                 <option value={0}>Tạm dừng</option>
@@ -119,19 +147,21 @@ export function EditPolicyDialog({ open, onOpenChange, policy }: Props) {
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             variant="outline"
             className="border-slate-200"
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Lưu thay đổi
+            {loading ? "Đang lưu..." : "Lưu thay đổi"}
           </Button>
         </DialogFooter>
       </DialogContent>

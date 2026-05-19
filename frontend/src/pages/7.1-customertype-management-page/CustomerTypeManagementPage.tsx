@@ -7,35 +7,43 @@ import { DetailCustomerTypeDialog } from "@/pages/7.1-customertype-management-pa
 import { EditCustomerTypeDialog } from "@/pages/7.1-customertype-management-page/EditCustomerTypeDialog";
 import { NewCustomerTypeDialog } from "@/pages/7.1-customertype-management-page/NewCustomerTypeDialog";
 import { page, input, btn, entity } from "@/pages/page-classes";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-
-const MOCK_CUSTOMER_TYPES: CustomerType[] = Array.from(
-  { length: 25 },
-  (_, i) => ({
-    CustomerTypeID: 100 + i,
-    CustomerTypeName:
-      i === 0
-        ? "Khách hàng Đồng"
-        : i === 1
-          ? "Khách hàng Bạc"
-          : i === 2
-            ? "Khách hàng Vàng"
-            : `Nhóm khách hàng VIP ${i}`,
-    Discount: (i % 5) * 5, // 0%, 5%, 10%, 15%, 20%
-    Detail: `Mô tả tiêu chuẩn và quyền lợi dành cho nhóm khách hàng thứ ${i + 1}`,
-    SpendingLimit: 5000000 + i * 5000000,
-  }),
-);
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function CustomerTypeManagementPage() {
+  const [customerTypes, setCustomerTypes] = useState<CustomerType[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedType, setSelectedType] = useState<CustomerType | null>(null);
 
   const topRef = useRef<HTMLDivElement>(null);
+
+  const loadCustomerTypes = async () => {
+    setLoading(true);
+    try {
+      const data = await api.customerTypes.list();
+      if (!data || data.length === 0) {
+        toast.error("Không có dữ liệu");
+        setCustomerTypes([]);
+      } else {
+        setCustomerTypes(data);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Lỗi lấy dữ liệu nhóm khách hàng");
+      setCustomerTypes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCustomerTypes();
+  }, []);
 
   // Reset về trang 1 khi tìm kiếm
   useEffect(() => {
@@ -52,7 +60,7 @@ export default function CustomerTypeManagementPage() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isNewOpen, setIsNewOpen] = useState(false);
 
-  const filtered = MOCK_CUSTOMER_TYPES.filter((t) =>
+  const filtered = customerTypes.filter((t) =>
     t.CustomerTypeName.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -89,96 +97,110 @@ export default function CustomerTypeManagementPage() {
       </div>
 
       <div className="border border-slate-200 overflow-hidden">
-        <Table>
-          <TableBody>
-            {paginatedTypes.map((t) => (
-              <TableRow
-                key={t.CustomerTypeID}
-                className={page.tableRow}
-              >
-                <TableCell className={cn("w-20", entity.id)}>
-                  {t.CustomerTypeID}
-                </TableCell>
-                <TableCell className={cn("text-left", entity.name)}>
-                  {t.CustomerTypeName}
-                </TableCell>
-                <TableCell className="text-blue-600 font-medium">
-                  Chiết khấu: {t.Discount}%
-                </TableCell>
-                <TableCell>
-                  {/* Grid nút bấm với chiều ngang bằng nhau (w-32) theo đúng layout mẫu */}
-                  <div className="flex gap-2 justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-blue-600 border-blue-200 w-32"
-                      onClick={() => openAction(t, "detail")}
-                    >
-                      Xem chi tiết
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-blue-600 border-blue-200 w-32"
-                      onClick={() => openAction(t, "edit")}
-                    >
-                      Cập nhật
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        {/* Bộ điều khiển Phân trang */}
-        <div className={page.pagination}>
-          <div className={page.paginationText}>
-            Hiển thị{" "}
-            <span className="font-medium">{paginatedTypes.length}</span> trên{" "}
-            <span className="font-medium">{filtered.length}</span> nhóm khách
-            hàng
+        {loading ? (
+          <div className="flex justify-center items-center py-20 bg-white">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <span className="ml-2 text-slate-500 font-medium">Đang tải dữ liệu nhóm khách hàng...</span>
           </div>
-
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={btn.paginationNav}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (pageNum) => (
-                  <Button
-                    key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
+        ) : paginatedTypes.length === 0 ? (
+          <div className="text-center py-20 text-slate-400 font-medium bg-white">
+            Không tìm thấy nhóm khách hàng nào hợp lệ.
+          </div>
+        ) : (
+          <>
+            <Table>
+              <TableBody>
+                {paginatedTypes.map((t) => (
+                  <TableRow
+                    key={t.CustomerTypeID}
+                    className={page.tableRow}
                   >
-                    {pageNum}</Button>
-                ),
-              )}
-            </div>
+                    <TableCell className={cn("w-20", entity.id)}>
+                      {t.CustomerTypeID}
+                    </TableCell>
+                    <TableCell className={cn("text-left", entity.name)}>
+                      {t.CustomerTypeName}
+                    </TableCell>
+                    <TableCell className="text-blue-600 font-medium">
+                      Chiết khấu: {t.Discount}%
+                    </TableCell>
+                    <TableCell>
+                      {/* Grid nút bấm với chiều ngang bằng nhau (w-32) theo đúng layout mẫu */}
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-blue-600 border-blue-200 w-32"
+                          onClick={() => openAction(t, "detail")}
+                        >
+                          Xem chi tiết
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-blue-600 border-blue-200 w-32"
+                          onClick={() => openAction(t, "edit")}
+                        >
+                          Cập nhật
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages || totalPages === 0}
-              className={btn.paginationNav}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+            {/* Bộ điều khiển Phân trang */}
+            {totalPages > 0 && (
+              <div className={page.pagination}>
+                <div className={page.paginationText}>
+                  Hiển thị{" "}
+                  <span className="font-medium">{paginatedTypes.length}</span> trên{" "}
+                  <span className="font-medium">{filtered.length}</span> nhóm khách hàng
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className={btn.paginationNav}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (pageNum) => (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
+                        >
+                          {pageNum}</Button>
+                      ),
+                    )}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    className={btn.paginationNav}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Các Dialog điều khiển */}
@@ -191,8 +213,13 @@ export default function CustomerTypeManagementPage() {
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         customerType={selectedType}
+        onSave={loadCustomerTypes}
       />
-      <NewCustomerTypeDialog open={isNewOpen} onOpenChange={setIsNewOpen} />
+      <NewCustomerTypeDialog
+        open={isNewOpen}
+        onOpenChange={setIsNewOpen}
+        onSave={loadCustomerTypes}
+      />
     </div>
   );
 }

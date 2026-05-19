@@ -11,16 +11,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { Product } from "@/lib/types";
+import type { Product, Category, ProductType } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface EditProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   product: Product | null;
+  onSave: () => void;
 }
 
-export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
+export function EditProductDialog({ open, onOpenChange, product, onSave }: EditProps) {
+  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+
   const [formData, setFormData] = useState({
     productName: "",
     productPrice: 0,
@@ -29,6 +36,22 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
     detail: "",
     allowReturn: false,
   });
+
+  useEffect(() => {
+    if (open) {
+      const loadOptions = async () => {
+        try {
+          const cats = await api.categories.list();
+          const pts = await api.productTypes.list();
+          setCategories(cats);
+          setProductTypes(pts);
+        } catch (e) {
+          console.error("Lỗi tải danh mục/loại sản phẩm:", e);
+        }
+      };
+      loadOptions();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (product) {
@@ -43,7 +66,7 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
     }
   }, [product]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -55,13 +78,31 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
     setFormData((prev) => ({ ...prev, allowReturn: checked }));
   };
 
-  const handleSubmit = () => {
-    if (!formData.productName.trim() || !formData.categoryName.trim()) {
-      alert("Vui lòng điền đầy đủ các thông tin bắt buộc!");
+  const handleSubmit = async () => {
+    if (!product) return;
+    if (!formData.productName.trim()) {
+      toast.error("Vui lòng điền tên sản phẩm!");
       return;
     }
-    console.log("Dữ liệu cập nhật gửi đi:", formData);
-    onOpenChange(false);
+    setLoading(true);
+    try {
+      await api.products.update(product.ProductID, {
+        ...product,
+        ProductName: formData.productName,
+        ProductPrice: formData.productPrice,
+        CategoryName: formData.categoryName,
+        ProductTypeName: formData.productTypeName,
+        Detail: formData.detail,
+        AllowReturn: formData.allowReturn ? 1 : 0,
+      });
+      toast.success("Cập nhật sản phẩm thành công!");
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Cập nhật sản phẩm thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,6 +125,7 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
               value={formData.productName}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -96,6 +138,7 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
               value={formData.productPrice}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -103,24 +146,38 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
             <Label htmlFor="categoryName">
               Danh mục <span className="text-red-500">*</span>
             </Label>
-            <Input
+            <select
               id="categoryName"
               name="categoryName"
               value={formData.categoryName}
               onChange={handleChange}
-              className={dialog.input}
-            />
+              className={cn(dialog.input, "bg-white border text-sm rounded-md p-2 h-10")}
+              disabled={loading}
+            >
+              {categories.map((cat) => (
+                <option key={cat.CategoryID} value={cat.CategoryName}>
+                  {cat.CategoryName}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="productTypeName">Loại sản phẩm</Label>
-            <Input
+            <select
               id="productTypeName"
               name="productTypeName"
               value={formData.productTypeName}
               onChange={handleChange}
-              className={dialog.input}
-            />
+              className={cn(dialog.input, "bg-white border text-sm rounded-md p-2 h-10")}
+              disabled={loading}
+            >
+              {productTypes.map((pt) => (
+                <option key={pt.ProductTypeID} value={pt.ProductTypeName}>
+                  {pt.ProductTypeName}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid gap-2">
@@ -131,6 +188,7 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
               value={formData.detail}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -141,6 +199,7 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
               onCheckedChange={(checked) =>
                 handleCheckboxChange(checked as boolean)
               }
+              disabled={loading}
             />
             <label
               htmlFor="allowReturn"
@@ -152,14 +211,15 @@ export function EditProductDialog({ open, onOpenChange, product }: EditProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Lưu thay đổi
+            {loading ? "Đang lưu..." : "Lưu thay đổi"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -12,6 +12,8 @@ import { useEmp } from "@/context/empContext";
 import { cn } from "@/lib/utils";
 import { dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 export function EditEmpDialog({
   open,
@@ -21,10 +23,11 @@ export function EditEmpDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const { emp } = useEmp();
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    email: emp.Email,
-    phone: emp.Phone,
+    email: emp?.Email || "",
+    phone: emp?.Phone || "",
     oldPassword: "",
     newPassword: "",
   });
@@ -32,6 +35,29 @@ export function EditEmpDialog({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!emp) return;
+    if (!formData.oldPassword) {
+      toast.error("Vui lòng nhập mật khẩu hiện tại để xác nhận!");
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.employees.update(emp.EmployeeID, {
+        ...emp,
+        Email: formData.email,
+        Phone: formData.phone,
+        PasswordHash: formData.newPassword || emp.PasswordHash,
+      });
+      toast.success("Cập nhật hồ sơ thành công!");
+      onOpenChange(false);
+    } catch (error: any) {
+      toast.error(error.message || "Cập nhật thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -105,11 +131,12 @@ export function EditEmpDialog({
             variant="outline"
             className={dialog.cancel}
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
-          <Button type="button" className={dialog.submit}>
-            Cập nhật thay đổi
+          <Button type="button" className={dialog.submit} onClick={handleSubmit} disabled={loading}>
+            {loading ? "Đang xử lý..." : "Cập nhật thay đổi"}
           </Button>
         </DialogFooter>
       </DialogContent>

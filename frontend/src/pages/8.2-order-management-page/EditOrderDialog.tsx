@@ -13,15 +13,19 @@ import { NativeSelect } from "@/components/ui/native-select";
 import type { Order } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface EditProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   order: Order;
+  onSave: () => void;
 }
 
-export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
+export function EditOrderDialog({ open, onOpenChange, order, onSave }: EditProps) {
   const [formData, setFormData] = useState<Partial<Order>>({});
+  const [loading, setLoading] = useState(false);
 
   // Cập nhật state khi prop order thay đổi
   useEffect(() => {
@@ -35,9 +39,21 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
     }
   }, [order]);
 
-  const handleSubmit = () => {
-    console.log("Cập nhật đơn hàng:", { id: order.OrderID, data: formData });
-    onOpenChange(false);
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      await api.orders.update(order.OrderID, {
+        ...order,
+        ...formData,
+      });
+      toast.success(`Đã cập nhật Đơn Hàng #${order.OrderID} thành công!`);
+      onOpenChange(false);
+      onSave();
+    } catch (e: any) {
+      toast.error(e.message || "Cập nhật đơn hàng thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,7 +68,7 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
         <div className={dialog.body}>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label className="text-xs text-slate-500">
+              <Label className="text-xs text-slate-500 font-medium">
                 Trạng thái Đơn hàng
               </Label>
               <NativeSelect
@@ -64,6 +80,7 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
                   })
                 }
                 className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
+                disabled={loading}
               >
                 <option value="0">Chờ xác nhận</option>
                 <option value="1">Đã xác nhận</option>
@@ -75,7 +92,7 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
             </div>
 
             <div className="grid gap-2">
-              <Label className="text-xs text-slate-500">
+              <Label className="text-xs text-slate-500 font-medium">
                 Trạng thái Giao vận
               </Label>
               <NativeSelect
@@ -87,6 +104,7 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
                   })
                 }
                 className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
+                disabled={loading}
               >
                 <option value="0">Cần lên lịch giao</option>
                 <option value="1">Đang đóng gói</option>
@@ -97,7 +115,7 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
           </div>
 
           <div className="grid gap-2">
-            <Label className="text-xs text-slate-500">
+            <Label className="text-xs text-slate-500 font-medium">
               Mã Vận Đơn (Ship Code)
             </Label>
             <Input
@@ -106,19 +124,21 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
               onChange={(e) =>
                 setFormData({ ...formData, ShipCode: e.target.value })
               }
-              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
+              disabled={loading}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label className="text-xs text-slate-500">Ghi chú vận chuyển</Label>
+            <Label className="text-xs text-slate-500 font-medium">Ghi chú vận chuyển</Label>
             <Input
               placeholder="Ghi chú..."
               value={formData.ShipmentNote || ""}
               onChange={(e) =>
                 setFormData({ ...formData, ShipmentNote: e.target.value })
               }
-              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9"
+              className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
+              disabled={loading}
             />
           </div>
         </div>
@@ -126,16 +146,17 @@ export function EditOrderDialog({ open, onOpenChange, order }: EditProps) {
         <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             variant="outline"
-           
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Lưu thay đổi
+            {loading ? "Đang lưu..." : "Lưu thay đổi"}
           </Button>
         </DialogFooter>
       </DialogContent>

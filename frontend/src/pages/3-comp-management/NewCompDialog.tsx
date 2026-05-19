@@ -11,13 +11,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { btn, dialog } from "@/pages/page-classes";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface NewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
-export function NewCompDialog({ open, onOpenChange }: NewProps) {
+export function NewCompDialog({ open, onOpenChange, onSave }: NewProps) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     shipCompanyName: "",
     supportedRegion: "",
@@ -32,24 +36,41 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.shipCompanyName || !formData.phone || !formData.email) {
-      alert("Vui lòng nhập đầy đủ các thông tin bắt buộc!");
+      toast.error("Vui lòng nhập đầy đủ các thông tin bắt buộc!");
       return;
     }
-    console.log("Dữ liệu tạo mới gửi đi:", formData);
-    // Xử lý tạo mới đối tác tại đây
+    setLoading(true);
+    try {
+      const shipCompanyId = Math.floor(Math.random() * 900000) + 100000;
+      await api.shipCompanies.create({
+        ShipCompanyID: shipCompanyId,
+        ShipCompanyName: formData.shipCompanyName,
+        SupportedRegion: formData.supportedRegion,
+        Phone: formData.phone,
+        Email: formData.email,
+        Address: formData.address,
+        Notes: formData.notes,
+        Status: 1,
+      });
 
-    // Reset state về form trống sau khi thêm thành công
-    setFormData({
-      shipCompanyName: "",
-      supportedRegion: "",
-      phone: "",
-      email: "",
-      address: "",
-      notes: "",
-    });
-    onOpenChange(false);
+      toast.success("Thêm đối tác vận chuyển mới thành công!");
+      setFormData({
+        shipCompanyName: "",
+        supportedRegion: "",
+        phone: "",
+        email: "",
+        address: "",
+        notes: "",
+      });
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Thêm đối tác vận chuyển thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -73,6 +94,7 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               value={formData.shipCompanyName}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -85,6 +107,7 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               value={formData.supportedRegion}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -100,6 +123,7 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               value={formData.email}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -114,6 +138,7 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               value={formData.phone}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -126,6 +151,7 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               value={formData.address}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -138,19 +164,21 @@ export function NewCompDialog({ open, onOpenChange }: NewProps) {
               value={formData.notes}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Tạo mới
+            {loading ? "Đang tạo..." : "Tạo mới"}
           </Button>
         </DialogFooter>
       </DialogContent>

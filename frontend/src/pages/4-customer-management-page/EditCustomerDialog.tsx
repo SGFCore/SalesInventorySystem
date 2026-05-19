@@ -12,6 +12,8 @@ import { useState, useEffect } from "react";
 import type { Customer } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface EditCustomerProps {
   open: boolean;
@@ -26,17 +28,30 @@ export function EditCustomerDialog({
   customer,
   onSave,
 }: EditCustomerProps) {
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Partial<Customer>>({});
 
   useEffect(() => {
     if (customer) setForm(customer);
   }, [customer]);
 
-  const handleSubmit = () => {
-    if (customer) {
-      // Gộp data cũ và mới rồi gửi ra ngoài
-      onSave({ ...customer, ...form } as Customer);
+  const handleSubmit = async () => {
+    if (!customer) return;
+    if (!form.FirstName || !form.LastName) {
+      toast.error("Họ và tên không được trống!");
+      return;
+    }
+    setLoading(true);
+    try {
+      const updatedCustomer = { ...customer, ...form } as Customer;
+      await api.customers.update(customer.CustomerID, updatedCustomer);
+      toast.success("Cập nhật thông tin khách hàng thành công!");
+      onSave(updatedCustomer);
       onOpenChange(false);
+    } catch (error: any) {
+      toast.error(error.message || "Cập nhật khách hàng thất bại!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,6 +73,7 @@ export function EditCustomerDialog({
                   setForm({ ...form, FirstName: e.target.value })
                 }
                 className="focus-visible:ring-blue-600 focus-visible:ring-offset-0"
+                disabled={loading}
               />
             </div>
             <div className="grid gap-1">
@@ -66,6 +82,7 @@ export function EditCustomerDialog({
                 value={form.LastName || ""}
                 onChange={(e) => setForm({ ...form, LastName: e.target.value })}
                 className="focus-visible:ring-blue-600 focus-visible:ring-offset-0"
+                disabled={loading}
               />
             </div>
           </div>
@@ -76,6 +93,7 @@ export function EditCustomerDialog({
               onChange={(e) =>
                 setForm({ ...form, CompanyName: e.target.value })
               }
+              disabled={loading}
             />
           </div>
           <div className="grid gap-1">
@@ -83,6 +101,7 @@ export function EditCustomerDialog({
             <Input
               value={form.Phone || ""}
               onChange={(e) => setForm({ ...form, Phone: e.target.value })}
+              disabled={loading}
             />
           </div>
           <div className="grid gap-1">
@@ -90,6 +109,7 @@ export function EditCustomerDialog({
             <Input
               value={form.Email || ""}
               onChange={(e) => setForm({ ...form, Email: e.target.value })}
+              disabled={loading}
             />
           </div>
           <div className="grid gap-1">
@@ -97,6 +117,7 @@ export function EditCustomerDialog({
             <Input
               value={form.Address || ""}
               onChange={(e) => setForm({ ...form, Address: e.target.value })}
+              disabled={loading}
             />
           </div>
         </div>
@@ -105,11 +126,12 @@ export function EditCustomerDialog({
             variant="outline"
             className={dialog.cancel}
             onClick={() => onOpenChange(false)}
+            disabled={loading}
           >
             Hủy
           </Button>
-          <Button className={btn.primary} onClick={handleSubmit}>
-            Lưu thay đổi
+          <Button className={btn.primary} onClick={handleSubmit} disabled={loading}>
+            {loading ? "Đang lưu..." : "Lưu thay đổi"}
           </Button>
         </DialogFooter>
       </DialogContent>

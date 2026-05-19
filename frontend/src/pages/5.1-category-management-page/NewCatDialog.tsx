@@ -11,13 +11,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
-export function NewCatDialog({ open, onOpenChange }: Props) {
+export function NewCatDialog({ open, onOpenChange, onSave }: Props) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     CategoryName: "",
   });
@@ -27,11 +31,27 @@ export function NewCatDialog({ open, onOpenChange }: Props) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    console.log("Dữ liệu tạo mới:", formData);
-    // Thực hiện logic API thêm mới ở đây
-    setFormData({ CategoryName: "" }); // Reset form
-    onOpenChange(false);
+  const handleSubmit = async () => {
+    if (!formData.CategoryName.trim()) {
+      toast.error("Vui lòng điền tên danh mục!");
+      return;
+    }
+    setLoading(true);
+    try {
+      const categoryId = Math.floor(Math.random() * 9000) + 1000;
+      await api.categories.create({
+        CategoryID: categoryId,
+        CategoryName: formData.CategoryName,
+      });
+      toast.success("Thêm danh mục mới thành công!");
+      setFormData({ CategoryName: "" });
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Thêm danh mục thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,19 +73,21 @@ export function NewCatDialog({ open, onOpenChange }: Props) {
               onChange={handleChange}
               className={dialog.input}
               placeholder="Nhập tên danh mục..."
+              disabled={loading}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Tạo mới
+            {loading ? "Đang tạo..." : "Tạo mới"}
           </Button>
         </DialogFooter>
       </DialogContent>

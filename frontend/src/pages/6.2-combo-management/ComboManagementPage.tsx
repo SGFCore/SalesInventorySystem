@@ -7,19 +7,16 @@ import { DetailComboDialog } from "@/pages/6.2-combo-management/DetailComboDialo
 import { NewComboDialog } from "@/pages/6.2-combo-management/NewComboDialog";
 import { page, btn, entity, input } from "@/pages/page-classes";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-
-// Giả lập dữ liệu mẫu gồm 45 combo để test phân trang
-const MOCK_COMBOS: Combo[] = Array.from({ length: 45 }, (_, i) => ({
-  ComboID: 501 + i,
-  ComboPrice: (i + 1) * 450000,
-}));
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 20;
 
 export default function ComboManagementPage() {
   const [combos, setCombos] = useState<Combo[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCombo, setSelectedCombo] = useState<Combo | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -28,8 +25,26 @@ export default function ComboManagementPage() {
   // State cho phân trang
   const [currentPage, setCurrentPage] = useState(1);
 
+  const loadCombos = async () => {
+    setLoading(true);
+    try {
+      const data = await api.combos.list();
+      if (!data || data.length === 0) {
+        toast.error("Không có dữ liệu");
+        setCombos([]);
+      } else {
+        setCombos(data);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Lỗi lấy dữ liệu combo");
+      setCombos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setCombos(MOCK_COMBOS);
+    loadCombos();
   }, []);
 
   // Reset về trang 1 khi tìm kiếm thay đổi
@@ -85,98 +100,113 @@ export default function ComboManagementPage() {
 
       {/* Combo Table */}
       <div className={page.tableWrap}>
-        <Table>
-          <TableBody>
-            {paginatedCombos.map((combo) => (
-              <TableRow
-                key={combo.ComboID}
-                className={page.tableRow}
-              >
-                {/* Thông tin chung (Mã Combo) */}
-                <TableCell>
-                  <div className="flex flex-col items-start">
-                    <div className={entity.rowMeta}>
-                      <span className="text-sm font-bold text-slate-900">
-                        Mã Combo: {combo.ComboID}
-                      </span>
-                    </div>
-                  </div>
-                </TableCell>
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <span className="ml-2 text-slate-500 font-medium">Đang tải dữ liệu combo...</span>
+          </div>
+        ) : paginatedCombos.length === 0 ? (
+          <div className="text-center py-20 text-slate-400 font-medium">
+            Không tìm thấy combo nào hợp lệ.
+          </div>
+        ) : (
+          <>
+            <Table>
+              <TableBody>
+                {paginatedCombos.map((combo) => (
+                  <TableRow
+                    key={combo.ComboID}
+                    className={page.tableRow}
+                  >
+                    {/* Thông tin chung (Mã Combo) */}
+                    <TableCell>
+                      <div className="flex flex-col items-start">
+                        <div className={entity.rowMeta}>
+                          <span className="text-sm font-bold text-slate-900">
+                            Mã Combo: {combo.ComboID}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
 
-                {/* Giá combo */}
-                <TableCell>
-                  <div className="flex flex-col items-start text-sm">
-                    <span className={entity.cellMeta}>
-                      Giá bán combo
-                    </span>
-                    <span className={cn(entity.price, 'mt-0.5')}>
-                      {combo.ComboPrice.toLocaleString("vi-VN")} đ
-                    </span>
-                  </div>
-                </TableCell>
+                    {/* Giá combo */}
+                    <TableCell>
+                      <div className="flex flex-col items-start text-sm">
+                        <span className={entity.cellMeta}>
+                          Giá bán combo
+                        </span>
+                        <span className={cn(entity.price, 'mt-0.5')}>
+                          {combo.ComboPrice.toLocaleString("vi-VN")} đ
+                        </span>
+                      </div>
+                    </TableCell>
 
-                {/* Các nút hành động có grid ngang bằng nhau giống ProductManagementPage */}
-                <TableCell>
+                    {/* Các nút hành động có grid ngang bằng nhau giống ProductManagementPage */}
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={cn(btn.actionSecondary, "w-full")}
+                        onClick={() => handleDetailClick(combo)}
+                      >
+                        Xem chi tiết
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {/* Bộ điều khiển Phân trang */}
+            {totalPages > 0 && (
+              <div className={page.pagination}>
+                <div className={page.paginationText}>
+                  Hiển thị{" "}
+                  <span className="font-medium">{paginatedCombos.length}</span> trên{" "}
+                  <span className="font-medium">{filteredCombos.length}</span> combo
+                </div>
+                <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    className={cn(btn.actionSecondary, "w-full")}
-                    onClick={() => handleDetailClick(combo)}
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className={btn.paginationNav}
                   >
-                    Xem chi tiết
+                    <ChevronLeft className="h-4 w-4" />
                   </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
 
-        {/* Bộ điều khiển Phân trang */}
-        <div className={page.pagination}>
-          <div className={page.paginationText}>
-            Hiển thị{" "}
-            <span className="font-medium">{paginatedCombos.length}</span> trên{" "}
-            <span className="font-medium">{filteredCombos.length}</span> combo
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={btn.paginationNav}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (pageNum) => (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
+                        >
+                          {pageNum}</Button>
+                      ),
+                    )}
+                  </div>
 
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (pageNum) => (
                   <Button
-                    key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
+                    variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    className={btn.paginationNav}
                   >
-                    {pageNum}</Button>
-                ),
-              )}
-            </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages || totalPages === 0}
-              className={btn.paginationNav}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Đăng ký các Dialog liên quan */}
@@ -186,7 +216,11 @@ export default function ComboManagementPage() {
         combo={selectedCombo}
       />
 
-      <NewComboDialog open={isNewOpen} onOpenChange={setIsNewOpen} />
+      <NewComboDialog
+        open={isNewOpen}
+        onOpenChange={setIsNewOpen}
+        onSave={loadCombos}
+      />
     </div>
   );
 }

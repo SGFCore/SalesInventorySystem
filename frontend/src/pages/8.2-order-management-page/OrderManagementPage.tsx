@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, MoreHorizontal, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Order } from "@/lib/types";
 import { DetailOrderDialog } from "@/pages/8.2-order-management-page/DetailOrderDialog";
@@ -18,26 +18,14 @@ import {
 import { ChangeProductDialog } from "@/pages/8.2-order-management-page/ChangeProductDialog";
 import { ReturnProductDialog } from "@/pages/8.2-order-management-page/ReturnProductDialog";
 import { page, btn, entity, input } from "@/pages/page-classes";
-
-const MOCK_ORDERS: Order[] = Array.from({ length: 45 }, (_, i) => ({
-  OrderID: 5000 + i,
-  CustomerName: `Khách hàng ${i + 1}`,
-  EmployeeID: 101,
-  InvoiceID: 1000 + i,
-  ShipCode: `VNPOST${8000 + i}`,
-  ShipCompanyID: i % 2 === 0 ? 1 : 2,
-  TotalAmount: (i + 1) * 200000,
-  OrderStatus: i % 6,
-  ShippingStatus: i % 4,
-  ShipmentNote: "Giao trong giờ hành chính",
-  ShippingFee: 30000,
-  ExportReceiptID: 2000 + i,
-}));
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 20;
 
 export default function OrderManagementPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
   // Dialog states
@@ -51,8 +39,27 @@ export default function OrderManagementPage() {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
 
+  const loadOrders = async () => {
+    setLoading(true);
+    try {
+      const data = await api.orders.list();
+      if (!data || data.length === 0) {
+        toast.error("Không có dữ liệu đơn hàng");
+        setOrders([]);
+      } else {
+        // Sort newest first
+        setOrders(data.sort((a, b) => b.OrderID - a.OrderID));
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Lỗi tải danh sách đơn hàng");
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setOrders(MOCK_ORDERS);
+    loadOrders();
   }, []);
 
   useEffect(() => {
@@ -77,7 +84,7 @@ export default function OrderManagementPage() {
     topRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [currentPage]);
 
-  const handleAction = (
+  const handleAction = async (
     order: Order,
     action:
       | "detail"
@@ -94,11 +101,59 @@ export default function OrderManagementPage() {
     if (action === "edit") setIsEditOpen(true);
     if (action === "change") setIsChangeOpen(true);
     if (action === "return") setIsReturnOpen(true);
+
     if (action === "cancel") {
-      alert(`Đã yêu cầu hủy đơn hàng #${order.OrderID}`);
+      try {
+        await api.orders.update(order.OrderID, {
+          ...order,
+          OrderStatus: 4, // Đã hủy
+        });
+        toast.success(`Đã hủy đơn hàng #${order.OrderID}`);
+        loadOrders();
+      } catch (e: any) {
+        toast.error(e.message || "Lỗi khi hủy đơn hàng");
+      }
     }
+
     if (action === "ship") {
-      alert(`Đã yêu cầu giao vận đơn hàng #${order.OrderID}`);
+      try {
+        await api.orders.update(order.OrderID, {
+          ...order,
+          ShippingStatus: 2, // Đã gửi vận chuyển
+          OrderStatus: 2, // Đang giao
+        });
+        toast.success(`Đã giao vận đơn hàng #${order.OrderID}`);
+        loadOrders();
+      } catch (e: any) {
+        toast.error(e.message || "Lỗi giao vận đơn hàng");
+      }
+    }
+
+    if (action === "cancelshipping") {
+      try {
+        await api.orders.update(order.OrderID, {
+          ...order,
+          ShippingStatus: 0, // Cần lên lịch giao
+          OrderStatus: 0, // Chờ xác nhận
+        });
+        toast.success(`Đã hủy giao vận cho đơn hàng #${order.OrderID}`);
+        loadOrders();
+      } catch (e: any) {
+        toast.error(e.message || "Lỗi khi hủy giao vận");
+      }
+    }
+
+    if (action === "packeted") {
+      try {
+        await api.orders.update(order.OrderID, {
+          ...order,
+          ShippingStatus: 1, // Đang đóng gói
+        });
+        toast.success(`Đã đánh dấu Đóng gói xong cho đơn hàng #${order.OrderID}`);
+        loadOrders();
+      } catch (e: any) {
+        toast.error(e.message || "Lỗi cập nhật trạng thái đóng gói");
+      }
     }
   };
 
@@ -133,7 +188,7 @@ export default function OrderManagementPage() {
     return (
       <Badge
         variant="outline"
-        className={cn("whitespace-nowrap", current.className)}
+        className={cn("whitespace-nowrap font-medium text-xs rounded-full px-2 py-0.5", current.className)}
       >
         {current.text}
       </Badge>
@@ -166,7 +221,7 @@ export default function OrderManagementPage() {
     return (
       <Badge
         variant="outline"
-        className={cn("whitespace-nowrap", current.className)}
+        className={cn("whitespace-nowrap font-medium text-xs rounded-full px-2 py-0.5", current.className)}
       >
         {current.text}
       </Badge>
@@ -192,194 +247,209 @@ export default function OrderManagementPage() {
       </div>
 
       <div className={page.tableWrap}>
-        <Table>
-          <TableBody>
-            {paginatedOrders.map((order) => (
-              <TableRow
-                key={order.OrderID}
-                className="hover:bg-slate-50 border-b border-slate-200"
-              >
-                <TableCell>
-                  <div className="flex flex-col items-start">
-                    <span className={entity.id}>{order.OrderID}</span>
-                    <span className="text-xs font-medium text-slate-500 mt-0.5">
-                      {order.CustomerName}
-                    </span>
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium text-xs text-slate-500 mb-1">
-                      Trạng thái ĐH
-                    </span>
-                    {renderOrderStatus(order.OrderStatus)}
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium text-xs text-slate-500 mb-1">
-                      Trạng thái Giao
-                    </span>
-                    {renderShippingStatus(order.ShippingStatus)}
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex flex-col items-start text-sm">
-                    <span className={entity.cellMeta}>Tổng tiền</span>
-                    <span className="font-bold text-blue-600 mt-0.5">
-                      {order.TotalAmount.toLocaleString("vi-VN")} đ
-                    </span>
-                  </div>
-                </TableCell>
-
-                <TableCell className="w-[60px] text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="h-8 w-8 p-0 hover:bg-slate-100"
-                      >
-                        <MoreHorizontal className="h-4 w-4 text-slate-600" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="bg-white border border-slate-200 min-w-[140px]"
-                    >
-                      <DropdownMenuItem
-                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2"
-                        onClick={() => handleAction(order, "detail")}
-                      >
-                        Xem chi tiết
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={
-                          order.OrderStatus === 4 || order.ShippingStatus >= 2
-                        }
-                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50"
-                        onClick={() => handleAction(order, "edit")}
-                      >
-                        Cập nhật
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={
-                          order.OrderStatus === 4 || order.ShippingStatus >= 2
-                        }
-                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50"
-                        onClick={() => handleAction(order, "change")}
-                      >
-                        Đổi hàng
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={
-                          order.OrderStatus === 4 || order.ShippingStatus >= 2
-                        }
-                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50"
-                        onClick={() => handleAction(order, "return")}
-                      >
-                        Trả hàng
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={
-                          order.OrderStatus === 4 || order.ShippingStatus >= 2
-                        }
-                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50"
-                        onClick={() => handleAction(order, "ship")}
-                      >
-                        Giao vận
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={
-                          order.OrderStatus === 4 || order.ShippingStatus >= 2
-                        }
-                        className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-medium disabled:opacity-50"
-                        onClick={() => handleAction(order, "cancel")}
-                      >
-                        Hủy đơn hàng
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={
-                          order.OrderStatus === 4 || order.ShippingStatus >= 2
-                        }
-                        className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-medium disabled:opacity-50"
-                        onClick={() => handleAction(order, "cancelshipping")}
-                      >
-                        Hủy giao vận
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={
-                          order.OrderStatus === 4 || order.ShippingStatus >= 2
-                        }
-                        className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50"
-                        onClick={() => handleAction(order, "packeted")}
-                      >
-                        Đóng gói xong
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        <div className={page.pagination}>
-          <div className={page.paginationText}>
-            Hiển thị{" "}
-            <span className="font-medium text-slate-900">
-              {paginatedOrders.length}
-            </span>{" "}
-            trên{" "}
-            <span className="font-medium text-slate-900">
-              {filteredOrders.length}
-            </span>{" "}
-            đơn hàng
+        {loading ? (
+          <div className="flex justify-center items-center py-20 bg-white">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <span className="ml-2 text-slate-500 font-medium">Đang tải đơn hàng...</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={btn.paginationNav}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (pageNum) => (
-                  <Button
-                    key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={
-                      currentPage === pageNum
-                        ? btn.paginationActive
-                        : btn.paginationInactive
-                    }
+        ) : paginatedOrders.length === 0 ? (
+          <div className="text-center py-20 text-slate-400 font-medium bg-white">
+            Không tìm thấy đơn hàng nào hợp lệ.
+          </div>
+        ) : (
+          <>
+            <Table>
+              <TableBody>
+                {paginatedOrders.map((order) => (
+                  <TableRow
+                    key={order.OrderID}
+                    className="hover:bg-slate-50 border-b border-slate-200"
                   >
-                    {pageNum}
+                    <TableCell>
+                      <div className="flex flex-col items-start">
+                        <span className={entity.id}>#{order.OrderID}</span>
+                        <span className="text-xs font-semibold text-slate-500 mt-0.5">
+                          {order.CustomerName}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex flex-col items-start text-sm">
+                        <span className="font-semibold text-xs text-slate-400 mb-1">
+                          Trạng thái ĐH
+                        </span>
+                        {renderOrderStatus(order.OrderStatus)}
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex flex-col items-start text-sm">
+                        <span className="font-semibold text-xs text-slate-400 mb-1">
+                          Trạng thái Giao
+                        </span>
+                        {renderShippingStatus(order.ShippingStatus)}
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex flex-col items-start text-sm">
+                        <span className={entity.cellMeta}>Tổng tiền</span>
+                        <span className="font-bold text-blue-600 mt-0.5">
+                          {order.TotalAmount.toLocaleString("vi-VN")} đ
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="w-[60px] text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0 hover:bg-slate-100"
+                          >
+                            <MoreHorizontal className="h-4 w-4 text-slate-600" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="bg-white border border-slate-200 min-w-[140px]"
+                        >
+                          <DropdownMenuItem
+                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 font-medium"
+                            onClick={() => handleAction(order, "detail")}
+                          >
+                            Xem chi tiết
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={
+                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                            }
+                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
+                            onClick={() => handleAction(order, "edit")}
+                          >
+                            Cập nhật
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={
+                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                            }
+                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
+                            onClick={() => handleAction(order, "change")}
+                          >
+                            Đổi hàng
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={
+                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                            }
+                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
+                            onClick={() => handleAction(order, "return")}
+                          >
+                            Trả hàng
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={
+                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                            }
+                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
+                            onClick={() => handleAction(order, "ship")}
+                          >
+                            Giao vận
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={
+                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                            }
+                            className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-semibold disabled:opacity-50"
+                            onClick={() => handleAction(order, "cancel")}
+                          >
+                            Hủy đơn hàng
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={
+                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                            }
+                            className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-semibold disabled:opacity-50"
+                            onClick={() => handleAction(order, "cancelshipping")}
+                          >
+                            Hủy giao vận
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={
+                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                            }
+                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
+                            onClick={() => handleAction(order, "packeted")}
+                          >
+                            Đóng gói xong
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {totalPages > 0 && (
+              <div className={page.pagination}>
+                <div className={page.paginationText}>
+                  Hiển thị{" "}
+                  <span className="font-medium text-slate-900">
+                    {paginatedOrders.length}
+                  </span>{" "}
+                  trên{" "}
+                  <span className="font-medium text-slate-900">
+                    {filteredOrders.length}
+                  </span>{" "}
+                  đơn hàng
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className={btn.paginationNav}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
                   </Button>
-                ),
-              )}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages || totalPages === 0}
-              className={btn.paginationNav}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (pageNum) => (
+                        <Button
+                          key={pageNum}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm;px-3"
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={
+                            currentPage === pageNum
+                              ? btn.paginationActive
+                              : btn.paginationInactive
+                          }
+                        >
+                          {pageNum}
+                        </Button>
+                      ),
+                    )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    className={btn.paginationNav}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       <DetailOrderDialog
@@ -387,12 +457,17 @@ export default function OrderManagementPage() {
         onOpenChange={setIsDetailOpen}
         order={selectedOrder}
       />
-      <NewOrderDialog open={isNewOpen} onOpenChange={setIsNewOpen} />
+      <NewOrderDialog
+        open={isNewOpen}
+        onOpenChange={setIsNewOpen}
+        onSave={loadOrders}
+      />
       {selectedOrder && (
         <EditOrderDialog
           open={isEditOpen}
           onOpenChange={setIsEditOpen}
           order={selectedOrder}
+          onSave={loadOrders}
         />
       )}
       {selectedOrder && (
@@ -400,6 +475,7 @@ export default function OrderManagementPage() {
           open={isChangeOpen}
           onOpenChange={setIsChangeOpen}
           order={selectedOrder}
+          onSave={loadOrders}
         />
       )}
       {selectedOrder && (
@@ -407,6 +483,7 @@ export default function OrderManagementPage() {
           open={isReturnOpen}
           onOpenChange={setIsReturnOpen}
           order={selectedOrder}
+          onSave={loadOrders}
         />
       )}
     </div>

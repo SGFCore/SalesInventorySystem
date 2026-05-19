@@ -12,14 +12,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { ShipCompany } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 interface EditProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   comp: ShipCompany | null;
+  onSave: () => void;
 }
 
-export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
+export function EditCompDialog({ open, onOpenChange, comp, onSave }: EditProps) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     shipCompanyName: "",
     supportedRegion: "",
@@ -47,14 +51,32 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!comp) return;
     if (!formData.shipCompanyName || !formData.phone || !formData.email) {
-      alert("Vui lòng điền đầy đủ các thông tin bắt buộc!");
+      toast.error("Vui lòng điền đầy đủ các thông tin bắt buộc!");
       return;
     }
-    console.log("Cập nhật đối tác:", formData);
-    // Xử lý logic lưu dữ liệu tại đây
-    onOpenChange(false);
+    setLoading(true);
+    try {
+      await api.shipCompanies.update(comp.ShipCompanyID, {
+        ...comp,
+        ShipCompanyName: formData.shipCompanyName,
+        SupportedRegion: formData.supportedRegion,
+        Phone: formData.phone,
+        Email: formData.email,
+        Address: formData.address,
+        Notes: formData.notes,
+      });
+
+      toast.success("Cập nhật đối tác vận chuyển thành công!");
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Cập nhật thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -77,6 +99,7 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               value={formData.shipCompanyName}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -88,6 +111,7 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               value={formData.supportedRegion}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -102,6 +126,7 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               value={formData.email}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -115,6 +140,7 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               value={formData.phone}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -126,6 +152,7 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               value={formData.address}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -137,19 +164,21 @@ export function EditCompDialog({ open, onOpenChange, comp }: EditProps) {
               value={formData.notes}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Lưu thay đổi
+            {loading ? "Đang lưu..." : "Lưu thay đổi"}
           </Button>
         </DialogFooter>
       </DialogContent>

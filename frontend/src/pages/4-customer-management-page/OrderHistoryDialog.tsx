@@ -15,37 +15,10 @@ import { Badge } from "@/components/ui/badge";
 import type { Customer, Order } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { badge, dialog, entity, page } from "@/pages/page-classes";
-
-const MOCK_ORDERS: Order[] = [
-  {
-    OrderID: 5001,
-    CustomerID: 2000,
-    EmployeeID: 1,
-    InvoiceID: 901,
-    ShipCode: "SHIP123",
-    ShipCompanyID: 1001,
-    TotalAmount: 1500000,
-    OrderStatus: 1,
-    ShippingStatus: 2,
-    ShipmentNote: "",
-    ShippingFee: 30000,
-    ExportReceiptID: 801,
-  },
-  {
-    OrderID: 5002,
-    CustomerID: 2000,
-    EmployeeID: 1,
-    InvoiceID: 902,
-    ShipCode: "SHIP456",
-    ShipCompanyID: 1002,
-    TotalAmount: 2450000,
-    OrderStatus: 1,
-    ShippingStatus: 1,
-    ShipmentNote: "Giao giờ hành chính",
-    ShippingFee: 25000,
-    ExportReceiptID: 802,
-  },
-];
+import React, { useState, useEffect } from "react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export function OrderHistoryDialog({
   open,
@@ -56,6 +29,26 @@ export function OrderHistoryDialog({
   onOpenChange: (o: boolean) => void;
   customer: Customer | null;
 }) {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open && customer) {
+      const loadOrders = async () => {
+        setLoading(true);
+        try {
+          const all = await api.orders.list();
+          setOrders(all.filter((o) => o.CustomerID === customer.CustomerID));
+        } catch (e: any) {
+          toast.error(e.message || "Không thể tải lịch sử đơn hàng!");
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadOrders();
+    }
+  }, [open, customer]);
+
   if (!customer) return null;
 
   return (
@@ -67,54 +60,60 @@ export function OrderHistoryDialog({
           </DialogTitle>
         </DialogHeader>
         <div className={page.tableWrap}>
-          <Table>
-            <TableHeader className="bg-slate-50">
-              <TableRow>
-                <TableCell className="text-xs font-semibold text-slate-700">
-                  Mã đơn
-                </TableCell>
-                <TableCell className="text-xs font-semibold text-slate-700">
-                  Mã ship
-                </TableCell>
-                <TableCell className="text-xs font-semibold text-slate-700">
-                  Tổng tiền
-                </TableCell>
-                <TableCell className="text-xs font-semibold text-slate-700">
-                  Trạng thái
-                </TableCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {MOCK_ORDERS.map((o) => (
-                <TableRow key={o.OrderID} className={page.tableRow}>
-                  <TableCell className={entity.id}>#{o.OrderID}</TableCell>
-                  <TableCell className={entity.price}>{o.ShipCode}</TableCell>
-                  <TableCell className={entity.cellValue}>
-                    {o.TotalAmount.toLocaleString()} đ
+          {loading ? (
+            <div className="flex justify-center items-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+              <span className="ml-2 text-slate-500 text-sm">Đang tải lịch sử...</span>
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="py-10 text-center text-sm text-slate-400 font-medium">
+              Không có dữ liệu giao dịch
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-slate-50">
+                <TableRow>
+                  <TableCell className="text-xs font-semibold text-slate-700">
+                    Mã đơn
                   </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        badge.base,
-                        o.ShippingStatus === 2
-                          ? badge.success
-                          : badge.info,
-                      )}
-                    >
-                      {o.ShippingStatus === 2 ? "Đã giao" : "Đang xử lý"}
-                    </Badge>
+                  <TableCell className="text-xs font-semibold text-slate-700">
+                    Mã ship
+                  </TableCell>
+                  <TableCell className="text-xs font-semibold text-slate-700">
+                    Tổng tiền
+                  </TableCell>
+                  <TableCell className="text-xs font-semibold text-slate-700">
+                    Trạng thái
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {orders.map((o) => (
+                  <TableRow key={o.OrderID} className={page.tableRow}>
+                    <TableCell className={entity.id}>#{o.OrderID}</TableCell>
+                    <TableCell className={entity.price}>{o.ShipCode}</TableCell>
+                    <TableCell className={entity.cellValue}>
+                      {o.TotalAmount.toLocaleString()} đ
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          badge.base,
+                          o.ShippingStatus === 2
+                            ? badge.success
+                            : badge.info,
+                        )}
+                      >
+                        {o.ShippingStatus === 2 ? "Đã giao" : "Đang xử lý"}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </div>
-        {MOCK_ORDERS.length === 0 && (
-          <div className="py-10 text-center text-sm text-slate-400">
-            Không có dữ liệu giao dịch
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );

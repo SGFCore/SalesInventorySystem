@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import type { ReturnPolicy } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { btn, dialog } from "@/pages/page-classes";
+import React from "react";
 
 interface Props {
   open: boolean;
@@ -32,14 +33,14 @@ export function DetailPolicyDialog({ open, onOpenChange, policy }: Props) {
         <div className={dialog.body}>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-slate-500 text-xs">Mã chính sách</Label>
-              <p className="font-medium">{policy.PolicyID}</p>
+              <Label className="text-slate-500 text-xs font-semibold">Mã chính sách</Label>
+              <p className="font-semibold text-slate-800">#{policy.PolicyID}</p>
             </div>
             <div>
-              <Label className="text-slate-500 text-xs">Trạng thái</Label>
+              <Label className="text-slate-500 text-xs font-semibold">Trạng thái</Label>
               <p
                 className={cn(
-                  "font-medium text-base",
+                  "font-bold text-sm mt-0.5",
                   policy.IsActive === 1 ? "text-green-600" : "text-slate-400",
                 )}
               >
@@ -49,40 +50,40 @@ export function DetailPolicyDialog({ open, onOpenChange, policy }: Props) {
           </div>
 
           <div>
-            <Label className="text-slate-500 text-xs">Tên chính sách</Label>
-            <p className="font-medium text-lg text-slate-900">
+            <Label className="text-slate-500 text-xs font-semibold">Tên chính sách</Label>
+            <p className="font-bold text-base text-slate-900 mt-0.5">
               {policy.PolicyName}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-slate-500 text-xs">
+              <Label className="text-slate-500 text-xs font-semibold">
                 Số ngày đổi trả tối đa
               </Label>
-              <p className="font-medium text-blue-600 text-lg">
+              <p className="font-bold text-blue-600 text-base mt-0.5">
                 {policy.MaxReturnDays} ngày
               </p>
             </div>
             <div>
-              <Label className="text-slate-500 text-xs">
+              <Label className="text-slate-500 text-xs font-semibold">
                 Tỷ lệ phí phạt đổi trả
               </Label>
-              <p className="font-medium text-red-600 text-lg">
-                {policy.PenaltyFeeRate}%
+              <p className="font-bold text-red-600 text-base mt-0.5">
+                {policy.PenaltyFeeRate * 100}%
               </p>
             </div>
           </div>
 
           <div>
-            <Label className="text-slate-500 text-xs">Ngày có hiệu lực</Label>
-            <p className="font-medium text-slate-700 bg-slate-50 p-3 border border-slate-100 text-sm">
-              {policy.EffectiveDate.toLocaleDateString("vi-VN")}
+            <Label className="text-slate-500 text-xs font-semibold">Ngày có hiệu lực</Label>
+            <p className="font-semibold text-slate-700 bg-slate-50 p-3 border border-slate-100 text-sm mt-1 rounded-md">
+              {new Date(policy.EffectiveDate).toLocaleDateString("vi-VN")}
             </p>
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
           <Button
             className={btn.primary}
             onClick={() => onOpenChange(false)}

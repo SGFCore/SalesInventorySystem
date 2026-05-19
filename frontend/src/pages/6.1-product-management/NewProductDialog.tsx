@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,23 +12,53 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { btn, dialog } from "@/pages/page-classes";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+import type { Category, ProductType } from "@/lib/types";
 
 interface NewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSave: () => void;
 }
 
-export function NewProductDialog({ open, onOpenChange }: NewProps) {
+export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
+  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+
   const [formData, setFormData] = useState({
     productName: "",
     productPrice: 0,
     categoryName: "",
     productTypeName: "",
     detail: "",
-    allowReturn: true, // Mặc định cho phép đổi trả khi tạo mới
+    allowReturn: true,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (open) {
+      const loadOptions = async () => {
+        try {
+          const cats = await api.categories.list();
+          const pts = await api.productTypes.list();
+          setCategories(cats);
+          setProductTypes(pts);
+          // Set default values if list is not empty
+          setFormData((prev) => ({
+            ...prev,
+            categoryName: cats[0]?.CategoryName || "",
+            productTypeName: pts[0]?.ProductTypeName || "",
+          }));
+        } catch (e) {
+          console.error("Lỗi tải danh mục/loại sản phẩm:", e);
+        }
+      };
+      loadOptions();
+    }
+  }, [open]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -40,22 +70,45 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
     setFormData((prev) => ({ ...prev, allowReturn: checked }));
   };
 
-  const handleSubmit = () => {
-    if (!formData.productName.trim() || !formData.categoryName.trim()) {
-      alert("Vui lòng nhập đầy đủ các trường thông tin bắt buộc!");
+  const handleSubmit = async () => {
+    if (!formData.productName.trim()) {
+      toast.error("Vui lòng điền tên sản phẩm!");
       return;
     }
-    console.log("Dữ liệu sản phẩm tạo mới:", formData);
-    // Reset state sau khi lưu thành công
-    setFormData({
-      productName: "",
-      productPrice: 0,
-      categoryName: "",
-      productTypeName: "",
-      detail: "",
-      allowReturn: true,
-    });
-    onOpenChange(false);
+    if (!formData.categoryName.trim()) {
+      toast.error("Vui lòng chọn danh mục!");
+      return;
+    }
+    setLoading(true);
+    try {
+      const productId = Math.floor(Math.random() * 90000) + 10000;
+      await api.products.create({
+        ProductID: productId,
+        ProductName: formData.productName,
+        ProductPrice: formData.productPrice,
+        CategoryName: formData.categoryName,
+        ProductTypeName: formData.productTypeName,
+        Detail: formData.detail,
+        AllowReturn: formData.allowReturn ? 1 : 0,
+        ProductStatus: 1,
+        ImageURL: "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+      });
+      toast.success("Thêm sản phẩm mới thành công!");
+      setFormData({
+        productName: "",
+        productPrice: 0,
+        categoryName: categories[0]?.CategoryName || "",
+        productTypeName: productTypes[0]?.ProductTypeName || "",
+        detail: "",
+        allowReturn: true,
+      });
+      onOpenChange(false);
+      onSave();
+    } catch (error: any) {
+      toast.error(error.message || "Thêm sản phẩm thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -79,6 +132,7 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
               onChange={handleChange}
               placeholder="Nhập tên sản phẩm..."
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -91,6 +145,7 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
               value={formData.productPrice}
               onChange={handleChange}
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -98,26 +153,38 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
             <Label htmlFor="new-categoryName">
               Danh mục <span className="text-red-500">*</span>
             </Label>
-            <Input
+            <select
               id="new-categoryName"
               name="categoryName"
               value={formData.categoryName}
               onChange={handleChange}
-              placeholder="Ví dụ: Thiết bị điện tử"
-              className={dialog.input}
-            />
+              className={cn(dialog.input, "bg-white border text-sm rounded-md p-2 h-10")}
+              disabled={loading}
+            >
+              {categories.map((cat) => (
+                <option key={cat.CategoryID} value={cat.CategoryName}>
+                  {cat.CategoryName}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="new-productTypeName">Loại sản phẩm</Label>
-            <Input
+            <select
               id="new-productTypeName"
               name="productTypeName"
               value={formData.productTypeName}
               onChange={handleChange}
-              placeholder="Ví dụ: Hàng cao cấp"
-              className={dialog.input}
-            />
+              className={cn(dialog.input, "bg-white border text-sm rounded-md p-2 h-10")}
+              disabled={loading}
+            >
+              {productTypes.map((pt) => (
+                <option key={pt.ProductTypeID} value={pt.ProductTypeName}>
+                  {pt.ProductTypeName}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid gap-2">
@@ -129,6 +196,7 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
               onChange={handleChange}
               placeholder="Mô tả thông số hoặc đặc tính..."
               className={dialog.input}
+              disabled={loading}
             />
           </div>
 
@@ -139,6 +207,7 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
               onCheckedChange={(checked) =>
                 handleCheckboxChange(checked as boolean)
               }
+              disabled={loading}
             />
             <label
               htmlFor="new-allowReturn"
@@ -150,14 +219,15 @@ export function NewProductDialog({ open, onOpenChange }: NewProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
             Hủy
           </Button>
           <Button
             className={btn.primary}
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Tạo mới
+            {loading ? "Đang tạo..." : "Tạo mới"}
           </Button>
         </DialogFooter>
       </DialogContent>
