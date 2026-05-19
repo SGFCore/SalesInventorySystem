@@ -1,7 +1,7 @@
 import { GroupedPageLayout, type TabConfig } from "@/components/GroupedPageLayout";
 import CompManagementPage from "@/pages/3-comp-management/CompManagementPage";
 import CustomerManagementPage from "@/pages/4-customer-management-page/CustomerManagementPage";
-import CustomerTypeManagementPage from "@/pages/7.1-customertype-management-page/CustomerManagementPage";
+import CustomerTypeManagementPage from "@/pages/7.1-customertype-management-page/CustomerTypeManagementPage";
 import { Handshake, Users, UserCheck } from "lucide-react";
 
 export default function CustomerPartnerManagement() {
