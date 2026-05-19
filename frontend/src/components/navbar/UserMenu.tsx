@@ -10,15 +10,22 @@ import UserAvatar from "@/components/navbar/UserAvatar";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEmp } from "@/context/empContext";
+import { api } from "@/lib/api";
 
 export default function UserMenu() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { emp } = useEmp();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/signin");
+  const handleLogout = async () => {
+    try {
+      await api.auth.signout();
+    } catch (error) {
+      console.error("Lỗi khi gọi API đăng xuất:", error);
+    } finally {
+      logout();
+      navigate("/signin");
+    }
   };
 
   return (

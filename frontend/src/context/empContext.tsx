@@ -3,7 +3,9 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 
 interface EmpContextType {
   emp: Employee;
+  setEmp: (emp: Employee) => void;
   roles: Role[];
+  setRoles: (roles: Role[]) => void;
   hasRole: (roleId: number) => boolean;
 }
 
@@ -47,7 +49,7 @@ export const EmpProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <EmpContext.Provider value={{ emp, roles, hasRole }}>
+    <EmpContext.Provider value={{ emp, setEmp, roles, setRoles, hasRole }}>
       {children}
     </EmpContext.Provider>
   );

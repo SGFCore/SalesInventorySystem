@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { useEmp } from "@/context/empContext";
+import { api } from "@/lib/api";
 import {
   Card,
   CardContent,
@@ -27,9 +29,11 @@ export function SignIn() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { setEmp, setRoles } = useEmp();
 
   // Dữ liệu mẫu phục vụ Prototype chạy thử
   const SAMPLE_CREDENTIALS = {
@@ -43,7 +47,7 @@ export function SignIn() {
     toast.success("Đã điền thông tin tài khoản mẫu!");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (employeeId.trim().length === 0 || password.trim().length === 0) {
@@ -51,10 +55,27 @@ export function SignIn() {
       return;
     }
 
-    // Xác thực prototype: Chấp nhận mọi tài khoản hợp lệ, hoặc tài khoản mẫu
-    toast.success("Đăng nhập thành công!");
-    login();
-    navigate("/");
+    setLoading(true);
+    try {
+      const response = await api.auth.signin({
+        username: employeeId,
+        password,
+      });
+
+      if (response && response.employee) {
+        setEmp(response.employee);
+        setRoles(response.roles || []);
+        toast.success("Đăng nhập thành công!");
+        login();
+        navigate("/");
+      } else {
+        toast.error("Phản hồi đăng nhập không hợp lệ từ máy chủ.");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -140,9 +161,10 @@ export function SignIn() {
           <CardFooter className="flex flex-col p-4 pt-1 space-y-3 border-0">
             <Button
               type="submit"
+              disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-none border-0"
             >
-              Đăng nhập
+              {loading ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
 
             {/* Hướng dẫn IT support rút gọn tối đa */}

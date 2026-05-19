@@ -356,3 +356,14 @@ export type Feedback = {
   AttachmentURL: string;
   Rating: number;
 };
+
+// 37. AUTH TYPES
+export type LoginCredentials = {
+  username: string;
+  password: string;
+};
+
+export type LoginResponse = {
+  employee: Employee;
+  roles: Role[];
+};

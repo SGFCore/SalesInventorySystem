@@ -12,9 +12,11 @@ import EmpInfoPage from "@/pages/1-emp-info/EmpInfoPage";
 import { SignIn } from "@/pages/SignIn";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { EmpProvider } from "@/context/empContext";
+import { NotificationProvider } from "@/context/notificationContext";
 import EmpManagementPage from "@/pages/2-emp-management/EmpManagementPage";
 import ComboManagementPage from "@/pages/6.2-combo-management/ComboManagementPage";
 import WarehouseManagementPage from "@/pages/11.1-warehouse-management-page/WarehouseManagementPage";
+import NotificationManagementPage from "@/pages/0-notification-management/NotificationManagementPage";
 
 // New Grouped Pages
 import CustomerPartnerManagement from "@/pages/grouped/CustomerPartnerManagement";
@@ -27,35 +29,44 @@ function App() {
   return (
     <EmpProvider>
       <AuthProvider>
-        <SidebarProvider>
-          <Router>
-            <Routes>
-              {/* Public Routes */}
-              <Route
-                path="/signin"
-                element={
-                  <PublicRoute>
-                    <SignIn />
-                  </PublicRoute>
-                }
-              />
-              {/* Private Routes */}
-              <Route
-                path="/"
-                element={
-                  <PrivateRoute>
-                    <Home />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <PrivateRoute>
-                    <EmpInfoPage />
-                  </PrivateRoute>
-                }
-              />
+        <NotificationProvider>
+          <SidebarProvider>
+            <Router>
+              <Routes>
+                {/* Public Routes */}
+                <Route
+                  path="/signin"
+                  element={
+                    <PublicRoute>
+                      <SignIn />
+                    </PublicRoute>
+                  }
+                />
+                {/* Private Routes */}
+                <Route
+                  path="/"
+                  element={
+                    <PrivateRoute>
+                      <Home />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <PrivateRoute>
+                      <EmpInfoPage />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/notification-management"
+                  element={
+                    <PrivateRoute>
+                      <NotificationManagementPage />
+                    </PrivateRoute>
+                  }
+                />
               <Route
                 path="/emp-management"
                 element={
@@ -178,9 +189,10 @@ function App() {
             </Routes>
           </Router>
         </SidebarProvider>
-      </AuthProvider>
-    </EmpProvider>
-  );
+      </NotificationProvider>
+    </AuthProvider>
+  </EmpProvider>
+);
 }
 
 export default App;

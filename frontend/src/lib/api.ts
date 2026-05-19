@@ -36,10 +36,18 @@ import type {
   Discount,
   ListDiscount,
   Feedback,
+  LoginCredentials,
+  LoginResponse,
 } from "./types";
 
 export const api = {
-  // Auth để Bảo làm
+  // Auth API
+  auth: {
+    signin: (credentials: LoginCredentials) =>
+      apiClient.post<LoginResponse>("/auth/signin", credentials),
+    signout: () =>
+      apiClient.post<void>("/auth/signout", {}),
+  },
 
   // 1. CUSTOMERTYPE TABLE
   customerTypes: {
