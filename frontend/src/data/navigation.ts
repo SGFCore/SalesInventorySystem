@@ -20,29 +20,9 @@ export const sidebarData: SidebarItem[] = [
     availableRole: [1],
   },
   {
-    directionTo: "/comp-management",
-    label: "Quản lý đối tác",
+    directionTo: "/customer-partner-management",
+    label: "Quản lý khách hàng/ đối tác",
     availableRole: [1, 3],
-  },
-  {
-    directionTo: "/customer-management",
-    label: "Quản lý khách hàng",
-    availableRole: [3],
-  },
-  {
-    directionTo: "/customertype-management",
-    label: "Quản lý nhóm khách hàng",
-    availableRole: [1],
-  },
-  {
-    directionTo: "/cat-management",
-    label: "Quản lý danh mục sản phẩm",
-    availableRole: [1],
-  },
-  {
-    directionTo: "/producttype-management",
-    label: "Quản lý loại sản phẩm",
-    availableRole: [1],
   },
   {
     directionTo: "/product-management",
@@ -51,33 +31,18 @@ export const sidebarData: SidebarItem[] = [
   },
   {
     directionTo: "/combo-management",
-    label: "Quản lý gói sản phẩm",
+    label: "Quản lý combo",
     availableRole: [1],
   },
   {
-    directionTo: "/discount-management",
-    label: "Quản lý khuyến mãi",
-    availableRole: [1],
-  },
-  {
-    directionTo: "/invoice-management",
-    label: "Quản lý hóa đơn",
-    availableRole: [3, 4],
-  },
-  {
-    directionTo: "/order-management",
-    label: "Quản lý đơn hàng",
-    availableRole: [1, 2, 3],
-  },
-  {
-    directionTo: "/orderreturn-management",
-    label: "Quản lý hoàn tiền",
-    availableRole: [4],
+    directionTo: "/multichannel-order-management",
+    label: "Quản lý đơn hàng đa kênh",
+    availableRole: [1, 2, 3, 4],
   },
   {
     directionTo: "/policy-management",
-    label: "Quản lý chính sách đổi trả",
-    availableRole: [1],
+    label: "Quản lý chính sách",
+    availableRole: [1, 4],
   },
   {
     directionTo: "/warehouse-management",
@@ -85,18 +50,8 @@ export const sidebarData: SidebarItem[] = [
     availableRole: [1, 2],
   },
   {
-    directionTo: "/request-management",
-    label: "Đề xuất bổ sung hàng",
-    availableRole: [1, 2],
-  },
-  {
-    directionTo: "/importreceipt-management",
-    label: "Phiếu nhập kho",
-    availableRole: [1, 2],
-  },
-  {
-    directionTo: "/countsheet-management",
-    label: "Phiếu kiểm kê",
+    directionTo: "/circulating-slips-management",
+    label: "Quản lý các phiếu lưu hành",
     availableRole: [1, 2],
   },
 ];

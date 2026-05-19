@@ -13,22 +13,15 @@ import { SignIn } from "@/pages/SignIn";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { EmpProvider } from "@/context/empContext";
 import EmpManagementPage from "@/pages/2-emp-management/EmpManagementPage";
-import CompManagementPage from "@/pages/3-comp-management/CompManagementPage";
-import CustomerManagementPage from "@/pages/4-customer-management-page/CustomerManagementPage";
-import CatManagementPage from "@/pages/5.1-category-management-page/CatManagementPage";
-import ProductTypeManagementPage from "@/pages/5.2-producttype-management-page/ProductTypeManagementPage";
-import ProductManagementPage from "@/pages/6.1-product-management/ProductManagementPage";
 import ComboManagementPage from "@/pages/6.2-combo-management/ComboManagementPage";
-import CustomerTypeManagementPage from "@/pages/7.1-customertype-management-page/CustomerManagementPage";
-import DiscountManagementPage from "@/pages/7.2-discount-management-page/DiscountManagementPage";
-import InvoiceManagementPage from "@/pages/8.1-invoice-management-page/InvoiceManagementPage";
-import OrderManagementPage from "@/pages/8.2-order-management-page/OrderManagementPage";
-import OrderReturnManagementPage from "@/pages/9-orderreturn-management-page/OrderReturnManagementPage";
-import PolicyManagementPage from "@/pages/10-policy-management-page/PolicyManagementPage";
 import WarehouseManagementPage from "@/pages/11.1-warehouse-management-page/WarehouseManagementPage";
-import RequestManagementPage from "@/pages/11.2-request-management-page/RequestManagementPage";
-import ImportReceiptManagementPage from "@/pages/12.1-importreceipt-management-page/ImportReceiptManagementPage";
-import CountsheetManagementPage from "@/pages/15-countsheet-management-page/CountsheetManagementPage";
+
+// New Grouped Pages
+import CustomerPartnerManagement from "@/pages/grouped/CustomerPartnerManagement";
+import ProductManagementGroup from "@/pages/grouped/ProductManagementGroup";
+import MultiChannelOrderManagement from "@/pages/grouped/MultiChannelOrderManagement";
+import PolicyManagementGroup from "@/pages/grouped/PolicyManagementGroup";
+import CirculatingSlipsManagement from "@/pages/grouped/CirculatingSlipsManagement";
 
 function App() {
   return (
@@ -72,98 +65,10 @@ function App() {
                 }
               />
               <Route
-                path="/comp-management"
-                element={
-                  <PrivateRoute>
-                    <CompManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/customer-management"
-                element={
-                  <PrivateRoute>
-                    <CustomerManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/cat-management"
-                element={
-                  <PrivateRoute>
-                    <CatManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/producttype-management"
-                element={
-                  <PrivateRoute>
-                    <ProductTypeManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/product-management"
-                element={
-                  <PrivateRoute>
-                    <ProductManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
                 path="/combo-management"
                 element={
                   <PrivateRoute>
                     <ComboManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/customertype-management"
-                element={
-                  <PrivateRoute>
-                    <CustomerTypeManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/discount-management"
-                element={
-                  <PrivateRoute>
-                    <DiscountManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/invoice-management"
-                element={
-                  <PrivateRoute>
-                    <InvoiceManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/order-management"
-                element={
-                  <PrivateRoute>
-                    <OrderManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/orderreturn-management"
-                element={
-                  <PrivateRoute>
-                    <OrderReturnManagementPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/policy-management"
-                element={
-                  <PrivateRoute>
-                    <PolicyManagementPage />
                   </PrivateRoute>
                 }
               />
@@ -175,30 +80,99 @@ function App() {
                   </PrivateRoute>
                 }
               />
+
+              {/* Grouped themed routes */}
               <Route
-                path="/request-management"
+                path="/customer-partner-management"
                 element={
                   <PrivateRoute>
-                    <RequestManagementPage />
+                    <CustomerPartnerManagement />
                   </PrivateRoute>
                 }
+              />
+              <Route
+                path="/product-management"
+                element={
+                  <PrivateRoute>
+                    <ProductManagementGroup />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/multichannel-order-management"
+                element={
+                  <PrivateRoute>
+                    <MultiChannelOrderManagement />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/policy-management"
+                element={
+                  <PrivateRoute>
+                    <PolicyManagementGroup />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/circulating-slips-management"
+                element={
+                  <PrivateRoute>
+                    <CirculatingSlipsManagement />
+                  </PrivateRoute>
+                }
+              />
+
+              {/* Legacy Route redirects for backwards compatibility */}
+              <Route
+                path="/comp-management"
+                element={<Navigate to="/customer-partner-management?tab=partners" replace />}
+              />
+              <Route
+                path="/customer-management"
+                element={<Navigate to="/customer-partner-management?tab=customers" replace />}
+              />
+              <Route
+                path="/customertype-management"
+                element={<Navigate to="/customer-partner-management?tab=customer-types" replace />}
+              />
+              <Route
+                path="/cat-management"
+                element={<Navigate to="/product-management?tab=categories" replace />}
+              />
+              <Route
+                path="/producttype-management"
+                element={<Navigate to="/product-management?tab=product-types" replace />}
+              />
+              <Route
+                path="/order-management"
+                element={<Navigate to="/multichannel-order-management?tab=orders" replace />}
+              />
+              <Route
+                path="/invoice-management"
+                element={<Navigate to="/multichannel-order-management?tab=invoices" replace />}
+              />
+              <Route
+                path="/discount-management"
+                element={<Navigate to="/policy-management?tab=promotions" replace />}
+              />
+              <Route
+                path="/orderreturn-management"
+                element={<Navigate to="/policy-management?tab=returns" replace />}
+              />
+              <Route
+                path="/request-management"
+                element={<Navigate to="/circulating-slips-management?tab=replenishment-requests" replace />}
               />
               <Route
                 path="/importreceipt-management"
-                element={
-                  <PrivateRoute>
-                    <ImportReceiptManagementPage />
-                  </PrivateRoute>
-                }
+                element={<Navigate to="/circulating-slips-management?tab=import-receipts" replace />}
               />
               <Route
                 path="/countsheet-management"
-                element={
-                  <PrivateRoute>
-                    <CountsheetManagementPage />
-                  </PrivateRoute>
-                }
+                element={<Navigate to="/circulating-slips-management?tab=count-sheets" replace />}
               />
+
               {/* Catch all */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
