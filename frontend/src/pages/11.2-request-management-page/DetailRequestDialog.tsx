@@ -176,10 +176,10 @@ export function DetailRequestDialog({
                         className="border-b border-slate-100 text-xs hover:bg-slate-50"
                       >
                         <TableCell className="w-20 text-slate-500 font-medium">
-                          Mã SP: #{item.ProductId}
+                          Mã SP: #{item.ProductID}
                         </TableCell>
                         <TableCell className="font-semibold text-slate-900">
-                          {item.ProductName}
+                          Sản phẩm #{item.ProductID}
                         </TableCell>
                         <TableCell className="text-right font-bold text-blue-600 w-24">
                           SL: {item.Quantity}

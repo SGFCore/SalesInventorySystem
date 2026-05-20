@@ -14,7 +14,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { btn, dialog } from "@/pages/page-classes";
 import { Trash2, Plus } from "lucide-react";
 import { api } from "@/lib/api";
-import type { Product, ShipCompany } from "@/lib/types";
+import type { Product, Shipcompany, Customer } from "@/lib/types";
 import { toast } from "sonner";
 import { useEmp } from "@/context/empContext";
 
@@ -28,7 +28,6 @@ export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
   const { emp } = useEmp();
   const [loading, setLoading] = useState(false);
   const [orderData, setOrderData] = useState({
-    CustomerName: "",
     InvoiceID: "",
     ShipCompanyID: "1",
     ShippingFee: 0,
@@ -36,28 +35,39 @@ export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
   });
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [shipCompanies, setShipCompanies] = useState<ShipCompany[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<{ productID: number; quantity: number }[]>([]);
+  const [shipCompanies, setShipCompanies] = useState<Shipcompany[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
+  const [selectedProducts, setSelectedProducts] = useState<
+    { productID: number; quantity: number }[]
+  >([]);
 
   useEffect(() => {
     if (open) {
       const loadOptions = async () => {
         try {
-          const [allProducts, allShip] = await Promise.all([
+          const [allProducts, allShip, allCustomers] = await Promise.all([
             api.products.list(),
             api.shipCompanies.list(),
+            api.customers.list(),
           ]);
           setProducts(allProducts);
           setShipCompanies(allShip);
+          setCustomers(allCustomers);
 
           if (allProducts.length > 0) {
-            setSelectedProducts([{ productID: allProducts[0].ProductID, quantity: 1 }]);
+            setSelectedProducts([
+              { productID: allProducts[0].ProductID, quantity: 1 },
+            ]);
           }
           if (allShip.length > 0) {
             setOrderData((prev) => ({
               ...prev,
               ShipCompanyID: allShip[0].ShipCompanyID.toString(),
             }));
+          }
+          if (allCustomers.length > 0) {
+            setSelectedCustomerId(allCustomers[0].id.toString());
           }
         } catch (e) {
           console.error("Lỗi tải danh mục tạo đơn hàng:", e);
@@ -81,8 +91,8 @@ export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
   };
 
   const handleSubmit = async () => {
-    if (!orderData.CustomerName.trim()) {
-      toast.error("Vui lòng nhập tên khách hàng!");
+    if (!selectedCustomerId) {
+      toast.error("Vui lòng chọn khách hàng!");
       return;
     }
     if (selectedProducts.length === 0) {
@@ -100,31 +110,31 @@ export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
       selectedProducts.forEach((item) => {
         const prod = products.find((p) => p.ProductID === item.productID);
         if (prod) {
-          totalAmount += prod.Price * item.quantity;
+          totalAmount += prod.ProductPrice * item.quantity;
         }
       });
 
       // 1. Create Order
       await api.orders.create({
-        OrderID: orderId,
-        CustomerName: orderData.CustomerName,
-        EmployeeID: emp?.EmployeeID || 1,
-        InvoiceID: orderData.InvoiceID ? Number(orderData.InvoiceID) : 0,
-        ShipCode: shipCode,
-        ShipCompanyID: Number(orderData.ShipCompanyID),
-        TotalAmount: totalAmount + orderData.ShippingFee,
-        OrderStatus: 0, // 0: Chờ xác nhận, 1: Đang chuẩn bị, 2: Đang giao, 3: Đã giao, 4: Đã hủy
-        ShippingStatus: 0, // 0: Chưa giao, 1: Đang giao, 2: Đã giao thành công, 3: Trả về
-        ShipmentNote: orderData.ShipmentNote,
-        ShippingFee: orderData.ShippingFee,
-        ExportReceiptID: 0,
+        id: orderId,
+        customerId: Number(selectedCustomerId),
+        employeeId: emp?.EmployeeID || 1,
+        invoiceId: orderData.InvoiceID ? Number(orderData.InvoiceID) : 0,
+        shipcode: shipCode,
+        shipcompanyId: Number(orderData.ShipCompanyID),
+        totalamount: totalAmount + orderData.ShippingFee,
+        orderstatus: 0, // 0: Chờ xác nhận, 1: Đang chuẩn bị, 2: Đang giao, 3: Đã giao, 4: Đã hủy
+        shippingstatus: 0, // 0: Chưa giao, 1: Đang giao, 2: Đã giao thành công, 3: Trả về
+        shipmentnote: orderData.ShipmentNote,
+        shippingfee: orderData.ShippingFee,
+        exportreceiptId: 0,
       });
 
       // 2. Create OrderDetails
       await Promise.all(
         selectedProducts.map((item, index) => {
           const prod = products.find((p) => p.ProductID === item.productID);
-          const price = prod ? prod.Price : 0;
+          const price = prod ? prod.ProductPrice : 0;
           return api.orderDetails.create({
             OrderDetailID: Math.floor(Math.random() * 900000) + 100000 + index,
             OrderID: orderId,
@@ -135,7 +145,7 @@ export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
             DiscountAmount: 0,
             TotalAmount: price * item.quantity,
           });
-        })
+        }),
       );
 
       toast.success("Tạo đơn hàng thành công!");
@@ -165,16 +175,21 @@ export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
             </Label>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label className="text-xs text-slate-500 font-medium">Tên khách hàng</Label>
-                <Input
-                  placeholder="Nhập tên khách hàng"
-                  value={orderData.CustomerName}
-                  onChange={(e) =>
-                    setOrderData({ ...orderData, CustomerName: e.target.value })
-                  }
-                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
+                <Label className="text-xs text-slate-500 font-medium">
+                  Khách hàng
+                </Label>
+                <NativeSelect
+                  value={selectedCustomerId}
+                  onChange={(e) => setSelectedCustomerId(e.target.value)}
+                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
                   disabled={loading}
-                />
+                >
+                  {customers.map((cust) => (
+                    <option key={cust.id} value={cust.id}>
+                      {cust.firstname} {cust.lastname} - {cust.phone}
+                    </option>
+                  ))}
+                </NativeSelect>
               </div>
               <div className="grid gap-2">
                 <Label className="text-xs text-slate-500 font-medium">
@@ -270,7 +285,8 @@ export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
                   >
                     {products.map((prod) => (
                       <option key={prod.ProductID} value={prod.ProductID}>
-                        {prod.ProductName} - {prod.Price.toLocaleString()} đ
+                        {prod.ProductName} -{" "}
+                        {prod.ProductPrice.toLocaleString()} đ
                       </option>
                     ))}
                   </NativeSelect>
@@ -282,7 +298,10 @@ export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
                       setSelectedProducts((prev) =>
                         prev.map((p, i) =>
                           i === index
-                            ? { ...p, quantity: Math.max(1, Number(e.target.value)) }
+                            ? {
+                                ...p,
+                                quantity: Math.max(1, Number(e.target.value)),
+                              }
                             : p,
                         ),
                       )

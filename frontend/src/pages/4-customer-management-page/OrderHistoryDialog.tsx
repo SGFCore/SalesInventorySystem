@@ -38,7 +38,7 @@ export function OrderHistoryDialog({
         setLoading(true);
         try {
           const all = await api.orders.list();
-          setOrders(all.filter((o) => o.CustomerID === customer.CustomerID));
+          setOrders(all.filter((o) => o.customerId === customer.id));
         } catch (e: any) {
           toast.error(e.message || "Không thể tải lịch sử đơn hàng!");
         } finally {
@@ -56,7 +56,7 @@ export function OrderHistoryDialog({
       <DialogContent className={cn("sm:max-w-[800px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className={dialog.title}>
-            Lịch sử giao dịch: {customer.FirstName} {customer.LastName}
+            Lịch sử giao dịch: {customer.firstname} {customer.lastname}
           </DialogTitle>
         </DialogHeader>
         <div className={page.tableWrap}>
@@ -89,23 +89,23 @@ export function OrderHistoryDialog({
               </TableHeader>
               <TableBody>
                 {orders.map((o) => (
-                  <TableRow key={o.OrderID} className={page.tableRow}>
-                    <TableCell className={entity.id}>#{o.OrderID}</TableCell>
-                    <TableCell className={entity.price}>{o.ShipCode}</TableCell>
+                  <TableRow key={o.id} className={page.tableRow}>
+                    <TableCell className={entity.id}>#{o.id}</TableCell>
+                    <TableCell className={entity.price}>{o.shipcode}</TableCell>
                     <TableCell className={entity.cellValue}>
-                      {o.TotalAmount.toLocaleString()} đ
+                      {o.totalamount.toLocaleString()} đ
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant="outline"
                         className={cn(
                           badge.base,
-                          o.ShippingStatus === 2
+                          o.shippingstatus === 2
                             ? badge.success
                             : badge.info,
                         )}
                       >
-                        {o.ShippingStatus === 2 ? "Đã giao" : "Đang xử lý"}
+                        {o.shippingstatus === 2 ? "Đã giao" : "Đang xử lý"}
                       </Badge>
                     </TableCell>
                   </TableRow>

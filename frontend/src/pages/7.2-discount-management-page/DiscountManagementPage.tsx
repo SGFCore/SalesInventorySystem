@@ -60,9 +60,12 @@ export default function DiscountManagementPage() {
     setCurrentPage(1);
   }, [search]);
 
-  const filteredDiscounts = discounts.filter((d) =>
-    d.DiscountName.toLowerCase().includes(search.trim().toLowerCase()),
-  );
+  const filteredDiscounts = discounts.filter((d) => {
+    if (!d) return false;
+    const safeSearch = (search || "").trim().toLowerCase();
+    const nameStr = d.discountname != null ? String(d.discountname).toLowerCase() : "";
+    return nameStr.includes(safeSearch);
+  });
 
   const totalPages = Math.ceil(filteredDiscounts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -141,19 +144,19 @@ export default function DiscountManagementPage() {
               <TableBody>
                 {paginatedDiscounts.map((discount) => {
                   return (
-                    <TableRow key={discount.DiscountID} className={page.tableRow}>
+                    <TableRow key={discount.id} className={page.tableRow}>
                       {/* Thông tin chung (Mã & Tên) */}
                       <TableCell>
                         <div className="flex flex-col items-start">
                           <div className="flex items-center gap-2 text-xs mb-0.5">
-                            <span className={entity.id}>{discount.DiscountID}</span>
+                            <span className={entity.id}>{discount.id}</span>
                             <span>•</span>
                             <span className="text-slate-500 font-medium">
-                              SP: {getProductName(discount.AppliedProductID)}
+                              SP: {getProductName(discount.appliedproductids)}
                             </span>
                           </div>
                           <span className="text-sm font-bold text-slate-900">
-                            {discount.DiscountName}
+                            {discount.discountname}
                           </span>
                         </div>
                       </TableCell>
@@ -163,7 +166,7 @@ export default function DiscountManagementPage() {
                         <div className="flex flex-col items-start text-sm">
                           <span className={entity.cellMeta}>Mức giảm giá</span>
                           <span className={cn(entity.price, "mt-0.5")}>
-                            {discount.Value.toLocaleString("vi-VN")} đ
+                            {(discount.value || 0).toLocaleString("vi-VN")} đ
                           </span>
                         </div>
                       </TableCell>
@@ -172,19 +175,19 @@ export default function DiscountManagementPage() {
                       <TableCell>
                         <div className="flex flex-col items-start text-xs">
                           <span className="text-slate-400 mb-0.5">Trạng thái</span>
-                          {discount.Status === 1 ? (
+                          {discount.status === 1 ? (
                             <Badge
                               variant="outline"
                               className={cn(badge.base, badge.success)}
                             >
-                              {getStatusLabel(discount.Status)}
+                              {getStatusLabel(discount.status)}
                             </Badge>
                           ) : (
                             <Badge
                               variant="outline"
                               className={cn(badge.base, badge.danger)}
                             >
-                              {getStatusLabel(discount.Status)}
+                              {getStatusLabel(discount.status)}
                             </Badge>
                           )}
                         </div>

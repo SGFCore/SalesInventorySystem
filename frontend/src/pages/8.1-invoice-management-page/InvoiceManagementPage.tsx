@@ -34,7 +34,13 @@ export default function InvoiceManagementPage() {
         setInvoices([]);
       } else {
         // Sort newest first
-        setInvoices(data.sort((a, b) => new Date(b.InvoiceDate).getTime() - new Date(a.InvoiceDate).getTime()));
+        setInvoices(
+          data.sort(
+            (a, b) =>
+              new Date(b.InvoiceDate).getTime() -
+              new Date(a.InvoiceDate).getTime(),
+          ),
+        );
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải danh sách hóa đơn");
@@ -143,7 +149,9 @@ export default function InvoiceManagementPage() {
         {loading ? (
           <div className="flex justify-center items-center py-20 bg-white">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <span className="ml-2 text-slate-500 font-medium">Đang tải hóa đơn...</span>
+            <span className="ml-2 text-slate-500 font-medium">
+              Đang tải hóa đơn...
+            </span>
           </div>
         ) : paginatedInvoices.length === 0 ? (
           <div className="text-center py-20 text-slate-400 font-medium bg-white">
@@ -160,8 +168,13 @@ export default function InvoiceManagementPage() {
                       <div className="flex flex-col items-start">
                         <span className={entity.id}>#{invoice.InvoiceID}</span>
                         <span className="text-xs text-slate-500 mt-0.5 font-medium">
-                          {new Date(invoice.InvoiceDate).toLocaleDateString("vi-VN")}{" "}
-                          {new Date(invoice.InvoiceDate).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(invoice.InvoiceDate).toLocaleDateString(
+                            "vi-VN",
+                          )}{" "}
+                          {new Date(invoice.InvoiceDate).toLocaleTimeString(
+                            "vi-VN",
+                            { hour: "2-digit", minute: "2-digit" },
+                          )}
                         </span>
                       </div>
                     </TableCell>
@@ -207,7 +220,10 @@ export default function InvoiceManagementPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className={cn(btn.actionPrimary, "w-32 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100")}
+                            className={cn(
+                              btn.actionPrimary,
+                              "w-32 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100",
+                            )}
                             onClick={() => handleConfirmPayment(invoice)}
                           >
                             XN. thanh toán
@@ -238,7 +254,9 @@ export default function InvoiceManagementPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                     className={btn.paginationNav}
                   >
@@ -250,8 +268,10 @@ export default function InvoiceManagementPage() {
                       (pageNum) => (
                         <Button
                           key={pageNum}
-                          variant={currentPage === pageNum ? "default" : "outline"}
-                          size="sm;px-3"
+                          variant={
+                            currentPage === pageNum ? "default" : "outline"
+                          }
+                          size="sm"
                           onClick={() => setCurrentPage(pageNum)}
                           className={
                             currentPage === pageNum

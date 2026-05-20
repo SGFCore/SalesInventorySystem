@@ -12,12 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Trash2, Plus, Search } from "lucide-react";
-import { NewCustomerDialog } from "@/pages/4-customer-management-page/NewCustomerDialog";
 import type { Customer, Product, Discount } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { useEmp } from "@/context/empContext";
+import { NewCustomerDialog } from "@/pages/4-customer-management-page/NewCustomerDialog";
 
 interface NewProps {
   open: boolean;
@@ -29,7 +29,9 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
   const { emp } = useEmp();
   const [loading, setLoading] = useState(false);
   const [phoneSearch, setPhoneSearch] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null,
+  );
   const [isNewCustomerOpen, setIsNewCustomerOpen] = useState(false);
 
   // Dynamic Options
@@ -40,8 +42,12 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
   const [saleChannelCode, setSaleChannelCode] = useState<number>(0); // 0: Tại quầy, 1: Mạng xã hội/Online
   const [status, setStatus] = useState<string>("0"); // "0": Chờ thanh toán, "1": Đã thanh toán, "2": Thanh toán 1 phần
 
-  const [selectedProducts, setSelectedProducts] = useState<{ productID: number; quantity: number }[]>([]);
-  const [selectedPromotions, setSelectedPromotions] = useState<{ promoID: number }[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<
+    { productID: number; quantity: number }[]
+  >([]);
+  const [selectedPromotions, setSelectedPromotions] = useState<
+    { promoID: number }[]
+  >([]);
 
   useEffect(() => {
     if (open) {
@@ -55,7 +61,9 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
           setDiscounts(promoList);
 
           if (prodList.length > 0) {
-            setSelectedProducts([{ productID: prodList[0].ProductID, quantity: 1 }]);
+            setSelectedProducts([
+              { productID: prodList[0].ProductID, quantity: 1 },
+            ]);
           }
           if (promoList.length > 0) {
             setSelectedPromotions([]);
@@ -75,10 +83,12 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
     }
     try {
       const customers = await api.customers.list();
-      const cust = customers.find((c) => c.Phone === phoneSearch.trim());
+      const cust = customers.find((c) => c.phone === phoneSearch.trim());
       if (cust) {
         setSelectedCustomer(cust);
-        toast.success(`Đã tìm thấy khách hàng: ${cust.FirstName} ${cust.LastName}`);
+        toast.success(
+          `Đã tìm thấy khách hàng: ${cust.firstname} ${cust.lastname}`,
+        );
       } else {
         toast.error("Không tìm thấy khách hàng. Vui lòng tạo mới!");
         setSelectedCustomer(null);
@@ -103,10 +113,7 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
 
   const handleAddPromotion = () => {
     if (discounts.length === 0) return;
-    setSelectedPromotions((prev) => [
-      ...prev,
-      { promoID: discounts[0].DiscountID },
-    ]);
+    setSelectedPromotions((prev) => [...prev, { promoID: discounts[0].id }]);
   };
 
   const handleRemovePromotion = (index: number) => {
@@ -130,16 +137,16 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
       selectedProducts.forEach((item) => {
         const prod = products.find((p) => p.ProductID === item.productID);
         if (prod) {
-          totalAmount += prod.Price * item.quantity;
+          totalAmount += prod.ProductPrice * item.quantity;
         }
       });
 
       // Apply promotional discounts if any
       let discountAmount = 0;
       selectedPromotions.forEach((item) => {
-        const promo = discounts.find((d) => d.DiscountID === item.promoID);
+        const promo = discounts.find((d) => d.id === item.promoID);
         if (promo) {
-          discountAmount += promo.Value;
+          discountAmount += promo.value;
         }
       });
 
@@ -151,23 +158,24 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
       // 1. Create Invoice record
       await api.invoices.create({
         InvoiceID: invoiceId,
-        CustomerID: selectedCustomer.CustomerID,
+        CustomerID: selectedCustomer.id,
         EmployeeID: emp?.EmployeeID || 1,
         SaleChannelCode: saleChannelCode,
         TotalAmount: totalAmount,
         TaxAmount: taxAmount,
         FinalAmount: finalAmount,
         Status: status,
-        InvoiceDate: new Date(),
+        InvoiceDate: new Date().toISOString(),
       });
 
       // 2. Create InvoiceDetail records
       await Promise.all(
         selectedProducts.map((item, index) => {
           const prod = products.find((p) => p.ProductID === item.productID);
-          const price = prod ? prod.Price : 0;
+          const price = prod ? prod.ProductPrice : 0;
           return api.invoiceDetails.create({
-            InvoiceDetailID: Math.floor(Math.random() * 900000) + 100000 + index,
+            InvoiceDetailID:
+              Math.floor(Math.random() * 900000) + 100000 + index,
             InvoiceID: invoiceId,
             ProductID: item.productID,
             ComboID: 0,
@@ -176,21 +184,21 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
             DiscountAmount: 0,
             TotalAmount: price * item.quantity,
           });
-        })
+        }),
       );
 
       // 3. Link Promotions to Invoice using listDiscounts if applicable
       if (selectedPromotions.length > 0) {
         await Promise.all(
           selectedPromotions.map((item) => {
-            const promo = discounts.find((d) => d.DiscountID === item.promoID);
-            const val = promo ? promo.Value : 0;
+            const promo = discounts.find((d) => d.id === item.promoID);
+            const val = promo ? promo.value : 0;
             return api.listDiscounts.create({
               OrderID: invoiceId, // Note: listDiscounts has OrderID representing transaction ID
               DiscountID: item.promoID,
               AppliedValue: val,
             });
-          })
+          }),
         );
       }
 
@@ -222,7 +230,10 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
               </Label>
               <div className="flex items-end gap-2">
                 <div className="grid gap-2 flex-1">
-                  <Label htmlFor="phoneSearch" className="text-xs text-slate-500">
+                  <Label
+                    htmlFor="phoneSearch"
+                    className="text-xs text-slate-500"
+                  >
                     Tra cứu SĐT
                   </Label>
                   <div className="flex gap-2">
@@ -259,12 +270,14 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
                   <p>
                     <span className="text-slate-500">Họ Tên:</span>{" "}
                     <strong className="text-slate-900">
-                      {selectedCustomer.FirstName} {selectedCustomer.LastName}
+                      {selectedCustomer.firstname} {selectedCustomer.lastname}
                     </strong>
                   </p>
                   <p>
                     <span className="text-slate-500">SĐT:</span>{" "}
-                    <strong className="text-slate-900">{selectedCustomer.Phone}</strong>
+                    <strong className="text-slate-900">
+                      {selectedCustomer.phone}
+                    </strong>
                   </p>
                 </div>
               )}
@@ -317,8 +330,10 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
                       onChange={(e) =>
                         setSelectedProducts((prev) =>
                           prev.map((p, i) =>
-                            i === index ? { ...p, productID: Number(e.target.value) } : p
-                          )
+                            i === index
+                              ? { ...p, productID: Number(e.target.value) }
+                              : p,
+                          ),
                         )
                       }
                       className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 flex-1"
@@ -326,7 +341,8 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
                     >
                       {products.map((prod) => (
                         <option key={prod.ProductID} value={prod.ProductID}>
-                          {prod.ProductName} - {prod.Price.toLocaleString()} đ
+                          {prod.ProductName} -{" "}
+                          {prod.ProductPrice.toLocaleString()} đ
                         </option>
                       ))}
                     </NativeSelect>
@@ -337,8 +353,13 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
                       onChange={(e) =>
                         setSelectedProducts((prev) =>
                           prev.map((p, i) =>
-                            i === index ? { ...p, quantity: Math.max(1, Number(e.target.value)) } : p
-                          )
+                            i === index
+                              ? {
+                                  ...p,
+                                  quantity: Math.max(1, Number(e.target.value)),
+                                }
+                              : p,
+                          ),
                         )
                       }
                       className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 w-20 text-sm text-center"
@@ -380,16 +401,19 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
                       onChange={(e) =>
                         setSelectedPromotions((prev) =>
                           prev.map((p, i) =>
-                            i === index ? { ...p, promoID: Number(e.target.value) } : p
-                          )
+                            i === index
+                              ? { ...p, promoID: Number(e.target.value) }
+                              : p,
+                          ),
                         )
                       }
                       className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 flex-1"
                       disabled={loading}
                     >
                       {discounts.map((promo) => (
-                        <option key={promo.DiscountID} value={promo.DiscountID}>
-                          {promo.DiscountName} (-{promo.Value.toLocaleString()}đ)
+                        <option key={promo.id} value={promo.id}>
+                          {promo.discountname} (-{promo.value.toLocaleString()}
+                          đ)
                         </option>
                       ))}
                     </NativeSelect>
@@ -440,6 +464,10 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
       <NewCustomerDialog
         open={isNewCustomerOpen}
         onOpenChange={setIsNewCustomerOpen}
+        onSave={(newCust) => {
+          setSelectedCustomer(newCust);
+          setPhoneSearch(newCust.phone);
+        }}
       />
     </>
   );

@@ -49,16 +49,16 @@ export function DetailProductDialog({
           </div>
 
           <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
-            <Label className="text-slate-500">Danh mục</Label>
+            <Label className="text-slate-500">Danh mục (ID)</Label>
             <span className="col-span-2 text-slate-900">
-              {product.CategoryName}
+              {product.CategoryID}
             </span>
           </div>
 
           <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
-            <Label className="text-slate-500">Loại sản phẩm</Label>
+            <Label className="text-slate-500">Loại sản phẩm (ID)</Label>
             <span className="col-span-2 text-slate-900">
-              {product.ProductTypeName}
+              {product.ProductTypeID}
             </span>
           </div>
 

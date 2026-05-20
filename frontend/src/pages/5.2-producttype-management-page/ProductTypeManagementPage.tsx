@@ -7,18 +7,18 @@ import { NewProductTypeDialog } from "@/pages/5.2-producttype-management-page/Ne
 import { page, input, btn, entity } from "@/pages/page-classes";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { ProductType } from "@/lib/types";
+import type { Producttype } from "@/lib/types";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function ProductTypeManagementPage() {
-  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+  const [productTypes, setProductTypes] = useState<Producttype[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedProductType, setSelectedProductType] =
-    useState<ProductType | null>(null);
+    useState<Producttype | null>(null);
 
   // Dialog states
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -62,7 +62,7 @@ export default function ProductTypeManagementPage() {
 
   // Logic lọc và phân trang
   const filtered = productTypes.filter((pt) =>
-    pt.ProductTypeName.toLowerCase().includes(search.toLowerCase()),
+    pt.producttypename.toLowerCase().includes(search.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -72,15 +72,22 @@ export default function ProductTypeManagementPage() {
     startIndex + ITEMS_PER_PAGE,
   );
 
-  const openAction = async (productType: ProductType, type: "edit" | "delete") => {
+  const openAction = async (
+    productType: Producttype,
+    type: "edit" | "delete",
+  ) => {
     if (type === "edit") {
       setSelectedProductType(productType);
       setIsEditOpen(true);
     }
     if (type === "delete") {
-      if (window.confirm(`Bạn có chắc chắn muốn xóa loại sản phẩm "${productType.ProductTypeName}"?`)) {
+      if (
+        window.confirm(
+          `Bạn có chắc chắn muốn xóa loại sản phẩm "${productType.producttypename}"?`,
+        )
+      ) {
         try {
-          await api.productTypes.delete(productType.ProductTypeID);
+          await api.productTypes.delete(productType.id);
           toast.success("Xóa loại sản phẩm thành công!");
           loadProductTypes();
         } catch (error: any) {
@@ -101,10 +108,7 @@ export default function ProductTypeManagementPage() {
           onChange={(e) => setSearch(e.target.value)}
           className={input.search}
         />
-        <Button
-          className={btn.primary}
-          onClick={() => setIsNewOpen(true)}
-        >
+        <Button className={btn.primary} onClick={() => setIsNewOpen(true)}>
           Thêm loại sản phẩm mới
         </Button>
       </div>
@@ -113,7 +117,9 @@ export default function ProductTypeManagementPage() {
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <span className="ml-2 text-slate-500 font-medium">Đang tải dữ liệu loại sản phẩm...</span>
+            <span className="ml-2 text-slate-500 font-medium">
+              Đang tải dữ liệu loại sản phẩm...
+            </span>
           </div>
         ) : paginatedProductTypes.length === 0 ? (
           <div className="text-center py-20 text-slate-400 font-medium">
@@ -124,15 +130,12 @@ export default function ProductTypeManagementPage() {
             <Table>
               <TableBody>
                 {paginatedProductTypes.map((pt) => (
-                  <TableRow
-                    key={pt.ProductTypeID}
-                    className={page.tableRow}
-                  >
+                  <TableRow key={pt.id} className={page.tableRow}>
                     <TableCell className={cn("w-20", entity.id)}>
-                      {pt.ProductTypeID}
+                      {pt.id}
                     </TableCell>
                     <TableCell className={cn("text-left", entity.name)}>
-                      {pt.ProductTypeName}
+                      {pt.producttypename}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2 justify-end">
@@ -164,15 +167,20 @@ export default function ProductTypeManagementPage() {
               <div className={page.pagination}>
                 <div className={page.paginationText}>
                   Hiển thị{" "}
-                  <span className="font-medium">{paginatedProductTypes.length}</span>{" "}
-                  trên <span className="font-medium">{filtered.length}</span> loại sản phẩm
+                  <span className="font-medium">
+                    {paginatedProductTypes.length}
+                  </span>{" "}
+                  trên <span className="font-medium">{filtered.length}</span>{" "}
+                  loại sản phẩm
                 </div>
 
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                     className={btn.paginationNav}
                   >
@@ -184,12 +192,19 @@ export default function ProductTypeManagementPage() {
                       (pageNum) => (
                         <Button
                           key={pageNum}
-                          variant={currentPage === pageNum ? "default" : "outline"}
+                          variant={
+                            currentPage === pageNum ? "default" : "outline"
+                          }
                           size="sm"
                           onClick={() => setCurrentPage(pageNum)}
-                          className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
+                          className={cn(
+                            currentPage === pageNum
+                              ? btn.paginationActive
+                              : btn.paginationInactive,
+                          )}
                         >
-                          {pageNum}</Button>
+                          {pageNum}
+                        </Button>
                       ),
                     )}
                   </div>

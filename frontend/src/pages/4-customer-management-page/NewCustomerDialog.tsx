@@ -47,16 +47,16 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
     try {
       const customerId = Math.floor(Math.random() * 8000) + 3000;
       const newCustomer: Customer = {
-        CustomerID: customerId,
-        CustomerTypeID: Number(formData.CustomerTypeID) || 1,
-        FirstName: formData.FirstName,
-        LastName: formData.LastName,
-        CompanyName: formData.CompanyName,
-        Phone: formData.Phone,
-        Email: formData.Email,
-        Address: formData.Address,
-        CreatedDate: new Date(),
-        TotalAccumulatedSpent: 0,
+        id: customerId,
+        customertypeId: Number(formData.CustomerTypeID) || 1,
+        firstname: formData.FirstName,
+        lastname: formData.LastName,
+        companyname: formData.CompanyName,
+        phone: formData.Phone,
+        email: formData.Email,
+        address: formData.Address,
+        createddate: new Date().toISOString(),
+        totalaccumulatedspent: 0,
       };
 
       await api.customers.create(newCustomer);

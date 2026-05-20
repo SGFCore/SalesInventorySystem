@@ -8,17 +8,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { CustomerType } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import type { Customertype } from "@/lib/types";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  customerType: CustomerType | null;
+  customerType: Customertype | null;
   onSave: () => void;
 }
 
@@ -29,7 +29,7 @@ export function EditCustomerTypeDialog({
   onSave,
 }: Props) {
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<Partial<CustomerType>>({});
+  const [form, setForm] = useState<Partial<Customertype>>({});
 
   // Cập nhật lại dữ liệu form mỗi khi đối tượng khách hàng truyền vào thay đổi
   useEffect(() => {
@@ -40,18 +40,18 @@ export function EditCustomerTypeDialog({
 
   const handleSubmit = async () => {
     if (!customerType) return;
-    if (!form.CustomerTypeName?.trim()) {
+    if (!form.customertypename?.trim()) {
       toast.error("Vui lòng nhập tên nhóm khách hàng!");
       return;
     }
     setLoading(true);
     try {
-      await api.customerTypes.update(customerType.CustomerTypeID, {
+      await api.customerTypes.update(customerType.id, {
         ...customerType,
-        CustomerTypeName: form.CustomerTypeName,
-        Discount: form.Discount || 0,
-        SpendingLimit: form.SpendingLimit || 0,
-        Detail: form.Detail || "",
+        CustomerTypeName: form.customertypename,
+        Discount: form.discount || 0,
+        SpendingLimit: form.spendinglimit || 0,
+        Detail: form.detail || "",
       });
       toast.success("Cập nhật nhóm khách hàng thành công!");
       onOpenChange(false);
@@ -78,9 +78,9 @@ export function EditCustomerTypeDialog({
             <Label htmlFor="edit-typeName">Tên nhóm khách hàng</Label>
             <Input
               id="edit-typeName"
-              value={form.CustomerTypeName || ""}
+              value={form.customertypename || ""}
               onChange={(e) =>
-                setForm({ ...form, CustomerTypeName: e.target.value })
+                setForm({ ...form, customertypename: e.target.value })
               }
               className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
               disabled={loading}
@@ -95,9 +95,9 @@ export function EditCustomerTypeDialog({
               <Input
                 id="edit-discount"
                 type="number"
-                value={form.Discount ?? ""}
+                value={form.discount ?? ""}
                 onChange={(e) =>
-                  setForm({ ...form, Discount: Number(e.target.value) })
+                  setForm({ ...form, discount: Number(e.target.value) })
                 }
                 className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
                 disabled={loading}
@@ -110,9 +110,9 @@ export function EditCustomerTypeDialog({
               <Input
                 id="edit-limit"
                 type="number"
-                value={form.SpendingLimit ?? ""}
+                value={form.spendinglimit ?? ""}
                 onChange={(e) =>
-                  setForm({ ...form, SpendingLimit: Number(e.target.value) })
+                  setForm({ ...form, spendinglimit: Number(e.target.value) })
                 }
                 className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
                 disabled={loading}
@@ -125,8 +125,8 @@ export function EditCustomerTypeDialog({
             <Label htmlFor="edit-detail">Mô tả quyền lợi</Label>
             <Input
               id="edit-detail"
-              value={form.Detail || ""}
-              onChange={(e) => setForm({ ...form, Detail: e.target.value })}
+              value={form.detail || ""}
+              onChange={(e) => setForm({ ...form, detail: e.target.value })}
               className="focus-visible:ring-blue-600 focus-visible:ring-offset-0 border-slate-200"
               disabled={loading}
             />

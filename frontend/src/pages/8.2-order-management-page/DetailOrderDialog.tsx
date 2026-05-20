@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { Order, OrderDetail, Product } from "@/lib/types";
+import type { Order, OrderDetail, Product, Customer } from "@/lib/types";
 import { dialog } from "@/pages/page-classes";
 import React, { useState, useEffect } from "react";
 import { api } from "@/lib/api";
@@ -25,19 +25,23 @@ export function DetailOrderDialog({ open, onOpenChange, order }: DetailProps) {
   const [loading, setLoading] = useState(false);
   const [details, setDetails] = useState<OrderDetail[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [customer, setCustomer] = useState<Customer | null>(null);
 
   useEffect(() => {
     if (open && order) {
       const loadDetails = async () => {
         setLoading(true);
         try {
-          const [allDetails, allProds] = await Promise.all([
+          const [allDetails, allProds, allCustomers] = await Promise.all([
             api.orderDetails.list(),
             api.products.list(),
+            api.customers.list(),
           ]);
-          const filtered = allDetails.filter((d) => d.OrderID === order.OrderID);
+          const filtered = allDetails.filter((d) => d.OrderID === order.id);
           setDetails(filtered);
           setProducts(allProds);
+          const cust = allCustomers.find((c) => c.id === order.customerId);
+          setCustomer(cust || null);
         } catch (e) {
           console.error("Lỗi lấy chi tiết đơn hàng:", e);
         } finally {
@@ -60,7 +64,7 @@ export function DetailOrderDialog({ open, onOpenChange, order }: DetailProps) {
       <DialogContent className={cn("sm:max-w-[650px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-4">
-            Chi tiết Đơn Hàng #{order.OrderID}
+            Chi tiết Đơn Hàng #{order.id}
           </DialogTitle>
         </DialogHeader>
 
@@ -75,25 +79,25 @@ export function DetailOrderDialog({ open, onOpenChange, order }: DetailProps) {
               <div className="grid gap-1">
                 <Label className="text-slate-500 text-xs">Khách hàng</Label>
                 <span className="font-semibold text-slate-900">
-                  {order.CustomerName}
+                  {customer ? `${customer.firstname} ${customer.lastname}` : `Khách hàng #${order.customerId}`}
                 </span>
               </div>
               <div className="grid gap-1">
                 <Label className="text-slate-500 text-xs">Mã Hóa Đơn</Label>
                 <span className="font-semibold text-slate-900">
-                  #{order.InvoiceID || "Không có"}
+                  #{order.invoiceId || "Không có"}
                 </span>
               </div>
               <div className="grid gap-1">
                 <Label className="text-slate-500 text-xs">Mã Vận Đơn</Label>
                 <span className="font-semibold text-slate-900 text-blue-600">
-                  {order.ShipCode || "Chưa có"}
+                  {order.shipcode || "Chưa có"}
                 </span>
               </div>
               <div className="grid gap-1">
                 <Label className="text-slate-500 text-xs">Phí vận chuyển</Label>
                 <span className="font-semibold text-slate-900">
-                  {order.ShippingFee.toLocaleString("vi-VN")} đ
+                  {(order.shippingfee || 0).toLocaleString("vi-VN")} đ
                 </span>
               </div>
               <div className="grid gap-1 md:col-span-2">
@@ -101,7 +105,7 @@ export function DetailOrderDialog({ open, onOpenChange, order }: DetailProps) {
                   Ghi chú giao hàng
                 </Label>
                 <span className="font-semibold text-slate-900">
-                  {order.ShipmentNote || "Không có"}
+                  {order.shipmentnote || "Không có"}
                 </span>
               </div>
             </div>
@@ -145,7 +149,7 @@ export function DetailOrderDialog({ open, onOpenChange, order }: DetailProps) {
                   Tổng cộng (đã gồm ship):
                 </span>
                 <span className="text-base font-bold text-blue-600">
-                  {order.TotalAmount.toLocaleString("vi-VN")} đ
+                  {(order.totalamount || 0).toLocaleString("vi-VN")} đ
                 </span>
               </div>
             </div>

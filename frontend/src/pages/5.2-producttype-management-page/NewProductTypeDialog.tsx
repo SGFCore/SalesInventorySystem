@@ -40,8 +40,8 @@ export function NewProductTypeDialog({ open, onOpenChange, onSave }: Props) {
     try {
       const productTypeId = Math.floor(Math.random() * 9000) + 1000;
       await api.productTypes.create({
-        ProductTypeID: productTypeId,
-        ProductTypeName: formData.ProductTypeName,
+        id: productTypeId,
+        producttypename: formData.ProductTypeName,
       });
       toast.success("Thêm loại sản phẩm mới thành công!");
       setFormData({ ProductTypeName: "" });

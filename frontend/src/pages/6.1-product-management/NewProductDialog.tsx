@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { btn, dialog } from "@/pages/page-classes";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import type { Category, ProductType } from "@/lib/types";
+import type { Category, Producttype } from "@/lib/types";
 
 interface NewProps {
   open: boolean;
@@ -25,13 +25,13 @@ interface NewProps {
 export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+  const [productTypes, setProductTypes] = useState<Producttype[]>([]);
 
   const [formData, setFormData] = useState({
     productName: "",
     productPrice: 0,
-    categoryName: "",
-    productTypeName: "",
+    categoryId: 0,
+    productTypeId: 0,
     detail: "",
     allowReturn: true,
   });
@@ -47,8 +47,8 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
           // Set default values if list is not empty
           setFormData((prev) => ({
             ...prev,
-            categoryName: cats[0]?.CategoryName || "",
-            productTypeName: pts[0]?.ProductTypeName || "",
+            categoryId: cats[0]?.id || 0,
+            productTypeId: pts[0]?.id || 0,
           }));
         } catch (e) {
           console.error("Lỗi tải danh mục/loại sản phẩm:", e);
@@ -62,7 +62,7 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "productPrice" ? Number(value) : value,
+      [name]: ["productPrice", "categoryId", "productTypeId"].includes(name) ? Number(value) : value,
     }));
   };
 
@@ -75,7 +75,7 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
       toast.error("Vui lòng điền tên sản phẩm!");
       return;
     }
-    if (!formData.categoryName.trim()) {
+    if (!formData.categoryId) {
       toast.error("Vui lòng chọn danh mục!");
       return;
     }
@@ -86,8 +86,8 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
         ProductID: productId,
         ProductName: formData.productName,
         ProductPrice: formData.productPrice,
-        CategoryName: formData.categoryName,
-        ProductTypeName: formData.productTypeName,
+        CategoryID: formData.categoryId,
+        ProductTypeID: formData.productTypeId,
         Detail: formData.detail,
         AllowReturn: formData.allowReturn ? 1 : 0,
         ProductStatus: 1,
@@ -97,8 +97,8 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
       setFormData({
         productName: "",
         productPrice: 0,
-        categoryName: categories[0]?.CategoryName || "",
-        productTypeName: productTypes[0]?.ProductTypeName || "",
+        categoryId: categories[0]?.id || 0,
+        productTypeId: productTypes[0]?.id || 0,
         detail: "",
         allowReturn: true,
       });
@@ -150,38 +150,38 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="new-categoryName">
+            <Label htmlFor="new-categoryId">
               Danh mục <span className="text-red-500">*</span>
             </Label>
             <select
-              id="new-categoryName"
-              name="categoryName"
-              value={formData.categoryName}
+              id="new-categoryId"
+              name="categoryId"
+              value={formData.categoryId}
               onChange={handleChange}
               className={cn(dialog.input, "bg-white border text-sm rounded-md p-2 h-10")}
               disabled={loading}
             >
               {categories.map((cat) => (
-                <option key={cat.CategoryID} value={cat.CategoryName}>
-                  {cat.CategoryName}
+                <option key={cat.id} value={cat.id}>
+                  {cat.categoryname}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="new-productTypeName">Loại sản phẩm</Label>
+            <Label htmlFor="new-productTypeId">Loại sản phẩm</Label>
             <select
-              id="new-productTypeName"
-              name="productTypeName"
-              value={formData.productTypeName}
+              id="new-productTypeId"
+              name="productTypeId"
+              value={formData.productTypeId}
               onChange={handleChange}
               className={cn(dialog.input, "bg-white border text-sm rounded-md p-2 h-10")}
               disabled={loading}
             >
               {productTypes.map((pt) => (
-                <option key={pt.ProductTypeID} value={pt.ProductTypeName}>
-                  {pt.ProductTypeName}
+                <option key={pt.id} value={pt.id}>
+                  {pt.producttypename}
                 </option>
               ))}
             </select>

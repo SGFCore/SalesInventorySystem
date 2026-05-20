@@ -35,43 +35,43 @@ export function DetailCustomerDialog({ open, onOpenChange, customer }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-slate-500 text-xs">Mã khách hàng</Label>
-              <p className="font-medium">{customer.CustomerID}</p>
+              <p className="font-medium">{customer.id}</p>
             </div>
             <div>
               <Label className="text-slate-500 text-xs">Loại khách hàng</Label>
-              <p className="font-medium">{customer.CustomerTypeID}</p>
+              <p className="font-medium">{customer.customertypeId}</p>
             </div>
           </div>
           <div>
             <Label className="text-slate-500 text-xs">Họ và Tên</Label>
             <p className="font-medium text-lg">
-              {customer.FirstName} {customer.LastName}
+              {customer.firstname} {customer.lastname}
             </p>
           </div>
           <div>
             <Label className="text-slate-500 text-xs">Tên công ty</Label>
-            <p className="font-medium">{renderValue(customer.CompanyName)}</p>
+            <p className="font-medium">{renderValue(customer.companyname)}</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-slate-500 text-xs">Điện thoại</Label>
               <p className="font-medium text-blue-600">
-                {renderValue(customer.Phone)}
+                {renderValue(customer.phone)}
               </p>
             </div>
             <div>
               <Label className="text-slate-500 text-xs">Email</Label>
-              <p className="font-medium">{renderValue(customer.Email)}</p>
+              <p className="font-medium">{renderValue(customer.email)}</p>
             </div>
           </div>
           <div>
             <Label className="text-slate-500 text-xs">Địa chỉ</Label>
-            <p className="font-medium">{renderValue(customer.Address)}</p>
+            <p className="font-medium">{renderValue(customer.address)}</p>
           </div>
           <div>
             <Label className="text-slate-500 text-xs">Tổng chi tiêu</Label>
             <p className="font-medium text-green-600">
-              {customer.TotalAccumulatedSpent.toLocaleString()} VNĐ
+              {customer.totalaccumulatedspent.toLocaleString()} VNĐ
             </p>
           </div>
         </div>

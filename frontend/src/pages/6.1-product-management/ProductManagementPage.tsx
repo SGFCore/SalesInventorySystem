@@ -178,7 +178,7 @@ export default function ProductManagementPage() {
                         )}
                       >
                         <span className={entity.cellMeta}>
-                          {product.CategoryName} • {product.ProductTypeName}
+                          DM: {product.CategoryID} • Loại: {product.ProductTypeID}
                         </span>
                         <span className={cn(entity.price, 'mt-0.5')}>
                           {product.ProductPrice.toLocaleString("vi-VN")} đ

@@ -1,215 +1,63 @@
-// 1. CUSTOMERTYPE TABLE [cite: 6]
-export type CustomerType = {
-  CustomerTypeID: number;
-  CustomerTypeName: string;
-  Discount: number;
-  Detail: string;
-  SpendingLimit: number;
-};
-
-// 2. CUSTOMER TABLE [cite: 22]
-export type Customer = {
-  CustomerID: number;
-  CustomerTypeID: number;
-  FirstName: string;
-  LastName: string;
-  CompanyName: string;
-  Phone: string;
-  Address: string;
-  Email: string;
-  CreatedDate: Date;
-  TotalAccumulatedSpent: number;
-};
-
-// 3. CATEGORY TABLE [cite: 50]
+// category.dto.ts
 export type Category = {
-  CategoryID: number;
-  CategoryName: string;
-};
+  id: number;
+  categoryname: string;
+}
 
-// 4. PRODUCT TABLE [cite: 57]
-export type Product = {
-  ProductID: number;
-  ProductName: string;
-  Detail: string;
-  ProductPrice: number;
-  ProductStatus: number;
-  CategoryName: string;
-  AllowReturn: number;
-  ImageURL: string;
-  ProductTypeName: string;
-};
+// combodetail.dto.ts
+export type Combodetail = {
+  comboId: number;
+  productId: number;
+  quantity: number;
+}
 
-// 5. PRODUCTTYPE TABLE [cite: 73]
-export type ProductType = {
-  ProductTypeID: number;
-  ProductTypeName: string;
-  CategoryID: number;
-};
-
-// 6. COMBO TABLE [cite: 89]
+// combo.dto.ts
 export type Combo = {
-  ComboID: number;
-  ComboPrice: number;
-};
+  id: number;
+  comboprice: number;
+}
 
-// 7. COMBODETAIL TABLE [cite: 96]
-export type ComboDetail = {
-  ComboID: number;
-  ProductID: number;
-  Quantity: number;
-};
+// countsheetdetail.dto.ts
+export type Countsheetdetail = {
+  countsheetId: number;
+  warehouseId: number;
+  productId: number;
+  quantity: number;
+  note: string;
+}
 
-// 8. WAREHOUSE TABLE [cite: 106]
-export type Warehouse = {
-  WareHouseID: number;
-  WareHouseName: string;
-  ManagerID: number;
-  Address: string;
-  ContactNumber: string;
-  Capacity: number;
-  Status: number;
-  WarehouseType: number;
-};
+// countsheet.dto.ts
+export type Countsheet = {
+  id: number;
+  createddate: string; // LocalDate -> ISO date string
+  status: number;
+}
 
-// 9. EMPLOYEE TABLE [cite: 123]
-export type Employee = {
-  EmployeeID: number;
-  Fullname: string;
-  Email: string;
-  Phone: string;
-  PasswordHash: string;
-  Status: number;
-};
+// customer.dto.ts
+export type Customer = {
+  id: number;
+  customertypeId: number;
+  firstname: string;
+  lastname: string;
+  companyname: string;
+  phone: string;
+  address: string;
+  email: string;
+  createddate: string; // LocalDate -> ISO date string
+  totalaccumulatedspent: number;
+}
 
-// 10. ROLE TABLE [cite: 141]
-export type Role = {
-  RoleID: number;
-  RoleName: string;
-};
+// customertype.dto.ts
+export type Customertype = {
+  id: number;
+  customertypename: string;
+  discount: number;
+  detail: string;
+  spendinglimit: number;
+}
 
-// 11. EMPLOYEEROLE TABLE [cite: 148]
-export type EmployeeRole = {
-  EmployeeID: number;
-  RoleID: number;
-};
-
-// 12. SHIPCOMPANY TABLE [cite: 159]
-export type ShipCompany = {
-  ShipCompanyID: number;
-  ShipCompanyName: string;
-  SupportedRegion: string;
-  Phone: string;
-  Email: string;
-  Address: string;
-  Notes: string;
-  Status: number;
-};
-
-// 13. INVOICE TABLE [cite: 178]
-export type Invoice = {
-  InvoiceID: number;
-  CustomerID: number;
-  EmployeeID: number;
-  SaleChannelCode: number;
-  TotalAmount: number;
-  TaxAmount: number;
-  FinalAmount: number;
-  Status: string;
-  InvoiceDate: Date;
-};
-
-// 14. ORDER TABLE [cite: 198]
-export type Order = {
-  OrderID: number;
-  CustomerName: string;
-  EmployeeID: number;
-  InvoiceID: number;
-  ShipCode: string;
-  ShipCompanyID: number;
-  TotalAmount: number;
-  OrderStatus: number;
-  ShippingStatus: number;
-  ShipmentNote: string;
-  ShippingFee: number;
-  ExportReceiptID: number;
-};
-
-// 15. ORDERDETAIL TABLE [cite: 224]
-export type OrderDetail = {
-  OrderDetailID: number;
-  OrderID: number;
-  ProductID: number;
-  ComboID: number;
-  Quantity: number;
-  UnitPrice: number;
-  DiscountAmount: number;
-  TotalAmount: number;
-};
-
-// 16. INVOICEDETAIL TABLE [cite: 246]
-export type InvoiceDetail = {
-  InvoiceDetailID: number;
-  InvoiceID: number;
-  ProductID: number;
-  ComboID: number;
-  Quantity: number;
-  UnitPrice: number;
-  DiscountAmount: number;
-  TotalAmount: number;
-};
-
-// 17. PAYMENTMETHOD TABLE [cite: 268]
-export type PaymentMethod = {
-  PaymentMethodID: number;
-  PaymentName: string;
-  Status: number;
-};
-
-// 18. PAYMENT TABLE [cite: 279]
-export type Payment = {
-  PaymentID: number;
-  InvoiceID: number;
-  PaymentMethodID: number;
-  AmountPaid: number;
-  ReferenceCode: string;
-  PaymentDate: Date;
-};
-
-// 19. RETURNPOLICY TABLE [cite: 293]
-export type ReturnPolicy = {
-  PolicyID: number;
-  PolicyName: string;
-  MaxReturnDays: number;
-  PenaltyFeeRate: number;
-  EffectiveDate: Date;
-  IsActive: number;
-};
-
-// 20. ORDERRETURN TABLE [cite: 307]
-export type OrderReturn = {
-  ReturnID: number;
-  OrderName: string;
-  EmployeeName: string;
-  ReturnDate: Date;
-  Reason: string;
-  TotalRefund: number;
-  ReturnRefCode: string;
-  Status: string;
-};
-
-// 21. RETURNDETAIL TABLE [cite: 323]
-export type ReturnDetail = {
-  ReturnID: number;
-  ProductID: number;
-  Quantity: number;
-  QC_Status: string;
-  TargetWarehouseID: number;
-  ActionTaken: string;
-};
-
-// 22. DETAILINVENTORY TABLE [cite: 343]
-export type DetailInventory = {
+// detailinventory.dto.ts
+export type Detailinventory = {
   WarehouseID: number;
   ProductID: number;
   CurrentQuantity: number;
@@ -219,9 +67,127 @@ export type DetailInventory = {
   MaxStock: number;
   IsAlertEnabled: number;
   StorageLocation: string;
-};
+}
 
-// 23. NOTIFICATION TABLE [cite: 363]
+// discount.dto.ts
+export type Discount = {
+  id: number;
+  customertypeId: number;
+  discountname: string;
+  value: number;
+  detail: string;
+  appliedproductids: string;
+  status: number;
+  expirydate: string; // LocalDate -> ISO date string
+  startdate: string; // LocalDate -> ISO date string
+}
+
+// employee.dto.ts
+export type Employee = {
+  EmployeeID: number;
+  Fullname: string;
+  Email: string;
+  Phone: string;
+  password: string;
+  Status: number;
+}
+
+// employeerole.dto.ts
+export type Employeerole = {
+  employeeId: number;
+  roleId: number;
+}
+
+// exportreceiptdetail.dto.ts
+export type Exportreceiptdetail = {
+  ExportReceiptID: number;
+  ProductID: number;
+  Quantity: number;
+}
+
+// exportreceipt.dto.ts
+export type Exportreceipt = {
+  id: number;
+  employeeId: number;
+  exporttype: number;
+  reason: string;
+  status: string;
+  createddate: string; // LocalDate -> ISO date string
+  warehouseId: number;
+}
+
+// feedback.dto.ts
+export type Feedback = {
+  FeedbackID: number;
+  OrderDetailID: number;
+  CustomerID: number;
+  FeedbackComment: string;
+  FeedBackDate: string; // Instant -> ISO string
+  AttachmentURL: string;
+  Rating: number;
+}
+
+// importreceiptdetail.dto.ts
+export type Importreceiptdetail = {
+  ImportReceiptID: number;
+  ProductID: number;
+  ProductName: string;
+  ExpectedQuantity: number;
+  ActualQuantity: number;
+}
+
+// importreceipt.dto.ts
+export type Importreceipt = {
+  ImportReceiptID: number;
+  EmployeeID: number;
+  WarehouseID: number;
+  Status: string;
+  CreatedDate: string; // LocalDate -> ISO date string
+  RequestID: number;
+  DiscrepancyReason: string;
+  DiscrepancyImageURL: string;
+  HasDiscrepancy: number;
+}
+
+// invoicedetail.dto.ts
+export type Invoicedetail = {
+  InvoiceDetailID: number;
+  InvoiceID: number;
+  ProductID: number;
+  ComboID: number;
+  Quantity: number;
+  UnitPrice: number;
+  DiscountAmount: number;
+  TotalAmount: number;
+}
+
+// invoice.dto.ts
+export type Invoice = {
+  InvoiceID: number;
+  CustomerID: number;
+  EmployeeID: number;
+  SaleChannelCode: number;
+  TotalAmount: number;
+  TaxAmount: number;
+  FinalAmount: number;
+  Status: string;
+  InvoiceDate: string; // LocalDate -> ISO date string
+}
+
+// listdiscount.dto.ts
+export type Listdiscount = {
+  orderId: number;
+  discountId: number;
+  appliedvalue: number;
+}
+
+// listdiscountId.dto.ts
+export type ListdiscountId = {
+  orderid: number;
+  discountid: number;
+}
+
+// notification.dto.ts
 export type Notification = {
   NotificationID: number;
   EmployeeID: number;
@@ -230,140 +196,174 @@ export type Notification = {
   Message: string;
   Type: number;
   Status: number;
-  CreatedDate: Date;
-};
+  CreatedDate: string; // LocalDate -> ISO date string
+}
 
-// 24. REQUESTFORM TABLE [cite: 384]
+// orderdetail.dto.ts
+export type OrderDetail = {
+  OrderDetailID: number;
+  OrderID: number;
+  ProductID: number;
+  ComboID: number;
+  Quantity: number;
+  UnitPrice: number;
+  DiscountAmount: number;
+  TotalAmount: number;
+}
+
+// order.dto.ts
+export type Order = {
+  id: number;
+  customerId: number;
+  employeeId: number;
+  invoiceId: number;
+  shipcode: string;
+  shipcompanyId: number;
+  totalamount: number;
+  orderstatus: number;
+  shippingstatus: number;
+  shipmentnote: string;
+  shippingfee: number;
+  exportreceiptId: number;
+}
+
+// orderreturn.dto.ts
+export type OrderReturn = {
+  id: number;
+  orderId: number;
+  employeeId: number;
+  returndate: string; // LocalDate -> ISO date string
+  reason: string;
+  totalrefund: number;
+  returnrefcode: string;
+  status: string;
+}
+
+// payment.dto.ts
+export type Payment = {
+  PaymentID: number;
+  InvoiceID: number;
+  PaymentMethodID: number;
+  AmountPaid: number;
+  ReferenceCode: string;
+  PaymentDate: string; // Instant -> ISO string
+}
+
+// paymentmethod.dto.ts
+export type PaymentMethod = {
+  PaymentMethodID: number;
+  PaymentName: string;
+  Status: number;
+}
+
+// product.dto.ts
+export type Product = {
+  ProductID: number;
+  ProductName: string;
+  Detail: string;
+  ProductPrice: number;
+  ProductStatus: number;
+  CategoryID: number;
+  AllowReturn: number;
+  ImageURL: string;
+  ProductTypeID: number;
+}
+
+// producttype.dto.ts
+export type Producttype = {
+  id: number;
+  producttypename: string;
+  categoryid: number;
+}
+
+// requestdetail.dto.ts
+export type RequestDetail = {
+  RequestID: number;
+  ProductID: number;
+  Quantity: number;
+}
+
+// requestdetailId.dto.ts
+export type RequestdetailId = {
+  requestid: number;
+  productid: number;
+}
+
+// requestform.dto.ts
 export type RequestForm = {
   RequestID: number;
   EmployeeID: number;
-  CreatedDate: Date;
+  CreatedDate: string; // LocalDate -> ISO date string
   Status: string;
   ApproverID: number;
   RejectReason: string;
-};
+}
 
-// 25. REQUESTDETAIL TABLE [cite: 401]
-export type RequestDetail = {
-  RequestID: number;
-  ProductId: number;
-  ProductName: string;
+// returndetail.dto.ts
+export type ReturnDetail = {
+  ReturnID: number;
+  ProductID: number;
   Quantity: number;
-};
+  QC_Status: string;
+  TargetWarehouseID: number;
+  ActionTaken: string;
+}
 
-// 26. TRANSFERTICKET TABLE [cite: 415]
-export type TransferTicket = {
-  TransferID: number;
-  EmployeeID: number;
-  SourceWHID: number;
-  DestWHID: number;
-  Status: string;
-  CreatedDate: Date;
-};
+// returnpolicy.dto.ts
+export type ReturnPolicy = {
+  PolicyID: number;
+  PolicyName: string;
+  MaxReturnDays: number;
+  PenaltyFeeRate: number;
+  EffectiveDate: string; // LocalDate -> ISO date string
+  IsActive: number;
+}
 
-// 27. TRANSFERTICKETDETAIL TABLE [cite: 434]
-export type TransferTicketDetail = {
+// role.dto.ts
+export type Role = {
+  RoleID: number;
+  RoleName: string;
+}
+
+// shipcompany.dto.ts
+export type Shipcompany = {
+  ShipCompanyID: number;
+  ShipCompanyName: string;
+  SupportedRegion: string;
+  Phone: string;
+  Email: string;
+  Address: string;
+  Notes: string;
+  Status: number;
+}
+
+// transferticketdetail.dto.ts
+export type Transferticketdetail = {
   TransferID: number;
   ProductID: number;
   ExportQuantity: number;
   ReceiveQuantity: number;
   RequestQuantity: number;
-};
+}
 
-// 28. IMPORTRECEIPT TABLE [cite: 451]
-export type ImportReceipt = {
-  ImportReceiptID: number;
+// transferticket.dto.ts
+export type Transferticket = {
+  TransferID: number;
   EmployeeID: number;
-  WarehouseID: number;
+  SourceWHID: number;
+  DestWHID: number;
   Status: string;
-  CreatedDate: Date;
-  RequestID: number;
-  DiscrepancyReason: string;
-  DiscrepancyImageURL: string;
-  HasDiscrepancy: number;
-};
+  CreatedDate: string; // LocalDate -> ISO date string
+}
 
-// 29. IMPORTRECEIPTDETAIL TABLE [cite: 478]
-export type ImportReceiptDetail = {
-  ImportReceiptID: number;
-  ProductID: number;
-  ProductName: string;
-  ExpectedQuantity: number;
-  ActualQuantity: number;
-};
-
-// 30. EXPORTRECEIPT TABLE [cite: 492]
-export type ExportReceipt = {
-  ExportReceiptID: number;
-  EmployeeID: number;
-  ExportType: number;
-  Reason: string;
-  Status: string;
-  CreatedDate: Date;
-  WarehouseID: number;
-};
-
-// 31. EXPORTRECEIPTDETAIL TABLE [cite: 512]
-export type ExportReceiptDetail = {
-  ExportReceiptID: number;
-  ProductID: number;
-  Quantity: number;
-};
-
-// 32. COUNTSHEET TABLE [cite: 525]
-export type CountSheet = {
-  CountSheetId: number;
-  CreatedDate: Date;
+// warehouse.dto.ts
+export type Warehouse = {
+  WareHouseID: number;
+  WareHouseName: string;
+  ManagerID: number;
+  Address: string;
+  ContactNumber: string;
+  Capacity: number;
   Status: number;
-};
-
-// 33. COUNTSHEETDETAIL TABLE [cite: 535]
-export type CountSheetDetail = {
-  CountSheetld: number;
-  WarehouseID: number;
-  ProductId: number;
-  Quantity: number;
-  Note: string;
-};
-
-// 34. DISCOUNT TABLE [cite: 555]
-export type Discount = {
-  DiscountID: number;
-  CustomerTypeID: number;
-  DiscountName: string;
-  Value: number;
-  Detail: string;
-  Status: number;
-  ExpiryDate: Date;
-  StartDate: Date;
-  AppliedProductID: string;
-};
-
-// 35. LISTDISCOUNT TABLE [cite: 575]
-export type ListDiscount = {
-  OrderID: number;
-  DiscountID: number;
-  AppliedValue: number;
-};
-
-// 36. FEEDBACK TABLE [cite: 587]
-export type Feedback = {
-  FeedbackID: number;
-  OrderDetailID: number;
-  CustomerID: number;
-  FeedbackComment: string;
-  FeedBackDate: Date;
-  AttachmentURL: string;
-  Rating: number;
-};
-
-// 37. AUTH TYPES
-export type LoginCredentials = {
-  username: string;
-  password: string;
-};
-
-export type LoginResponse = {
-  employee: Employee;
-  roles: Role[];
-};
+  WarehouseType: number;
+}

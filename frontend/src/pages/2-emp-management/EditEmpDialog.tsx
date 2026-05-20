@@ -22,7 +22,12 @@ interface EditProps {
   onSave: () => void;
 }
 
-export function EditEmpDialog({ open, onOpenChange, employee, onSave }: EditProps) {
+export function EditEmpDialog({
+  open,
+  onOpenChange,
+  employee,
+  onSave,
+}: EditProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullname: "",
@@ -60,7 +65,7 @@ export function EditEmpDialog({ open, onOpenChange, employee, onSave }: EditProp
         Fullname: formData.fullname,
         Email: formData.email,
         Phone: formData.phone,
-        PasswordHash: formData.password || employee.PasswordHash,
+        password: formData.password || employee.password,
       });
       toast.success("Cập nhật thông tin nhân viên thành công!");
       onOpenChange(false);
@@ -76,9 +81,7 @@ export function EditEmpDialog({ open, onOpenChange, employee, onSave }: EditProp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className={dialog.title}>
-            Cập nhật nhân viên
-          </DialogTitle>
+          <DialogTitle className={dialog.title}>Cập nhật nhân viên</DialogTitle>
         </DialogHeader>
 
         <div className={dialog.body}>
@@ -131,10 +134,19 @@ export function EditEmpDialog({ open, onOpenChange, employee, onSave }: EditProp
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button
+            variant="outline"
+            className={dialog.cancel}
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
             Hủy
           </Button>
-          <Button className={btn.primary} onClick={handleSubmit} disabled={loading}>
+          <Button
+            className={btn.primary}
+            onClick={handleSubmit}
+            disabled={loading}
+          >
             {loading ? "Đang lưu..." : "Lưu thay đổi"}
           </Button>
         </DialogFooter>

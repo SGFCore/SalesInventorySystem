@@ -34,7 +34,7 @@ export default function OrderReturnManagementPage() {
         toast.error("Không có dữ liệu hoàn trả");
         setOrderReturns([]);
       } else {
-        setOrderReturns(data.sort((a, b) => b.ReturnID - a.ReturnID));
+        setOrderReturns(data.sort((a, b) => b.id - a.id));
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải danh sách hoàn tiền");
@@ -55,7 +55,7 @@ export default function OrderReturnManagementPage() {
 
   // Lọc dữ liệu theo Mã hoàn tiền
   const filteredReturns = orderReturns.filter((item) =>
-    item.ReturnID.toString().includes(search.trim()),
+    item.id.toString().includes(search.trim()),
   );
 
   // Tính toán phân trang
@@ -73,11 +73,11 @@ export default function OrderReturnManagementPage() {
 
   const handleAcceptClick = async (item: OrderReturn) => {
     try {
-      await api.orderReturns.update(item.ReturnID, {
+      await api.orderReturns.update(item.id, {
         ...item,
-        Status: "1", // 1: Đã duyệt / hoàn tất
+        status: "1", // 1: Đã duyệt / hoàn tất
       });
-      toast.success(`Đã chấp nhận đơn hoàn tiền mã: #${item.ReturnID}`);
+      toast.success(`Đã chấp nhận đơn hoàn tiền mã: #${item.id}`);
       loadOrderReturns();
     } catch (e: any) {
       toast.error(e.message || "Lỗi duyệt đơn hoàn tiền");
@@ -129,17 +129,17 @@ export default function OrderReturnManagementPage() {
               <TableBody>
                 {paginatedReturns.map((item) => (
                   <TableRow
-                    key={item.ReturnID}
+                    key={item.id}
                     className={page.tableRow}
                   >
                     {/* Thông tin Mã và Ngày hoàn tiền */}
                     <TableCell>
                       <div className="flex flex-col items-start">
                         <span className="text-sm font-bold text-slate-900">
-                          #{item.ReturnID}
+                          #{item.id}
                         </span>
                         <span className="text-xs text-slate-500 mt-0.5 font-medium">
-                          Ngày tạo: {new Date(item.ReturnDate).toLocaleDateString("vi-VN")}
+                          Ngày tạo: {new Date(item.returndate).toLocaleDateString("vi-VN")}
                         </span>
                       </div>
                     </TableCell>
@@ -147,10 +147,10 @@ export default function OrderReturnManagementPage() {
                     <TableCell>
                       <div className="flex flex-col items-start">
                         <span className="text-sm font-semibold text-slate-950">
-                          {item.OrderName}
+                          Đơn hàng #{item.orderId}
                         </span>
                         <span className="text-xs text-slate-400 mt-0.5">
-                          NV lập: {item.EmployeeName}
+                          NV lập: #{item.employeeId}
                         </span>
                       </div>
                     </TableCell>
@@ -158,7 +158,7 @@ export default function OrderReturnManagementPage() {
                     <TableCell>
                       <div className="flex flex-col items-start">
                         <span className="text-xs font-semibold text-slate-400">Lý do</span>
-                        <span className="text-xs font-medium text-slate-700 mt-0.5">{item.Reason}</span>
+                        <span className="text-xs font-medium text-slate-700 mt-0.5">{item.reason}</span>
                       </div>
                     </TableCell>
 
@@ -169,7 +169,7 @@ export default function OrderReturnManagementPage() {
                           Tổng tiền hoàn tiền
                         </span>
                         <span className={cn(entity.price, 'mt-0.5')}>
-                          {item.TotalRefund.toLocaleString("vi-VN")} đ
+                          {item.totalrefund.toLocaleString("vi-VN")} đ
                         </span>
                       </div>
                     </TableCell>
@@ -179,11 +179,11 @@ export default function OrderReturnManagementPage() {
                         <span className="font-semibold text-xs text-slate-400 mb-1">Trạng thái</span>
                         <span className={cn(
                           "text-xs font-semibold px-2 py-0.5 rounded-full border",
-                          item.Status === "1" || item.Status === "Đã duyệt"
+                          item.status === "1" || item.status === "Đã duyệt"
                             ? "bg-green-50 text-green-700 border-green-200"
                             : "bg-yellow-50 text-yellow-700 border-yellow-200"
                         )}>
-                          {item.Status === "1" || item.Status === "Đã duyệt" ? "Đã duyệt" : "Chờ xử lý"}
+                          {item.status === "1" || item.status === "Đã duyệt" ? "Đã duyệt" : "Chờ xử lý"}
                         </span>
                       </div>
                     </TableCell>
@@ -202,10 +202,10 @@ export default function OrderReturnManagementPage() {
                         <Button
                           size="sm"
                           className={cn(btn.primary, "w-28")}
-                          disabled={item.Status === "1" || item.Status === "Đã duyệt"}
+                          disabled={item.status === "1" || item.status === "Đã duyệt"}
                           onClick={() => handleAcceptClick(item)}
                         >
-                          {item.Status === "1" || item.Status === "Đã duyệt" ? "Đã duyệt" : "Chấp nhận"}
+                          {item.status === "1" || item.status === "Đã duyệt" ? "Đã duyệt" : "Chấp nhận"}
                         </Button>
                       </div>
                     </TableCell>

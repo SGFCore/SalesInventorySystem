@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { CountSheet, CountSheetDetail, Product } from "@/lib/types";
+import type { Countsheet, Countsheetdetail, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { btn, dialog } from "@/pages/page-classes";
 import React, { useState, useEffect } from "react";
@@ -20,7 +20,7 @@ import { MAP_STATUS } from "@/pages/15-countsheet-management-page/CountsheetMana
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  countsheet: CountSheet | null;
+  countsheet: Countsheet | null;
   mode: "view" | "approve";
   onSave: () => void;
 }
@@ -34,7 +34,7 @@ export function DetailCountsheetDialog({
 }: Props) {
   const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(false);
-  const [details, setDetails] = useState<CountSheetDetail[]>([]);
+  const [details, setDetails] = useState<Countsheetdetail[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export function DetailCountsheetDialog({
             setProducts(prodList);
             
             const filteredDetails = allDetails.filter(
-              (d) => d.CountSheetld === countsheet.CountSheetId
+              (d) => d.countsheetId === countsheet.id
             );
             setDetails(filteredDetails);
           } catch (e) {
@@ -67,7 +67,7 @@ export function DetailCountsheetDialog({
 
   if (!countsheet) return null;
 
-  const statusConfig = MAP_STATUS[countsheet.Status] || {
+  const statusConfig = MAP_STATUS[countsheet.status] || {
     text: "Không rõ",
     className: "bg-slate-100 text-slate-400 border-slate-200",
   };
@@ -88,9 +88,9 @@ export function DetailCountsheetDialog({
       const newStatus = isApproved ? 2 : 3; // 2: Đã phê duyệt, 3: Từ chối
 
       // 1. Cập nhật trạng thái phiếu kiểm kê
-      await api.countSheets.update(countsheet.CountSheetId, {
+      await api.countSheets.update(countsheet.id, {
         ...countsheet,
-        Status: newStatus,
+        status: newStatus,
       });
 
       // 2. Nếu phê duyệt thành công, đồng bộ số lượng kiểm kê thực tế vào DetailInventory
@@ -99,24 +99,24 @@ export function DetailCountsheetDialog({
         await Promise.all(
           details.map(async (item) => {
             const existingInv = allInventories.find(
-              (inv) => inv.WarehouseID === item.WarehouseID && inv.ProductID === item.ProductId
+              (inv) => inv.WarehouseID === item.warehouseId && inv.ProductID === item.productId
             );
 
             if (existingInv) {
-              await api.detailInventories.update(item.WarehouseID, {
+              await api.detailInventories.update(item.warehouseId, {
                 ...existingInv,
-                CurrentQuantity: item.Quantity,
-                RealStock: item.Quantity,
-                AvailableStock: item.Quantity,
+                CurrentQuantity: item.quantity,
+                RealStock: item.quantity,
+                AvailableStock: item.quantity,
                 StorageLocation: existingInv.StorageLocation || "Khu kiểm kê",
               });
             } else {
               await api.detailInventories.create({
-                WarehouseID: item.WarehouseID,
-                ProductID: item.ProductId,
-                CurrentQuantity: item.Quantity,
-                RealStock: item.Quantity,
-                AvailableStock: item.Quantity,
+                WarehouseID: item.warehouseId,
+                ProductID: item.productId,
+                CurrentQuantity: item.quantity,
+                RealStock: item.quantity,
+                AvailableStock: item.quantity,
                 MinStock: 10,
                 MaxStock: 500,
                 IsAlertEnabled: 1,
@@ -159,7 +159,7 @@ export function DetailCountsheetDialog({
             <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-2">
               <div>
                 <Label className="text-slate-500 text-xs font-semibold">Mã phiếu kiểm kê</Label>
-                <p className="font-semibold text-slate-900">#{countsheet.CountSheetId}</p>
+                <p className="font-semibold text-slate-900">#{countsheet.id}</p>
               </div>
               <div>
                 <Label className="text-slate-500 text-xs font-semibold">Trạng thái hệ thống</Label>
@@ -173,7 +173,7 @@ export function DetailCountsheetDialog({
               <div>
                 <Label className="text-slate-500 text-xs font-semibold">Ngày tạo phiếu</Label>
                 <p className="font-semibold text-slate-900">
-                  {new Date(countsheet.CreatedDate).toLocaleDateString("vi-VN")}
+                  {new Date(countsheet.createddate).toLocaleDateString("vi-VN")}
                 </p>
               </div>
               <div>
@@ -196,19 +196,19 @@ export function DetailCountsheetDialog({
                         className="border-b border-slate-100 text-xs hover:bg-slate-50"
                       >
                         <TableCell className="w-20 text-slate-500 font-medium">
-                          Mã SP: #{item.ProductId}
+                          Mã SP: #{item.productId}
                         </TableCell>
                         <TableCell className="font-semibold text-slate-900">
-                          {getProductName(item.ProductId)}
+                          {getProductName(item.productId)}
                         </TableCell>
                         <TableCell className="text-slate-500 font-semibold text-xs">
-                          Kho #{item.WarehouseID}
+                          Kho #{item.warehouseId}
                         </TableCell>
                         <TableCell className="text-right font-bold w-24 text-blue-600">
-                          SL kiểm: {item.Quantity}
+                          SL kiểm: {item.quantity}
                         </TableCell>
                         <TableCell className="text-slate-400 text-[10px] italic max-w-[120px] truncate">
-                          {item.Note || "---"}
+                          {item.note || "---"}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -218,7 +218,7 @@ export function DetailCountsheetDialog({
             </div>
 
             {/* Form điền lý do khi người duyệt muốn từ chối */}
-            {mode === "approve" && countsheet.Status === 1 && (
+            {mode === "approve" && countsheet.status === 1 && (
               <div className="mt-2 grid gap-2 border-t border-slate-200 pt-4">
                 <Label
                   htmlFor="rejectReason"
@@ -241,7 +241,7 @@ export function DetailCountsheetDialog({
 
         {/* Footer xử lý action theo trạng thái phân quyền */}
         <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
-          {mode === "approve" && countsheet.Status === 1 ? (
+          {mode === "approve" && countsheet.status === 1 ? (
             <div className="flex gap-2 justify-end w-full">
               <Button
                 variant="outline"

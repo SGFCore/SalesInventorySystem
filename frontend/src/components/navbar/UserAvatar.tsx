@@ -14,11 +14,11 @@ export default function UserAvatar({
   textSize = "text-sm",
   className,
 }: UserAvatarProps) {
-  const initials = username
+  const initials = (username || "System User")
     .trim()
     .split(/\s+/)
     .slice(-2)
-    .map((n) => n[0])
+    .map((n) => n[0] || "")
     .join("")
     .toUpperCase();
 

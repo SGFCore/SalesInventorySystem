@@ -94,8 +94,8 @@ export function NewImportReceiptDialog({ open, onOpenChange, onSave }: Props) {
           );
           
           const prefilled = reqDetails.map((d) => ({
-            ProductID: d.ProductId,
-            ProductName: d.ProductName,
+            ProductID: d.ProductID,
+            ProductName: (d as any).ProductName || "",
             ExpectedQuantity: d.Quantity,
             ActualQuantity: d.Quantity, // mặc định bằng số yêu cầu
           }));

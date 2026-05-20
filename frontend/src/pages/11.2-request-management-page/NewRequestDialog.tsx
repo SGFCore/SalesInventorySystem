@@ -24,7 +24,7 @@ interface Props {
 }
 
 interface DetailInput {
-  ProductId: number;
+  ProductID: number;
   Quantity: number;
 }
 
@@ -41,7 +41,7 @@ export function NewRequestDialog({ open, onOpenChange, onSave }: Props) {
           const list = await api.products.list();
           setProducts(list);
           if (list.length > 0) {
-            setItems([{ ProductId: list[0].ProductID, Quantity: 1 }]);
+            setItems([{ ProductID: list[0].ProductID, Quantity: 1 }]);
           }
         } catch (e) {
           console.error("Lỗi lấy danh sách sản phẩm:", e);
@@ -67,7 +67,7 @@ export function NewRequestDialog({ open, onOpenChange, onSave }: Props) {
     if (products.length === 0) return;
     setItems((prev) => [
       ...prev,
-      { ProductId: products[0].ProductID, Quantity: 1 },
+      { ProductID: products[0].ProductID, Quantity: 1 },
     ]);
   };
 
@@ -92,7 +92,7 @@ export function NewRequestDialog({ open, onOpenChange, onSave }: Props) {
       await api.requestForms.create({
         RequestID: requestId,
         EmployeeID: empId,
-        CreatedDate: new Date(),
+        CreatedDate: new Date().toISOString(),
         Status: "0", // "0": Chờ duyệt
         ApproverID: 0,
         RejectReason: "",
@@ -101,12 +101,9 @@ export function NewRequestDialog({ open, onOpenChange, onSave }: Props) {
       // 2. Create request details
       await Promise.all(
         items.map((item) => {
-          const prod = products.find((p) => p.ProductID === item.ProductId);
-          const prodName = prod ? prod.ProductName : "Sản phẩm";
           return api.requestDetails.create({
             RequestID: requestId,
-            ProductId: item.ProductId,
-            ProductName: prodName,
+            ProductID: item.ProductID,
             Quantity: item.Quantity,
           });
         })
@@ -161,9 +158,9 @@ export function NewRequestDialog({ open, onOpenChange, onSave }: Props) {
                       Tên sản phẩm hàng hóa
                     </Label>
                     <select
-                      value={item.ProductId}
+                      value={item.ProductID}
                       onChange={(e) =>
-                        handleItemChange(index, "ProductId", Number(e.target.value))
+                        handleItemChange(index, "ProductID", Number(e.target.value))
                       }
                       className="flex h-8 w-full border border-slate-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 rounded-md font-medium text-slate-800"
                       disabled={loading}

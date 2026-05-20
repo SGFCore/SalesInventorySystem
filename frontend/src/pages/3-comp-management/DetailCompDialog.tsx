@@ -7,14 +7,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import type { ShipCompany } from "@/lib/types";
+import type { Shipcompany } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { btn, dialog } from "@/pages/page-classes";
 
 interface DetailProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  comp: ShipCompany | null;
+  comp: Shipcompany | null;
 }
 
 export function DetailCompDialog({ open, onOpenChange, comp }: DetailProps) {

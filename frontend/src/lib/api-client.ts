@@ -1,5 +1,10 @@
 const DEFAULT_API_BASE = "http://127.0.0.1:8080/api";
-const API_BASE = (import.meta.env.VITE_API_BASE || DEFAULT_API_BASE).replace(
+const VITE_API_BASE =
+  typeof import.meta !== "undefined" && import.meta.env
+    ? import.meta.env.VITE_API_BASE
+    : undefined;
+
+const API_BASE = (VITE_API_BASE || DEFAULT_API_BASE).replace(
   /\/+$/,
   "",
 );
@@ -20,6 +25,9 @@ async function request<T>(
 ): Promise<T> {
   const { method = "GET", body, headers = {} } = options;
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+
   const config: RequestInit = {
     method,
     headers: {
@@ -27,19 +35,27 @@ async function request<T>(
       "Client-Type": headers["X-Client-Type"] || "CUSTOMER",
       ...headers,
     },
+    credentials: "include",
+    signal: controller.signal,
   };
 
-  if (body) {
+  // Only attach body if method is not GET or HEAD
+  if (body && method !== "GET" && method !== "HEAD") {
     config.body = JSON.stringify(body);
   }
 
   let response: Response;
   try {
     response = await fetch(toApiUrl(endpoint), config);
-  } catch {
+  } catch (err: any) {
+    if (err.name === "AbortError") {
+      throw new Error(`Request timed out at ${API_BASE}. Please try again.`);
+    }
     throw new Error(
       `Cannot connect to API at ${API_BASE}. Make sure backend is running.`,
     );
+  } finally {
+    clearTimeout(timeoutId);
   }
 
   if (!response.ok) {
@@ -54,7 +70,9 @@ async function request<T>(
     return undefined as T;
   }
 
-  return response.json();
+  // Safe parse empty body for successful responses (e.g. 200 OK with no content)
+  const responseText = await response.text();
+  return responseText ? (JSON.parse(responseText) as T) : (undefined as T);
 }
 
 export const apiClient = {
@@ -78,25 +96,43 @@ export const apiClient = {
     formData: FormData,
     headers?: Record<string, string>,
   ): Promise<T> => {
+    const safeHeaders = headers || {};
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 seconds timeout
+
     let response: Response;
     try {
       response = await fetch(toApiUrl(endpoint), {
         method: "POST",
         body: formData,
-        headers,
+        headers: {
+          "Client-Type": safeHeaders["X-Client-Type"] || "CUSTOMER",
+          ...safeHeaders,
+        },
+        credentials: "include",
+        signal: controller.signal,
       });
-    } catch {
+    } catch (err: any) {
+      if (err.name === "AbortError") {
+        throw new Error(`Upload timed out at ${API_BASE}. Please try again.`);
+      }
       throw new Error(
         `Cannot connect to API at ${API_BASE}. Make sure backend is running.`,
       );
+    } finally {
+      clearTimeout(timeoutId);
     }
+
     if (!response.ok) {
       const error = await response
         .json()
         .catch(() => ({ message: response.statusText }));
       throw new Error(error.message || `HTTP ${response.status}`);
     }
-    return response.json();
+
+    // Safe parse empty body for successful uploads
+    const responseText = await response.text();
+    return responseText ? (JSON.parse(responseText) as T) : (undefined as T);
   },
 
   download: async (
@@ -104,20 +140,31 @@ export const apiClient = {
     filename = "file.pdf",
     headers?: Record<string, string>,
   ) => {
+    const safeHeaders = headers || {};
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds timeout
+
     let response: Response;
     try {
       response = await fetch(toApiUrl(endpoint), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Client-Type": "CUSTOMER",
-          ...headers,
+          "Client-Type": safeHeaders["X-Client-Type"] || "CUSTOMER",
+          ...safeHeaders,
         },
+        credentials: "include",
+        signal: controller.signal,
       });
-    } catch {
+    } catch (err: any) {
+      if (err.name === "AbortError") {
+        throw new Error(`Download timed out at ${API_BASE}. Please try again.`);
+      }
       throw new Error(
         `Cannot connect to API at ${API_BASE}. Make sure backend is running.`,
       );
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     if (!response.ok) {

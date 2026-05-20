@@ -50,7 +50,7 @@ export function EditPolicyDialog({ open, onOpenChange, policy, onSave }: Props) 
       const updatedData = {
         ...policy,
         ...form,
-        EffectiveDate: dateString ? new Date(dateString) : new Date(policy.EffectiveDate),
+        EffectiveDate: dateString ? new Date(dateString).toISOString() : new Date(policy.EffectiveDate).toISOString(),
         PenaltyFeeRate: form.PenaltyFeeRate !== undefined ? Number(form.PenaltyFeeRate) / 100 : policy.PenaltyFeeRate,
       };
 

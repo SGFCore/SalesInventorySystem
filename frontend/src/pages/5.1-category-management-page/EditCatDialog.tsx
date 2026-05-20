@@ -31,7 +31,7 @@ export function EditCatDialog({ open, onOpenChange, cat, onSave }: EditProps) {
   useEffect(() => {
     if (cat) {
       setFormData({
-        CategoryName: cat.CategoryName,
+        CategoryName: cat.categoryname,
       });
     }
   }, [cat]);
@@ -49,9 +49,9 @@ export function EditCatDialog({ open, onOpenChange, cat, onSave }: EditProps) {
     }
     setLoading(true);
     try {
-      await api.categories.update(cat.CategoryID, {
-        CategoryID: cat.CategoryID,
-        CategoryName: formData.CategoryName,
+      await api.categories.update(cat.id, {
+        id: cat.id,
+        categoryname: formData.CategoryName,
       });
       toast.success("Cập nhật danh mục thành công!");
       onOpenChange(false);

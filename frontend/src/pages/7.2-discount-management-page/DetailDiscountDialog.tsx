@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import type { Discount, Product, CustomerType } from "@/lib/types";
+import type { Discount, Product, Customertype } from "@/lib/types";
 import { dialog } from "@/pages/page-classes";
 import React, { useState, useEffect } from "react";
 import { api } from "@/lib/api";
@@ -27,7 +27,7 @@ export function DetailDiscountDialog({
 }: DetailProps) {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
-  const [customerTypes, setCustomerTypes] = useState<CustomerType[]>([]);
+  const [customerTypes, setCustomerTypes] = useState<Customertype[]>([]);
 
   useEffect(() => {
     if (open && discount) {
@@ -71,8 +71,8 @@ export function DetailDiscountDialog({
   };
 
   const getCustomerTypeName = (id: number) => {
-    const t = customerTypes.find((ct) => ct.CustomerTypeID === id);
-    return t ? t.CustomerTypeName : `Đối tượng #${id}`;
+    const t = customerTypes.find((ct) => ct.id === id);
+    return t ? t.id : `Đối tượng #${id}`;
   };
 
   return (
@@ -87,70 +87,72 @@ export function DetailDiscountDialog({
         {loading ? (
           <div className="flex justify-center items-center py-10 bg-white">
             <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-            <span className="ml-2 text-slate-500 text-sm font-medium">Đang tải chi tiết...</span>
+            <span className="ml-2 text-slate-500 text-sm font-medium">
+              Đang tải chi tiết...
+            </span>
           </div>
         ) : (
           <div className="grid gap-4 py-4 text-sm">
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500">Mã khuyến mãi</Label>
               <span className="col-span-2 font-medium text-slate-900">
-                #{discount.DiscountID}
+                #{discount.id}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500">Tên chương trình</Label>
               <span className="col-span-2 font-bold text-slate-900">
-                {discount.DiscountName}
+                {discount.discountname}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500">Sản phẩm áp dụng</Label>
               <span className="col-span-2 font-medium text-slate-900">
-                {getProductName(discount.AppliedProductID)}
+                {getProductName(discount.appliedproductids)}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500">Giá trị giảm</Label>
               <span className="col-span-2 font-bold text-blue-600">
-                {discount.Value.toLocaleString("vi-VN")} đ
+                {discount.value.toLocaleString("vi-VN")} đ
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500">Đối tượng áp dụng</Label>
               <span className="col-span-2 text-slate-900 font-medium">
-                {getCustomerTypeName(discount.CustomerTypeID)}
+                {getCustomerTypeName(discount.customertypeId)}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500">Ngày bắt đầu</Label>
               <span className="col-span-2 text-slate-900">
-                {new Date(discount.StartDate).toLocaleDateString("vi-VN")}
+                {new Date(discount.startdate).toLocaleDateString("vi-VN")}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500">Ngày hết hạn</Label>
               <span className="col-span-2 text-slate-900">
-                {new Date(discount.ExpiryDate).toLocaleDateString("vi-VN")}
+                {new Date(discount.expirydate).toLocaleDateString("vi-VN")}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500">Trạng thái</Label>
               <span className="col-span-2 font-medium text-slate-900">
-                {getStatusLabel(discount.Status)}
+                {getStatusLabel(discount.status)}
               </span>
             </div>
 
             <div className="grid gap-1 items-start pt-1">
               <Label className="text-slate-500">Chi tiết ưu đãi</Label>
               <p className="text-slate-600 leading-relaxed text-xs p-3 bg-slate-50 rounded-md">
-                {discount.Detail}
+                {discount.detail}
               </p>
             </div>
           </div>

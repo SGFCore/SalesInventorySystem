@@ -98,17 +98,17 @@ export function NewComboDialog({ open, onOpenChange, onSave }: NewProps) {
       const comboId = Math.floor(Math.random() * 9000) + 1000;
       // 1. Tạo combo
       await api.combos.create({
-        ComboID: comboId,
-        ComboPrice: comboPrice,
+        id: comboId,
+        comboprice: comboPrice,
       });
 
       // 2. Tạo chi tiết combo
       await Promise.all(
         selectedProducts.map((p) =>
           api.comboDetails.create({
-            ComboID: comboId,
-            ProductID: p.productID,
-            Quantity: p.quantity,
+            comboId: comboId,
+            productId: p.productID,
+            quantity: p.quantity,
           }),
         ),
       );

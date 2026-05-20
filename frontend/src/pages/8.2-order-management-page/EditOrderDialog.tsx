@@ -31,10 +31,10 @@ export function EditOrderDialog({ open, onOpenChange, order, onSave }: EditProps
   useEffect(() => {
     if (order) {
       setFormData({
-        OrderStatus: order.OrderStatus,
-        ShippingStatus: order.ShippingStatus,
-        ShipCode: order.ShipCode,
-        ShipmentNote: order.ShipmentNote,
+        orderstatus: order.orderstatus,
+        shippingstatus: order.shippingstatus,
+        shipcode: order.shipcode,
+        shipmentnote: order.shipmentnote,
       });
     }
   }, [order]);
@@ -42,11 +42,11 @@ export function EditOrderDialog({ open, onOpenChange, order, onSave }: EditProps
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await api.orders.update(order.OrderID, {
+      await api.orders.update(order.id, {
         ...order,
         ...formData,
       });
-      toast.success(`Đã cập nhật Đơn Hàng #${order.OrderID} thành công!`);
+      toast.success(`Đã cập nhật Đơn Hàng #${order.id} thành công!`);
       onOpenChange(false);
       onSave();
     } catch (e: any) {
@@ -61,7 +61,7 @@ export function EditOrderDialog({ open, onOpenChange, order, onSave }: EditProps
       <DialogContent className={cn("sm:max-w-[500px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-4">
-            Cập nhật Đơn Hàng #{order?.OrderID}
+            Cập nhật Đơn Hàng #{order?.id}
           </DialogTitle>
         </DialogHeader>
 
@@ -72,11 +72,11 @@ export function EditOrderDialog({ open, onOpenChange, order, onSave }: EditProps
                 Trạng thái Đơn hàng
               </Label>
               <NativeSelect
-                value={formData.OrderStatus?.toString() || "0"}
+                value={formData.orderstatus?.toString() || "0"}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    OrderStatus: Number(e.target.value),
+                    orderstatus: Number(e.target.value),
                   })
                 }
                 className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
@@ -96,11 +96,11 @@ export function EditOrderDialog({ open, onOpenChange, order, onSave }: EditProps
                 Trạng thái Giao vận
               </Label>
               <NativeSelect
-                value={formData.ShippingStatus?.toString() || "0"}
+                value={formData.shippingstatus?.toString() || "0"}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    ShippingStatus: Number(e.target.value),
+                    shippingstatus: Number(e.target.value),
                   })
                 }
                 className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
@@ -120,9 +120,9 @@ export function EditOrderDialog({ open, onOpenChange, order, onSave }: EditProps
             </Label>
             <Input
               placeholder="Nhập mã vận đơn..."
-              value={formData.ShipCode || ""}
+              value={formData.shipcode || ""}
               onChange={(e) =>
-                setFormData({ ...formData, ShipCode: e.target.value })
+                setFormData({ ...formData, shipcode: e.target.value })
               }
               className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
               disabled={loading}
@@ -133,9 +133,9 @@ export function EditOrderDialog({ open, onOpenChange, order, onSave }: EditProps
             <Label className="text-xs text-slate-500 font-medium">Ghi chú vận chuyển</Label>
             <Input
               placeholder="Ghi chú..."
-              value={formData.ShipmentNote || ""}
+              value={formData.shipmentnote || ""}
               onChange={(e) =>
-                setFormData({ ...formData, ShipmentNote: e.target.value })
+                setFormData({ ...formData, shipmentnote: e.target.value })
               }
               className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
               disabled={loading}

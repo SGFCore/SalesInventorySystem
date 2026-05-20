@@ -37,14 +37,14 @@ export function EditCustomerDialog({
 
   const handleSubmit = async () => {
     if (!customer) return;
-    if (!form.FirstName || !form.LastName) {
+    if (!form.firstname || !form.lastname) {
       toast.error("Họ và tên không được trống!");
       return;
     }
     setLoading(true);
     try {
       const updatedCustomer = { ...customer, ...form } as Customer;
-      await api.customers.update(customer.CustomerID, updatedCustomer);
+      await api.customers.update(customer.id, updatedCustomer);
       toast.success("Cập nhật thông tin khách hàng thành công!");
       onSave(updatedCustomer);
       onOpenChange(false);
@@ -68,9 +68,9 @@ export function EditCustomerDialog({
             <div className="grid gap-1">
               <Label>Họ</Label>
               <Input
-                value={form.FirstName || ""}
+                value={form.firstname || ""}
                 onChange={(e) =>
-                  setForm({ ...form, FirstName: e.target.value })
+                  setForm({ ...form, firstname: e.target.value })
                 }
                 className="focus-visible:ring-blue-600 focus-visible:ring-offset-0"
                 disabled={loading}
@@ -79,8 +79,8 @@ export function EditCustomerDialog({
             <div className="grid gap-1">
               <Label>Tên</Label>
               <Input
-                value={form.LastName || ""}
-                onChange={(e) => setForm({ ...form, LastName: e.target.value })}
+                value={form.lastname || ""}
+                onChange={(e) => setForm({ ...form, lastname: e.target.value })}
                 className="focus-visible:ring-blue-600 focus-visible:ring-offset-0"
                 disabled={loading}
               />
@@ -89,9 +89,9 @@ export function EditCustomerDialog({
           <div className="grid gap-1">
             <Label>Công ty</Label>
             <Input
-              value={form.CompanyName || ""}
+              value={form.companyname || ""}
               onChange={(e) =>
-                setForm({ ...form, CompanyName: e.target.value })
+                setForm({ ...form, companyname: e.target.value })
               }
               disabled={loading}
             />
@@ -99,24 +99,24 @@ export function EditCustomerDialog({
           <div className="grid gap-1">
             <Label>Số điện thoại</Label>
             <Input
-              value={form.Phone || ""}
-              onChange={(e) => setForm({ ...form, Phone: e.target.value })}
+              value={form.phone || ""}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
               disabled={loading}
             />
           </div>
           <div className="grid gap-1">
             <Label>Email</Label>
             <Input
-              value={form.Email || ""}
-              onChange={(e) => setForm({ ...form, Email: e.target.value })}
+              value={form.email || ""}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
               disabled={loading}
             />
           </div>
           <div className="grid gap-1">
             <Label>Địa chỉ</Label>
             <Input
-              value={form.Address || ""}
-              onChange={(e) => setForm({ ...form, Address: e.target.value })}
+              value={form.address || ""}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
               disabled={loading}
             />
           </div>

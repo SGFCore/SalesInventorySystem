@@ -54,7 +54,7 @@ export function ReturnProductDialog({
             api.products.list(),
             api.returnPolicies.list(),
           ]);
-          setOrderDetails(detailsList.filter((d) => d.OrderID === order.OrderID));
+          setOrderDetails(detailsList.filter((d) => d.OrderID === order.id));
           setProducts(prodsList);
           setPolicies(polList.filter((p) => p.IsActive === 1));
         } catch (e) {
@@ -94,9 +94,9 @@ export function ReturnProductDialog({
     setLoading(true);
     try {
       // 1. Update order status to 5 (Đổi/trả)
-      await api.orders.update(order.OrderID, {
+      await api.orders.update(order.id, {
         ...order,
-        OrderStatus: 5,
+        orderstatus: 5,
       });
 
       // 2. Compute Refund Amount
@@ -113,27 +113,27 @@ export function ReturnProductDialog({
 
       // 3. Create OrderReturn entry
       await api.orderReturns.create({
-        ReturnID: returnId,
-        OrderName: `ĐH #${order.OrderID}`,
-        EmployeeName: emp ? `${emp.FirstName} ${emp.LastName}` : "Nhân viên",
-        ReturnDate: new Date(),
-        Reason: "Trả hàng",
-        TotalRefund: refundSum,
-        ReturnRefCode: refCode,
-        Status: "1", // Completed
+        id: returnId,
+        orderId: order.id,
+        employeeId: emp?.EmployeeID || 1,
+        returndate: new Date().toISOString().split("T")[0],
+        reason: "Trả hàng",
+        totalrefund: refundSum,
+        returnrefcode: refCode,
+        status: "1", // Completed
       });
 
       // 4. Create ReturnDetails entry
       await Promise.all(
-        selectedProductIds.map((pid, idx) => {
+        selectedProductIds.map((pid) => {
           const qty = getProductQty(pid);
           return api.returnDetails.create({
-            ReturnDetailID: Math.floor(Math.random() * 900000) + 100000 + idx,
             ReturnID: returnId,
             ProductID: pid,
             Quantity: qty,
-            UnitPrice: getProductPrice(pid),
-            RefundAmount: getProductPrice(pid) * qty,
+            QC_Status: "Chờ kiểm định",
+            TargetWarehouseID: 1,
+            ActionTaken: "Trả hàng",
           });
         })
       );
@@ -153,7 +153,7 @@ export function ReturnProductDialog({
       <DialogContent className={cn("sm:max-w-[550px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-4">
-            Yêu cầu Trả Hàng #{order?.OrderID}
+            Yêu cầu Trả Hàng #{order?.id}
           </DialogTitle>
         </DialogHeader>
 

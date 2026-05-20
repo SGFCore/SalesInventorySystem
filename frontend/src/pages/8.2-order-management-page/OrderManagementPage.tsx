@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, MoreHorizontal, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { Order } from "@/lib/types";
+import type { Order, Customer } from "@/lib/types";
 import { DetailOrderDialog } from "@/pages/8.2-order-management-page/DetailOrderDialog";
 import { NewOrderDialog } from "@/pages/8.2-order-management-page/NewOrderDialog";
 import { EditOrderDialog } from "@/pages/8.2-order-management-page/EditOrderDialog";
@@ -25,6 +25,7 @@ const ITEMS_PER_PAGE = 20;
 
 export default function OrderManagementPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
@@ -42,13 +43,17 @@ export default function OrderManagementPage() {
   const loadOrders = async () => {
     setLoading(true);
     try {
-      const data = await api.orders.list();
-      if (!data || data.length === 0) {
+      const [orderData, customerData] = await Promise.all([
+        api.orders.list(),
+        api.customers.list(),
+      ]);
+      setCustomers(customerData);
+      if (!orderData || orderData.length === 0) {
         toast.error("Không có dữ liệu đơn hàng");
         setOrders([]);
       } else {
         // Sort newest first
-        setOrders(data.sort((a, b) => b.OrderID - a.OrderID));
+        setOrders(orderData.sort((a, b) => b.id - a.id));
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải danh sách đơn hàng");
@@ -66,11 +71,18 @@ export default function OrderManagementPage() {
     setCurrentPage(1);
   }, [search]);
 
-  const filteredOrders = orders.filter(
-    (ord) =>
-      ord.OrderID.toString().includes(search.trim()) ||
-      ord.CustomerName.toLowerCase().includes(search.toLowerCase()),
-  );
+  const getCustomerName = (customerId: number) => {
+    const cust = customers.find((c) => c.id === customerId);
+    return cust ? `${cust.firstname} ${cust.lastname}` : `Khách hàng #${customerId}`;
+  };
+
+  const filteredOrders = orders.filter((ord) => {
+    if (!ord) return false;
+    const safeSearch = (search || "").trim().toLowerCase();
+    const idStr = ord.id != null ? String(ord.id) : "";
+    const nameStr = getCustomerName(ord.customerId).toLowerCase();
+    return idStr.includes(safeSearch) || nameStr.includes(safeSearch);
+  });
 
   const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -104,11 +116,11 @@ export default function OrderManagementPage() {
 
     if (action === "cancel") {
       try {
-        await api.orders.update(order.OrderID, {
+        await api.orders.update(order.id, {
           ...order,
-          OrderStatus: 4, // Đã hủy
+          orderstatus: 4, // Đã hủy
         });
-        toast.success(`Đã hủy đơn hàng #${order.OrderID}`);
+        toast.success(`Đã hủy đơn hàng #${order.id}`);
         loadOrders();
       } catch (e: any) {
         toast.error(e.message || "Lỗi khi hủy đơn hàng");
@@ -117,12 +129,12 @@ export default function OrderManagementPage() {
 
     if (action === "ship") {
       try {
-        await api.orders.update(order.OrderID, {
+        await api.orders.update(order.id, {
           ...order,
-          ShippingStatus: 2, // Đã gửi vận chuyển
-          OrderStatus: 2, // Đang giao
+          shippingstatus: 2, // Đã gửi vận chuyển
+          orderstatus: 2, // Đang giao
         });
-        toast.success(`Đã giao vận đơn hàng #${order.OrderID}`);
+        toast.success(`Đã giao vận đơn hàng #${order.id}`);
         loadOrders();
       } catch (e: any) {
         toast.error(e.message || "Lỗi giao vận đơn hàng");
@@ -131,12 +143,12 @@ export default function OrderManagementPage() {
 
     if (action === "cancelshipping") {
       try {
-        await api.orders.update(order.OrderID, {
+        await api.orders.update(order.id, {
           ...order,
-          ShippingStatus: 0, // Cần lên lịch giao
-          OrderStatus: 0, // Chờ xác nhận
+          shippingstatus: 0, // Cần lên lịch giao
+          orderstatus: 0, // Chờ xác nhận
         });
-        toast.success(`Đã hủy giao vận cho đơn hàng #${order.OrderID}`);
+        toast.success(`Đã hủy giao vận cho đơn hàng #${order.id}`);
         loadOrders();
       } catch (e: any) {
         toast.error(e.message || "Lỗi khi hủy giao vận");
@@ -145,11 +157,11 @@ export default function OrderManagementPage() {
 
     if (action === "packeted") {
       try {
-        await api.orders.update(order.OrderID, {
+        await api.orders.update(order.id, {
           ...order,
-          ShippingStatus: 1, // Đang đóng gói
+          shippingstatus: 1, // Đang đóng gói
         });
-        toast.success(`Đã đánh dấu Đóng gói xong cho đơn hàng #${order.OrderID}`);
+        toast.success(`Đã đánh dấu Đóng gói xong cho đơn hàng #${order.id}`);
         loadOrders();
       } catch (e: any) {
         toast.error(e.message || "Lỗi cập nhật trạng thái đóng gói");
@@ -262,14 +274,14 @@ export default function OrderManagementPage() {
               <TableBody>
                 {paginatedOrders.map((order) => (
                   <TableRow
-                    key={order.OrderID}
+                    key={order.id}
                     className="hover:bg-slate-50 border-b border-slate-200"
                   >
                     <TableCell>
                       <div className="flex flex-col items-start">
-                        <span className={entity.id}>#{order.OrderID}</span>
+                        <span className={entity.id}>#{order.id}</span>
                         <span className="text-xs font-semibold text-slate-500 mt-0.5">
-                          {order.CustomerName}
+                          {getCustomerName(order.customerId)}
                         </span>
                       </div>
                     </TableCell>
@@ -279,7 +291,7 @@ export default function OrderManagementPage() {
                         <span className="font-semibold text-xs text-slate-400 mb-1">
                           Trạng thái ĐH
                         </span>
-                        {renderOrderStatus(order.OrderStatus)}
+                        {renderOrderStatus(order.orderstatus)}
                       </div>
                     </TableCell>
 
@@ -288,7 +300,7 @@ export default function OrderManagementPage() {
                         <span className="font-semibold text-xs text-slate-400 mb-1">
                           Trạng thái Giao
                         </span>
-                        {renderShippingStatus(order.ShippingStatus)}
+                        {renderShippingStatus(order.shippingstatus)}
                       </div>
                     </TableCell>
 
@@ -296,7 +308,7 @@ export default function OrderManagementPage() {
                       <div className="flex flex-col items-start text-sm">
                         <span className={entity.cellMeta}>Tổng tiền</span>
                         <span className="font-bold text-blue-600 mt-0.5">
-                          {order.TotalAmount.toLocaleString("vi-VN")} đ
+                          {(order.totalamount || 0).toLocaleString("vi-VN")} đ
                         </span>
                       </div>
                     </TableCell>
@@ -323,7 +335,7 @@ export default function OrderManagementPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             disabled={
-                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                              order.orderstatus === 4 || order.shippingstatus >= 2
                             }
                             className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
                             onClick={() => handleAction(order, "edit")}
@@ -332,7 +344,7 @@ export default function OrderManagementPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             disabled={
-                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                              order.orderstatus === 4 || order.shippingstatus >= 2
                             }
                             className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
                             onClick={() => handleAction(order, "change")}
@@ -341,7 +353,7 @@ export default function OrderManagementPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             disabled={
-                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                              order.orderstatus === 4 || order.shippingstatus >= 2
                             }
                             className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
                             onClick={() => handleAction(order, "return")}
@@ -350,7 +362,7 @@ export default function OrderManagementPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             disabled={
-                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                              order.orderstatus === 4 || order.shippingstatus >= 2
                             }
                             className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
                             onClick={() => handleAction(order, "ship")}
@@ -359,7 +371,7 @@ export default function OrderManagementPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             disabled={
-                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                              order.orderstatus === 4 || order.shippingstatus >= 2
                             }
                             className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-semibold disabled:opacity-50"
                             onClick={() => handleAction(order, "cancel")}
@@ -368,7 +380,7 @@ export default function OrderManagementPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             disabled={
-                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                              order.orderstatus === 4 || order.shippingstatus >= 2
                             }
                             className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-semibold disabled:opacity-50"
                             onClick={() => handleAction(order, "cancelshipping")}
@@ -377,7 +389,7 @@ export default function OrderManagementPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             disabled={
-                              order.OrderStatus === 4 || order.ShippingStatus >= 2
+                              order.orderstatus === 4 || order.shippingstatus >= 2
                             }
                             className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
                             onClick={() => handleAction(order, "packeted")}
@@ -421,7 +433,7 @@ export default function OrderManagementPage() {
                         <Button
                           key={pageNum}
                           variant={currentPage === pageNum ? "default" : "outline"}
-                          size="sm;px-3"
+                          size="sm"
                           onClick={() => setCurrentPage(pageNum)}
                           className={
                             currentPage === pageNum

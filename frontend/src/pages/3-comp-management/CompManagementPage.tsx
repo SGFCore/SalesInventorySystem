@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { ShipCompany } from "@/lib/types";
+import type { Shipcompany } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { DetailCompDialog } from "@/pages/3-comp-management/DetailCompDialog";
 import { EditCompDialog } from "@/pages/3-comp-management/EditCompDialog";
@@ -16,10 +16,10 @@ import { useEffect, useRef, useState } from "react";
 const ITEMS_PER_PAGE = 20;
 
 export default function CompManagementPage() {
-  const [companies, setCompanies] = useState<ShipCompany[]>([]);
+  const [companies, setCompanies] = useState<Shipcompany[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [selectedComp, setSelectedComp] = useState<ShipCompany | null>(null);
+  const [selectedComp, setSelectedComp] = useState<Shipcompany | null>(null);
 
   // States điều khiển các Dialog
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -74,13 +74,13 @@ export default function CompManagementPage() {
     topRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [currentPage]);
 
-  const handleActionClick = (comp: ShipCompany, action: "detail" | "edit") => {
+  const handleActionClick = (comp: Shipcompany, action: "detail" | "edit") => {
     setSelectedComp(comp);
     if (action === "detail") setIsDetailOpen(true);
     if (action === "edit") setIsEditOpen(true);
   };
 
-  const toggleStatus = async (comp: ShipCompany) => {
+  const toggleStatus = async (comp: Shipcompany) => {
     try {
       const newStatus = comp.Status === 1 ? 0 : 1;
       await api.shipCompanies.update(comp.ShipCompanyID, {

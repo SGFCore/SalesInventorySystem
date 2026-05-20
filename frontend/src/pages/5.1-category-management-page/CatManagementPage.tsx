@@ -63,7 +63,7 @@ export default function CatManagementPage() {
 
   // Logic lọc và phân trang
   const filtered = categories.filter((c) =>
-    c.CategoryName.toLowerCase().includes(search.toLowerCase()),
+    c.categoryname.toLowerCase().includes(search.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -79,9 +79,9 @@ export default function CatManagementPage() {
       setIsEditOpen(true);
     }
     if (type === "delete") {
-      if (window.confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.CategoryName}"?`)) {
+      if (window.confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.categoryname}"?`)) {
         try {
-          await api.categories.delete(category.CategoryID);
+          await api.categories.delete(category.id);
           toast.success("Xóa danh mục thành công!");
           loadCategories();
         } catch (error: any) {
@@ -126,14 +126,14 @@ export default function CatManagementPage() {
               <TableBody>
                 {paginatedCategories.map((c) => (
                   <TableRow
-                    key={c.CategoryID}
+                    key={c.id}
                     className={page.tableRow}
                   >
                     <TableCell className={cn("w-20", entity.id)}>
-                      {c.CategoryID}
+                      {c.id}
                     </TableCell>
                     <TableCell className={cn("text-left", entity.name)}>
-                      {c.CategoryName}
+                      {c.categoryname}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2 justify-end">

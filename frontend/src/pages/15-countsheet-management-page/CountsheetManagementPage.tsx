@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { CountSheet } from "@/lib/types";
+import type { Countsheet } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { DetailCountsheetDialog } from "@/pages/15-countsheet-management-page/DetailCountsheetDialog";
 import { EditCountsheetDialog } from "@/pages/15-countsheet-management-page/EditCountsheetDialog";
@@ -25,10 +25,10 @@ const ITEMS_PER_PAGE = 10;
 export default function CountsheetManagementPage() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [countsheets, setCountsheets] = useState<CountSheet[]>([]);
+  const [countsheets, setCountsheets] = useState<Countsheet[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCountsheet, setSelectedCountsheet] =
-    useState<CountSheet | null>(null);
+    useState<Countsheet | null>(null);
 
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +40,7 @@ export default function CountsheetManagementPage() {
         toast.error("Không có dữ liệu phiếu kiểm kho");
         setCountsheets([]);
       } else {
-        setCountsheets(data.sort((a, b) => b.CountSheetId - a.CountSheetId));
+        setCountsheets(data.sort((a, b) => b.id - a.id));
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải phiếu kiểm kho");
@@ -69,7 +69,7 @@ export default function CountsheetManagementPage() {
   const [dialogMode, setDialogMode] = useState<"view" | "approve">("view");
 
   const filtered = countsheets.filter((c) =>
-    c.CountSheetId.toString().includes(search),
+    c.id.toString().includes(search),
   );
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -117,20 +117,20 @@ export default function CountsheetManagementPage() {
             <Table>
               <TableBody>
                 {paginatedCountsheets.map((c) => {
-                  const statusConfig = MAP_STATUS[c.Status] || {
+                  const statusConfig = MAP_STATUS[c.status] || {
                     text: "Không rõ",
                     className: "bg-slate-100 text-slate-400",
                   };
                   return (
                     <TableRow
-                      key={c.CountSheetId}
+                      key={c.id}
                       className={page.tableRow}
                     >
                       <TableCell className="w-24 font-bold text-slate-500">
-                        #{c.CountSheetId}
+                        #{c.id}
                       </TableCell>
                       <TableCell className="text-slate-500 text-xs font-semibold">
-                        Ngày tạo: {new Date(c.CreatedDate).toLocaleDateString("vi-VN")}
+                        Ngày tạo: {new Date(c.createddate).toLocaleDateString("vi-VN")}
                       </TableCell>
                       <TableCell>
                         <span
@@ -161,7 +161,7 @@ export default function CountsheetManagementPage() {
                             variant="outline"
                             size="sm"
                             className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
-                            disabled={c.Status === 2 || c.Status === 4}
+                            disabled={c.status === 2 || c.status === 4}
                             onClick={() => {
                               setSelectedCountsheet(c);
                               setDialogMode("approve");
@@ -174,7 +174,7 @@ export default function CountsheetManagementPage() {
                             variant="outline"
                             size="sm"
                             className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
-                            disabled={c.Status === 2 || c.Status === 4}
+                            disabled={c.status === 2 || c.status === 4}
                             onClick={() => {
                               setSelectedCountsheet(c);
                               setIsEditOpen(true);

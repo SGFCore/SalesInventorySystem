@@ -39,7 +39,7 @@ export function DetailOrderReturnDialog({
             api.returnDetails.list(),
             api.products.list(),
           ]);
-          setDetails(detailsList.filter((d) => d.ReturnID === orderReturn.ReturnID));
+          setDetails(detailsList.filter((d) => d.ReturnID === orderReturn.id));
           setProducts(prodsList);
         } catch (e) {
           console.error("Lỗi lấy chi tiết đơn hoàn trả:", e);
@@ -63,7 +63,7 @@ export function DetailOrderReturnDialog({
       <DialogContent className={cn("sm:max-w-[550px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className={dialog.title}>
-            Chi tiết đơn hoàn trả hàng #{orderReturn.ReturnID}
+            Chi tiết đơn hoàn trả hàng #{orderReturn.id}
           </DialogTitle>
         </DialogHeader>
 
@@ -77,49 +77,49 @@ export function DetailOrderReturnDialog({
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500 font-medium">Mã Hoàn Trả</Label>
               <span className="col-span-2 font-semibold text-slate-900">
-                #{orderReturn.ReturnID}
+                #{orderReturn.id}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500 font-medium">Mã tham chiếu</Label>
               <span className="col-span-2 font-semibold text-slate-900 text-blue-600">
-                {orderReturn.ReturnRefCode}
+                {orderReturn.returnrefcode}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500 font-medium">Đơn hàng gốc</Label>
               <span className="col-span-2 font-semibold text-slate-900">
-                {orderReturn.OrderName}
+                Đơn hàng #{orderReturn.orderId}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500 font-medium">Nhân viên tiếp nhận</Label>
               <span className="col-span-2 font-semibold text-slate-900">
-                {orderReturn.EmployeeName}
+                NV #{orderReturn.employeeId}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500 font-medium">Ngày hoàn trả</Label>
               <span className="col-span-2 font-semibold text-slate-900">
-                {new Date(orderReturn.ReturnDate).toLocaleDateString("vi-VN")}
+                {new Date(orderReturn.returndate).toLocaleDateString("vi-VN")}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500 font-medium">Lý do hoàn trả</Label>
               <span className="col-span-2 font-semibold text-slate-900">
-                {orderReturn.Reason}
+                {orderReturn.reason}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
               <Label className="text-slate-500 font-medium">Tổng tiền hoàn</Label>
               <span className="col-span-2 font-bold text-blue-600 text-base">
-                {orderReturn.TotalRefund.toLocaleString("vi-VN")} đ
+                {orderReturn.totalrefund.toLocaleString("vi-VN")} đ
               </span>
             </div>
 

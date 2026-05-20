@@ -36,7 +36,7 @@ export function FeedbackDialog({
     setLoading(true);
     try {
       const all = await api.feedbacks.list();
-      setFeedbacks(all.filter((f) => f.CustomerID === customer.CustomerID));
+      setFeedbacks(all.filter((f) => f.CustomerID === customer.id));
     } catch (e: any) {
       toast.error(e.message || "Không thể tải phản hồi!");
     } finally {
@@ -62,9 +62,9 @@ export function FeedbackDialog({
       await api.feedbacks.create({
         FeedbackID: feedbackId,
         OrderDetailID: Math.floor(Math.random() * 8000) + 1000,
-        CustomerID: customer.CustomerID,
+        CustomerID: customer.id,
         FeedbackComment: newComment,
-        FeedBackDate: new Date(),
+        FeedBackDate: new Date().toISOString(),
         AttachmentURL: "",
         Rating: newRating,
       });
@@ -86,7 +86,7 @@ export function FeedbackDialog({
       <DialogContent className={cn("sm:max-w-[600px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className={dialog.title}>
-            Phản hồi từ: {customer.FirstName} {customer.LastName}
+            Phản hồi từ: {customer.firstname} {customer.lastname}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">

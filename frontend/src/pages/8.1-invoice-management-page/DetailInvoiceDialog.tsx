@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { Invoice, InvoiceDetail, Product } from "@/lib/types";
+import type { Invoice, Invoicedetail, Product } from "@/lib/types";
 import { dialog } from "@/pages/page-classes";
 import React, { useState, useEffect } from "react";
 import { api } from "@/lib/api";
@@ -27,7 +27,7 @@ export function DetailInvoiceDialog({
   invoice,
 }: DetailProps) {
   const [loading, setLoading] = useState(false);
-  const [details, setDetails] = useState<InvoiceDetail[]>([]);
+  const [details, setDetails] = useState<Invoicedetail[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {

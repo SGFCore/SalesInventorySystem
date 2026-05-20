@@ -139,14 +139,14 @@ export function NewOrderReturnDialog({ open, onOpenChange, onSave }: NewProps) {
 
       // 1. Create OrderReturn
       await api.orderReturns.create({
-        ReturnID: returnId,
-        OrderName: orderName,
-        EmployeeName: employeeName,
-        ReturnDate: new Date(),
-        Reason: reason || "Đổi trả hàng",
-        TotalRefund: totalRefund,
-        ReturnRefCode: returnRefCode,
-        Status: "0", // 0: Chờ xử lý
+        id: returnId,
+        orderId: parseInt(orderName.replace(/\D/g, '')) || 0,
+        employeeId: emp ? emp.EmployeeID : 1,
+        returndate: new Date().toISOString(),
+        reason: reason || "Đổi trả hàng",
+        totalrefund: totalRefund,
+        returnrefcode: returnRefCode,
+        status: "0", // 0: Chờ xử lý
       });
 
       // 2. Create ReturnDetails song song

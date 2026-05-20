@@ -17,7 +17,7 @@ export const EmpProvider = ({ children }: { children: ReactNode }) => {
     Fullname: "Nguyễn Giám Đốc",
     Email: "giamdoc.nguyen@sgf.vn",
     Phone: "0988111222",
-    PasswordHash: "hashed_admin",
+    password: "hashed_admin",
     Status: 1,
   });
 

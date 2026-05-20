@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trash2, Plus, Loader2 } from "lucide-react";
-import type { Warehouse, DetailInventory, Product } from "@/lib/types";
+import type { Warehouse, Detailinventory, Product } from "@/lib/types";
 import { dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
@@ -29,7 +29,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse, onSave }: P
   const [products, setProducts] = useState<Product[]>([]);
 
   // State quản lý danh sách sản phẩm và định mức tồn kho (Dynamic fields)
-  const [inventoryProducts, setInventoryProducts] = useState<DetailInventory[]>([]);
+  const [inventoryProducts, setInventoryProducts] = useState<Detailinventory[]>([]);
 
   useEffect(() => {
     if (open && warehouse) {
@@ -104,7 +104,7 @@ export function EditWarehouseDialog({ open, onOpenChange, warehouse, onSave }: P
   // Cập nhật giá trị các trường trong danh sách sản phẩm động
   const handleProductChange = (
     index: number,
-    field: keyof DetailInventory,
+    field: keyof Detailinventory,
     value: string | number,
   ) => {
     setInventoryProducts((prev) =>

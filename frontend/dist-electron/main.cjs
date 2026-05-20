@@ -17,6 +17,8 @@ function createWindow() {
         },
     });
     win.loadURL("http://localhost:5173");
+    // Hiển thị DevTools
+    win.webContents.openDevTools();
     // Ẩn menu bar
     electron_1.Menu.setApplicationMenu(null);
     // Log lỗi nếu có

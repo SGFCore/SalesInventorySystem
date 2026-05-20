@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { Product, Category, ProductType } from "@/lib/types";
+import type { Product, Category, Producttype } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
@@ -26,13 +26,13 @@ interface EditProps {
 export function EditProductDialog({ open, onOpenChange, product, onSave }: EditProps) {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+  const [productTypes, setProductTypes] = useState<Producttype[]>([]);
 
   const [formData, setFormData] = useState({
     productName: "",
     productPrice: 0,
-    categoryName: "",
-    productTypeName: "",
+    categoryId: 0,
+    productTypeId: 0,
     detail: "",
     allowReturn: false,
   });
@@ -58,8 +58,8 @@ export function EditProductDialog({ open, onOpenChange, product, onSave }: EditP
       setFormData({
         productName: product.ProductName,
         productPrice: product.ProductPrice,
-        categoryName: product.CategoryName,
-        productTypeName: product.ProductTypeName,
+        categoryId: product.CategoryID,
+        productTypeId: product.ProductTypeID,
         detail: product.Detail,
         allowReturn: product.AllowReturn === 1,
       });
@@ -70,7 +70,7 @@ export function EditProductDialog({ open, onOpenChange, product, onSave }: EditP
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "productPrice" ? Number(value) : value,
+      [name]: ["productPrice", "categoryId", "productTypeId"].includes(name) ? Number(value) : value,
     }));
   };
 
@@ -90,8 +90,8 @@ export function EditProductDialog({ open, onOpenChange, product, onSave }: EditP
         ...product,
         ProductName: formData.productName,
         ProductPrice: formData.productPrice,
-        CategoryName: formData.categoryName,
-        ProductTypeName: formData.productTypeName,
+        CategoryID: formData.categoryId,
+        ProductTypeID: formData.productTypeId,
         Detail: formData.detail,
         AllowReturn: formData.allowReturn ? 1 : 0,
       });
@@ -143,38 +143,38 @@ export function EditProductDialog({ open, onOpenChange, product, onSave }: EditP
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="categoryName">
+            <Label htmlFor="categoryId">
               Danh mục <span className="text-red-500">*</span>
             </Label>
             <select
-              id="categoryName"
-              name="categoryName"
-              value={formData.categoryName}
+              id="categoryId"
+              name="categoryId"
+              value={formData.categoryId}
               onChange={handleChange}
               className={cn(dialog.input, "bg-white border text-sm rounded-md p-2 h-10")}
               disabled={loading}
             >
               {categories.map((cat) => (
-                <option key={cat.CategoryID} value={cat.CategoryName}>
-                  {cat.CategoryName}
+                <option key={cat.id} value={cat.id}>
+                  {cat.categoryname}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="productTypeName">Loại sản phẩm</Label>
+            <Label htmlFor="productTypeId">Loại sản phẩm</Label>
             <select
-              id="productTypeName"
-              name="productTypeName"
-              value={formData.productTypeName}
+              id="productTypeId"
+              name="productTypeId"
+              value={formData.productTypeId}
               onChange={handleChange}
               className={cn(dialog.input, "bg-white border text-sm rounded-md p-2 h-10")}
               disabled={loading}
             >
               {productTypes.map((pt) => (
-                <option key={pt.ProductTypeID} value={pt.ProductTypeName}>
-                  {pt.ProductTypeName}
+                <option key={pt.id} value={pt.id}>
+                  {pt.producttypename}
                 </option>
               ))}
             </select>

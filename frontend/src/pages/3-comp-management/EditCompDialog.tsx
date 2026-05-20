@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { ShipCompany } from "@/lib/types";
+import type { Shipcompany } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
@@ -18,7 +18,7 @@ import { toast } from "sonner";
 interface EditProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  comp: ShipCompany | null;
+  comp: Shipcompany | null;
   onSave: () => void;
 }
 

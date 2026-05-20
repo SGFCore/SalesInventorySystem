@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { CountSheet, CountSheetDetail, Warehouse, Product } from "@/lib/types";
+import type { Countsheet, Countsheetdetail, Warehouse, Product } from "@/lib/types";
 import { dialog } from "@/pages/page-classes";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -19,7 +19,7 @@ import { toast } from "sonner";
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  countsheet: CountSheet;
+  countsheet: Countsheet;
   onSave: () => void;
 }
 
@@ -55,16 +55,16 @@ export function EditCountsheetDialog({
           setProducts(prodList);
 
           const currentDetails = allDetails.filter(
-            (d) => d.CountSheetld === countsheet.CountSheetId
+            (d) => d.countsheetId === countsheet.id
           );
 
           if (currentDetails.length > 0) {
             setItems(
               currentDetails.map((d) => ({
-                WarehouseID: d.WarehouseID,
-                ProductId: d.ProductId,
-                Quantity: d.Quantity,
-                Note: d.Note || "",
+                WarehouseID: d.warehouseId,
+                ProductId: d.productId,
+                Quantity: d.quantity,
+                Note: d.note || "",
               }))
             );
           } else if (whList.length > 0 && prodList.length > 0) {
@@ -128,20 +128,20 @@ export function EditCountsheetDialog({
     setLoading(true);
     try {
       // 1. Cập nhật Master
-      await api.countSheets.update(countsheet.CountSheetId, {
+      await api.countSheets.update(countsheet.id, {
         ...countsheet,
-        Status: 1, // Trả về trạng thái Chờ phê duyệt sau khi cập nhật
+        status: 1, // Trả về trạng thái Chờ phê duyệt sau khi cập nhật
       });
 
       // 2. Cập nhật Details (Xóa cũ tạo mới hoặc lưu đè)
       await Promise.all(
         items.map((item) =>
           api.countSheetDetails.create({
-            CountSheetld: countsheet.CountSheetId,
-            WarehouseID: item.WarehouseID,
-            ProductId: item.ProductId,
-            Quantity: item.Quantity,
-            Note: item.Note || "Kiểm kê định kỳ",
+            countsheetId: countsheet.id,
+            warehouseId: item.WarehouseID,
+            productId: item.ProductId,
+            quantity: item.Quantity,
+            note: item.Note || "Kiểm kê định kỳ",
           }).catch((err) => {
             // Nếu đã tồn tại thì bỏ qua hoặc ghi đè
             return api.countSheetDetails.list(); 
@@ -164,7 +164,7 @@ export function EditCountsheetDialog({
       <DialogContent className={cn("sm:max-w-[620px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className={dialog.title}>
-            Cập nhật phiếu kiểm kê #{countsheet?.CountSheetId}
+            Cập nhật phiếu kiểm kê #{countsheet?.id}
           </DialogTitle>
         </DialogHeader>
 

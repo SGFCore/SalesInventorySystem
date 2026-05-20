@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { DetailInventory, Warehouse, Product } from "@/lib/types";
+import type { Detailinventory, Warehouse, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { btn } from "@/pages/page-classes";
 import { dialog } from "@/pages/page-classes";
@@ -34,7 +34,7 @@ export function ReportWarehouseDialog({
   warehouse,
 }: Props) {
   const [loading, setLoading] = useState(false);
-  const [inventories, setInventories] = useState<DetailInventory[]>([]);
+  const [inventories, setInventories] = useState<Detailinventory[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {

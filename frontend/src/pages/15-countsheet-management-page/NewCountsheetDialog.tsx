@@ -118,20 +118,20 @@ export function NewCountsheetDialog({ open, onOpenChange, onSave }: Props) {
       
       // 1. Tạo phiếu kiểm Master
       await api.countSheets.create({
-        CountSheetId: countSheetId,
-        CreatedDate: new Date(),
-        Status: isDraftMode ? 0 : 1, // 0: Bản nháp, 1: Chờ phê duyệt
+        id: countSheetId,
+        createddate: new Date().toISOString(),
+        status: isDraftMode ? 0 : 1, // 0: Bản nháp, 1: Chờ phê duyệt
       });
 
       // 2. Tạo chi tiết phiếu kiểm Details
       await Promise.all(
         items.map((item) =>
           api.countSheetDetails.create({
-            CountSheetld: countSheetId,
-            WarehouseID: item.WarehouseID,
-            ProductId: item.ProductId,
-            Quantity: item.Quantity,
-            Note: item.Note || "Kiểm kê định kỳ",
+            countsheetId: countSheetId,
+            warehouseId: item.WarehouseID,
+            productId: item.ProductId,
+            quantity: item.Quantity,
+            note: item.Note || "Kiểm kê định kỳ",
           })
         )
       );

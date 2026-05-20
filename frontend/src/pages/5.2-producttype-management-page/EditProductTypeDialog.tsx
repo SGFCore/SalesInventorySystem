@@ -11,14 +11,14 @@ import { Label } from "@/components/ui/label";
 import { btn, dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
-import type { ProductType } from "@/lib/types";
+import type { Producttype } from "@/lib/types";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
 interface EditProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  productType: ProductType | null;
+  productType: Producttype | null;
   onSave: () => void;
 }
 
@@ -36,7 +36,7 @@ export function EditProductTypeDialog({
   useEffect(() => {
     if (productType) {
       setFormData({
-        ProductTypeName: productType.ProductTypeName,
+        ProductTypeName: productType.producttypename,
       });
     }
   }, [productType]);
@@ -54,9 +54,9 @@ export function EditProductTypeDialog({
     }
     setLoading(true);
     try {
-      await api.productTypes.update(productType.ProductTypeID, {
-        ProductTypeID: productType.ProductTypeID,
-        ProductTypeName: formData.ProductTypeName,
+      await api.productTypes.update(productType.id, {
+        id: productType.id,
+        producttypename: formData.ProductTypeName,
       });
       toast.success("Cập nhật loại sản phẩm thành công!");
       onOpenChange(false);
@@ -92,7 +92,12 @@ export function EditProductTypeDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button
+            variant="outline"
+            className={dialog.cancel}
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
             Hủy
           </Button>
           <Button

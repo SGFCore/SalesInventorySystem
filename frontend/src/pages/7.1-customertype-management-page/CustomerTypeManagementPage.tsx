@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { CustomerType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { DetailCustomerTypeDialog } from "@/pages/7.1-customertype-management-page/DetailCustomerTypeDialog";
 import { EditCustomerTypeDialog } from "@/pages/7.1-customertype-management-page/EditCustomerTypeDialog";
@@ -11,15 +10,16 @@ import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import type { Customertype } from "@/lib/types";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function CustomerTypeManagementPage() {
-  const [customerTypes, setCustomerTypes] = useState<CustomerType[]>([]);
+  const [customerTypes, setCustomerTypes] = useState<Customertype[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedType, setSelectedType] = useState<CustomerType | null>(null);
+  const [selectedType, setSelectedType] = useState<Customertype | null>(null);
 
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +61,7 @@ export default function CustomerTypeManagementPage() {
   const [isNewOpen, setIsNewOpen] = useState(false);
 
   const filtered = customerTypes.filter((t) =>
-    t.CustomerTypeName.toLowerCase().includes(search.toLowerCase()),
+    t.customertypename.toLowerCase().includes(search.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -71,7 +71,7 @@ export default function CustomerTypeManagementPage() {
     startIndex + ITEMS_PER_PAGE,
   );
 
-  const openAction = (typeObj: CustomerType, actionType: "detail" | "edit") => {
+  const openAction = (typeObj: Customertype, actionType: "detail" | "edit") => {
     setSelectedType(typeObj);
     if (actionType === "detail") setIsDetailOpen(true);
     if (actionType === "edit") setIsEditOpen(true);
@@ -88,10 +88,7 @@ export default function CustomerTypeManagementPage() {
           onChange={(e) => setSearch(e.target.value)}
           className={input.search}
         />
-        <Button
-          className={btn.primary}
-          onClick={() => setIsNewOpen(true)}
-        >
+        <Button className={btn.primary} onClick={() => setIsNewOpen(true)}>
           Thêm nhóm khách hàng mới
         </Button>
       </div>
@@ -100,7 +97,9 @@ export default function CustomerTypeManagementPage() {
         {loading ? (
           <div className="flex justify-center items-center py-20 bg-white">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <span className="ml-2 text-slate-500 font-medium">Đang tải dữ liệu nhóm khách hàng...</span>
+            <span className="ml-2 text-slate-500 font-medium">
+              Đang tải dữ liệu nhóm khách hàng...
+            </span>
           </div>
         ) : paginatedTypes.length === 0 ? (
           <div className="text-center py-20 text-slate-400 font-medium bg-white">
@@ -111,18 +110,15 @@ export default function CustomerTypeManagementPage() {
             <Table>
               <TableBody>
                 {paginatedTypes.map((t) => (
-                  <TableRow
-                    key={t.CustomerTypeID}
-                    className={page.tableRow}
-                  >
+                  <TableRow key={t.id} className={page.tableRow}>
                     <TableCell className={cn("w-20", entity.id)}>
-                      {t.CustomerTypeID}
+                      {t.id}
                     </TableCell>
                     <TableCell className={cn("text-left", entity.name)}>
-                      {t.CustomerTypeName}
+                      {t.customertypename}
                     </TableCell>
                     <TableCell className="text-blue-600 font-medium">
-                      Chiết khấu: {t.Discount}%
+                      Chiết khấu: {t.discount}%
                     </TableCell>
                     <TableCell>
                       {/* Grid nút bấm với chiều ngang bằng nhau (w-32) theo đúng layout mẫu */}
@@ -155,15 +151,18 @@ export default function CustomerTypeManagementPage() {
               <div className={page.pagination}>
                 <div className={page.paginationText}>
                   Hiển thị{" "}
-                  <span className="font-medium">{paginatedTypes.length}</span> trên{" "}
-                  <span className="font-medium">{filtered.length}</span> nhóm khách hàng
+                  <span className="font-medium">{paginatedTypes.length}</span>{" "}
+                  trên <span className="font-medium">{filtered.length}</span>{" "}
+                  nhóm khách hàng
                 </div>
 
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                     className={btn.paginationNav}
                   >
@@ -175,12 +174,19 @@ export default function CustomerTypeManagementPage() {
                       (pageNum) => (
                         <Button
                           key={pageNum}
-                          variant={currentPage === pageNum ? "default" : "outline"}
+                          variant={
+                            currentPage === pageNum ? "default" : "outline"
+                          }
                           size="sm"
                           onClick={() => setCurrentPage(pageNum)}
-                          className={cn(currentPage === pageNum ? btn.paginationActive : btn.paginationInactive)}
+                          className={cn(
+                            currentPage === pageNum
+                              ? btn.paginationActive
+                              : btn.paginationInactive,
+                          )}
                         >
-                          {pageNum}</Button>
+                          {pageNum}
+                        </Button>
                       ),
                     )}
                   </div>

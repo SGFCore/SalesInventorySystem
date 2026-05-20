@@ -49,7 +49,7 @@ export function EditEmpDialog({
         ...emp,
         Email: formData.email,
         Phone: formData.phone,
-        PasswordHash: formData.newPassword || emp.PasswordHash,
+        password: formData.newPassword || emp.password,
       });
       toast.success("Cập nhật hồ sơ thành công!");
       onOpenChange(false);
@@ -135,7 +135,12 @@ export function EditEmpDialog({
           >
             Hủy
           </Button>
-          <Button type="button" className={dialog.submit} onClick={handleSubmit} disabled={loading}>
+          <Button
+            type="button"
+            className={dialog.submit}
+            onClick={handleSubmit}
+            disabled={loading}
+          >
             {loading ? "Đang xử lý..." : "Cập nhật thay đổi"}
           </Button>
         </DialogFooter>

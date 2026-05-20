@@ -63,7 +63,7 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
         Fullname: formData.fullname,
         Email: formData.email,
         Phone: formData.phone,
-        PasswordHash: formData.password,
+        password: formData.password,
         Status: 1,
       });
 
@@ -96,9 +96,7 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn("sm:max-w-[425px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className={dialog.title}>
-            Thêm nhân viên mới
-          </DialogTitle>
+          <DialogTitle className={dialog.title}>Thêm nhân viên mới</DialogTitle>
         </DialogHeader>
 
         <div className={dialog.body}>
@@ -179,7 +177,11 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
           >
             Hủy
           </Button>
-          <Button className={dialog.submit} onClick={handleSubmit} disabled={loading}>
+          <Button
+            className={dialog.submit}
+            onClick={handleSubmit}
+            disabled={loading}
+          >
             {loading ? "Đang xử lý..." : "Tạo mới"}
           </Button>
         </DialogFooter>

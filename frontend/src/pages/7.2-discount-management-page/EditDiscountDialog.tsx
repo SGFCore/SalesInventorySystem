@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import type { Discount, Product, CustomerType } from "@/lib/types";
+import type { Discount, Product, Customertype } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
@@ -31,7 +31,7 @@ export function EditDiscountDialog({
 }: EditProps) {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
-  const [customerTypes, setCustomerTypes] = useState<CustomerType[]>([]);
+  const [customerTypes, setCustomerTypes] = useState<Customertype[]>([]);
 
   const [discountName, setDiscountName] = useState("");
   const [value, setValue] = useState<number>(0);
@@ -62,14 +62,14 @@ export function EditDiscountDialog({
 
   useEffect(() => {
     if (discount) {
-      setDiscountName(discount.DiscountName);
-      setValue(discount.Value);
-      setCustomerTypeID(discount.CustomerTypeID);
-      setAppliedProductID(discount.AppliedProductID || "");
-      setDetail(discount.Detail);
-      setStatus(discount.Status);
-      setStartDate(new Date(discount.StartDate).toISOString().split("T")[0]);
-      setExpiryDate(new Date(discount.ExpiryDate).toISOString().split("T")[0]);
+      setDiscountName(discount.discountname);
+      setValue(discount.value);
+      setCustomerTypeID(discount.customertypeId);
+      setAppliedProductID(discount.appliedproductids || "");
+      setDetail(discount.detail);
+      setStatus(discount.status);
+      setStartDate(new Date(discount.startdate).toISOString().split("T")[0]);
+      setExpiryDate(new Date(discount.expirydate).toISOString().split("T")[0]);
     }
   }, [discount, open]);
 
@@ -98,16 +98,16 @@ export function EditDiscountDialog({
 
     setLoading(true);
     try {
-      await api.discounts.update(discount.DiscountID, {
+      await api.discounts.update(discount.id, {
         ...discount,
-        DiscountName: discountName,
-        Value: value,
-        CustomerTypeID: customerTypeID,
-        AppliedProductID: appliedProductID,
-        Detail: detail,
-        Status: status,
-        StartDate: new Date(startDate),
-        ExpiryDate: new Date(expiryDate),
+        discountname: discountName,
+        value: value,
+        customertypeId: customerTypeID,
+        appliedproductids: appliedProductID,
+        detail: detail,
+        status: status,
+        startdate: new Date(startDate).toISOString(),
+        expirydate: new Date(expiryDate).toISOString(),
       });
 
       toast.success("Cập nhật khuyến mãi thành công!");
@@ -195,8 +195,8 @@ export function EditDiscountDialog({
                 disabled={loading}
               >
                 {customerTypes.map((t) => (
-                  <option key={t.CustomerTypeID} value={t.CustomerTypeID}>
-                    {t.CustomerTypeName}
+                  <option key={t.id} value={t.id}>
+                    {t.customertypename}
                   </option>
                 ))}
               </NativeSelect>
@@ -266,7 +266,12 @@ export function EditDiscountDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button
+            variant="outline"
+            className={dialog.cancel}
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
             Hủy
           </Button>
           <Button

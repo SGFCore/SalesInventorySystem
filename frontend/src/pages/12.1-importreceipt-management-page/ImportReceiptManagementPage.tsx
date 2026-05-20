@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { ImportReceipt } from "@/lib/types";
+import type { Importreceipt } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { DetailImportReceiptDialog } from "@/pages/12.1-importreceipt-management-page/DetailImportReceiptDialog";
 import { NewImportReceiptDialog } from "@/pages/12.1-importreceipt-management-page/NewImportReceiptDialog";
@@ -16,9 +16,9 @@ const ITEMS_PER_PAGE = 10;
 export default function ImportReceiptManagementPage() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [receipts, setReceipts] = useState<ImportReceipt[]>([]);
+  const [receipts, setReceipts] = useState<Importreceipt[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedReceipt, setSelectedReceipt] = useState<ImportReceipt | null>(
+  const [selectedReceipt, setSelectedReceipt] = useState<Importreceipt | null>(
     null,
   );
 
@@ -74,7 +74,7 @@ export default function ImportReceiptManagementPage() {
     startIndex + ITEMS_PER_PAGE,
   );
 
-  const openAction = (receiptObj: ImportReceipt, mode: "view" | "approve") => {
+  const openAction = (receiptObj: Importreceipt, mode: "view" | "approve") => {
     setSelectedReceipt(receiptObj);
     setDialogMode(mode);
     setIsDetailOpen(true);

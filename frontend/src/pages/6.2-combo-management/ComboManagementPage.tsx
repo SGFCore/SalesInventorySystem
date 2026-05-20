@@ -53,9 +53,12 @@ export default function ComboManagementPage() {
   }, [search]);
 
   // Lọc dữ liệu theo Mã Combo
-  const filteredCombos = combos.filter((c) =>
-    c.ComboID.toString().includes(search.trim()),
-  );
+  const filteredCombos = combos.filter((c) => {
+    if (!c) return false;
+    const safeSearch = (search || "").trim();
+    const idStr = c.id != null ? String(c.id) : "";
+    return idStr.includes(safeSearch);
+  });
 
   // Tính toán phân trang
   const totalPages = Math.ceil(filteredCombos.length / ITEMS_PER_PAGE);
@@ -115,7 +118,7 @@ export default function ComboManagementPage() {
               <TableBody>
                 {paginatedCombos.map((combo) => (
                   <TableRow
-                    key={combo.ComboID}
+                    key={combo.id}
                     className={page.tableRow}
                   >
                     {/* Thông tin chung (Mã Combo) */}
@@ -123,7 +126,7 @@ export default function ComboManagementPage() {
                       <div className="flex flex-col items-start">
                         <div className={entity.rowMeta}>
                           <span className="text-sm font-bold text-slate-900">
-                            Mã Combo: {combo.ComboID}
+                            Mã Combo: {combo.id}
                           </span>
                         </div>
                       </div>
@@ -136,7 +139,7 @@ export default function ComboManagementPage() {
                           Giá bán combo
                         </span>
                         <span className={cn(entity.price, 'mt-0.5')}>
-                          {combo.ComboPrice.toLocaleString("vi-VN")} đ
+                          {(combo.comboprice || 0).toLocaleString("vi-VN")} đ
                         </span>
                       </div>
                     </TableCell>

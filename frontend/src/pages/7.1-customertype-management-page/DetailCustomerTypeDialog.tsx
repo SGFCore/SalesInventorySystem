@@ -7,14 +7,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import type { CustomerType } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
+import type { Customertype } from "@/lib/types";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  customerType: CustomerType | null;
+  customerType: Customertype | null;
 }
 
 export function DetailCustomerTypeDialog({
@@ -42,12 +42,12 @@ export function DetailCustomerTypeDialog({
               <Label className="text-slate-500 text-xs">
                 Mã nhóm khách hàng
               </Label>
-              <p className="font-medium">{customerType.CustomerTypeID}</p>
+              <p className="font-medium">{customerType.id}</p>
             </div>
             <div>
               <Label className="text-slate-500 text-xs">Mức chiết khấu</Label>
               <p className="font-medium text-blue-600 text-lg">
-                {customerType.Discount}%
+                {customerType.discount}%
               </p>
             </div>
           </div>
@@ -57,7 +57,7 @@ export function DetailCustomerTypeDialog({
               Tên nhóm khách hàng
             </Label>
             <p className="font-medium text-lg">
-              {customerType.CustomerTypeName}
+              {customerType.customertypename}
             </p>
           </div>
 
@@ -66,7 +66,7 @@ export function DetailCustomerTypeDialog({
               Hạn mức chi tiêu yêu cầu
             </Label>
             <p className="font-medium text-green-600">
-              {customerType.SpendingLimit.toLocaleString()} VNĐ
+              {customerType.spendinglimit.toLocaleString()} VNĐ
             </p>
           </div>
 
@@ -75,16 +75,13 @@ export function DetailCustomerTypeDialog({
               Mô tả chi tiết quyền lợi
             </Label>
             <p className="font-medium text-slate-700 bg-slate-50 p-3 border border-slate-100 text-sm">
-              {renderValue(customerType.Detail)}
+              {renderValue(customerType.detail)}
             </p>
           </div>
         </div>
 
         <DialogFooter>
-          <Button
-            className={btn.primary}
-            onClick={() => onOpenChange(false)}
-          >
+          <Button className={btn.primary} onClick={() => onOpenChange(false)}>
             Đóng
           </Button>
         </DialogFooter>

@@ -52,8 +52,8 @@ export function NewPolicyDialog({ open, onOpenChange, onSave }: Props) {
         MaxReturnDays: Number(formData.MaxReturnDays) || 7,
         PenaltyFeeRate: (Number(formData.PenaltyFeeRate) || 0) / 100, // Convert percentage to fraction
         EffectiveDate: formData.EffectiveDate
-          ? new Date(formData.EffectiveDate)
-          : new Date(),
+          ? new Date(formData.EffectiveDate).toISOString()
+          : new Date().toISOString(),
         IsActive: Number(formData.IsActive),
       });
 

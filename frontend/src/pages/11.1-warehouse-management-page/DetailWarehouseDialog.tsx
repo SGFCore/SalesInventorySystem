@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { Warehouse, DetailInventory, Product } from "@/lib/types";
+import type { Warehouse, Detailinventory, Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { dialog } from "@/pages/page-classes";
 import React, { useState, useEffect } from "react";
@@ -27,7 +27,7 @@ export function DetailWarehouseDialog({
   warehouse,
 }: Props) {
   const [loading, setLoading] = useState(false);
-  const [inventories, setInventories] = useState<DetailInventory[]>([]);
+  const [inventories, setInventories] = useState<Detailinventory[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {

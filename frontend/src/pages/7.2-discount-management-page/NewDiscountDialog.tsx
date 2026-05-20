@@ -86,15 +86,15 @@ export function NewDiscountDialog({ open, onOpenChange, onSave }: NewProps) {
     try {
       const discountId = Math.floor(Math.random() * 9000) + 1000;
       await api.discounts.create({
-        DiscountID: discountId,
-        DiscountName: discountName,
-        Value: value,
-        CustomerTypeID: customerTypeID,
-        AppliedProductID: appliedProductID,
-        Detail: detail,
-        Status: status,
-        StartDate: new Date(startDate),
-        ExpiryDate: new Date(expiryDate),
+        id: discountId,
+        discountname: discountName,
+        value: value,
+        customertypeId: customerTypeID,
+        appliedproductids: appliedProductID,
+        detail: detail,
+        status: status,
+        startdate: new Date(startDate).toISOString(),
+        expirydate: new Date(expiryDate).toISOString(),
       });
 
       toast.success("Tạo mới chương trình khuyến mãi thành công!");

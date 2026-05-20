@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { ImportReceipt, ImportReceiptDetail } from "@/lib/types";
+import type { Importreceipt, Importreceiptdetail } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { btn, dialog } from "@/pages/page-classes";
 import React, { useState, useEffect } from "react";
@@ -20,7 +20,7 @@ import { useEmp } from "@/context/empContext";
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  importReceipt: ImportReceipt | null;
+  importReceipt: Importreceipt | null;
   mode: "view" | "approve";
   onSave: () => void;
 }
@@ -35,7 +35,7 @@ export function DetailImportReceiptDialog({
   const { emp } = useEmp();
   const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(false);
-  const [details, setDetails] = useState<ImportReceiptDetail[]>([]);
+  const [details, setDetails] = useState<Importreceiptdetail[]>([]);
 
   useEffect(() => {
     if (open) {

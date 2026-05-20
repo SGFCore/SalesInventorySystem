@@ -15,6 +15,9 @@ function createWindow() {
 
   win.loadURL("http://localhost:5173");
 
+  // Hiển thị DevTools
+  win.webContents.openDevTools();
+
   // Ẩn menu bar
   Menu.setApplicationMenu(null);
 

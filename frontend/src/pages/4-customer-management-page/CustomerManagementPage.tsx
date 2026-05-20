@@ -68,7 +68,7 @@ export default function CustomerManagementPage() {
   const [isNewOpen, setIsNewOpen] = useState(false);
 
   const filtered = customers.filter((c) =>
-    `${c.FirstName} ${c.LastName}`.toLowerCase().includes(search.toLowerCase()),
+    `${c.firstname} ${c.lastname}`.toLowerCase().includes(search.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -120,12 +120,12 @@ export default function CustomerManagementPage() {
             <Table>
               <TableBody>
                 {paginatedCustomers.map((c) => (
-                  <TableRow key={c.CustomerID} className={page.tableRow}>
+                  <TableRow key={c.id} className={page.tableRow}>
                     <TableCell className={cn("w-20", entity.id)}>
-                      {c.CustomerID}
+                      {c.id}
                     </TableCell>
                     <TableCell className={cn("text-left", entity.name)}>
-                      {c.FirstName} {c.LastName}
+                      {c.firstname} {c.lastname}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2 justify-end">

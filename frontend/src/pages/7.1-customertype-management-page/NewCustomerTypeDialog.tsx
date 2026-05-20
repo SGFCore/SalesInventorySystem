@@ -13,6 +13,7 @@ import { btn, dialog } from "@/pages/page-classes";
 import React, { useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import type { Customertype } from "@/lib/types";
 
 interface Props {
   open: boolean;
@@ -20,46 +21,57 @@ interface Props {
   onSave: () => void;
 }
 
+type CustomerTypeFormData = Omit<Customertype, "id">;
+
+const INITIAL_FORM_DATA: CustomerTypeFormData = {
+  customertypename: "",
+  discount: 0,
+  detail: "",
+  spendinglimit: 0,
+};
+
 export function NewCustomerTypeDialog({ open, onOpenChange, onSave }: Props) {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    CustomerTypeName: "",
-    Discount: "",
-    SpendingLimit: "",
-    Detail: "",
-  });
+
+  const [formData, setFormData] =
+    useState<CustomerTypeFormData>(INITIAL_FORM_DATA);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "number" ? Number(value) : value,
+    }));
   };
 
   const handleSubmit = async () => {
-    if (!formData.CustomerTypeName.trim()) {
+    if (!formData.customertypename.trim()) {
       toast.error("Vui lòng nhập tên nhóm khách hàng!");
       return;
     }
+
     setLoading(true);
+
     try {
       const typeId = Math.floor(Math.random() * 9000) + 1000;
+
       await api.customerTypes.create({
-        CustomerTypeID: typeId,
-        CustomerTypeName: formData.CustomerTypeName,
-        Discount: Number(formData.Discount) || 0,
-        SpendingLimit: Number(formData.SpendingLimit) || 0,
-        Detail: formData.Detail,
+        id: typeId,
+        customertypename: formData.customertypename.trim(),
+        discount: formData.discount,
+        spendinglimit: formData.spendinglimit,
+        detail: formData.detail.trim(),
       });
+
       toast.success("Tạo nhóm khách hàng thành công!");
-      setFormData({
-        CustomerTypeName: "",
-        Discount: "",
-        SpendingLimit: "",
-        Detail: "",
-      });
+
+      setFormData(INITIAL_FORM_DATA);
+
       onOpenChange(false);
       onSave();
     } catch (error: any) {
-      toast.error(error.message || "Tạo nhóm khách hàng thất bại!");
+      toast.error(error?.message || "Tạo nhóm khách hàng thất bại!");
     } finally {
       setLoading(false);
     }
@@ -76,11 +88,12 @@ export function NewCustomerTypeDialog({ open, onOpenChange, onSave }: Props) {
 
         <div className={dialog.body}>
           <div className="grid gap-2">
-            <Label htmlFor="CustomerTypeName">Tên nhóm khách hàng</Label>
+            <Label htmlFor="customertypename">Tên nhóm khách hàng</Label>
+
             <Input
-              id="CustomerTypeName"
-              name="CustomerTypeName"
-              value={formData.CustomerTypeName}
+              id="customertypename"
+              name="customertypename"
+              value={formData.customertypename}
               onChange={handleChange}
               className={dialog.input}
               disabled={loading}
@@ -89,24 +102,27 @@ export function NewCustomerTypeDialog({ open, onOpenChange, onSave }: Props) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="Discount">Chiết khấu (%)</Label>
+              <Label htmlFor="discount">Chiết khấu (%)</Label>
+
               <Input
-                id="Discount"
-                name="Discount"
+                id="discount"
+                name="discount"
                 type="number"
-                value={formData.Discount}
+                value={formData.discount}
                 onChange={handleChange}
                 className={dialog.input}
                 disabled={loading}
               />
             </div>
+
             <div className="grid gap-2">
-              <Label htmlFor="SpendingLimit">Hạn mức chi tiêu (VNĐ)</Label>
+              <Label htmlFor="spendinglimit">Hạn mức chi tiêu (VNĐ)</Label>
+
               <Input
-                id="SpendingLimit"
-                name="SpendingLimit"
+                id="spendinglimit"
+                name="spendinglimit"
                 type="number"
-                value={formData.SpendingLimit}
+                value={formData.spendinglimit}
                 onChange={handleChange}
                 className={dialog.input}
                 disabled={loading}
@@ -115,11 +131,12 @@ export function NewCustomerTypeDialog({ open, onOpenChange, onSave }: Props) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="Detail">Mô tả / Chi tiết quyền lợi</Label>
+            <Label htmlFor="detail">Mô tả / Chi tiết quyền lợi</Label>
+
             <Input
-              id="Detail"
-              name="Detail"
-              value={formData.Detail}
+              id="detail"
+              name="detail"
+              value={formData.detail}
               onChange={handleChange}
               className={dialog.input}
               disabled={loading}
@@ -135,6 +152,7 @@ export function NewCustomerTypeDialog({ open, onOpenChange, onSave }: Props) {
           >
             Hủy
           </Button>
+
           <Button
             className={btn.primary}
             onClick={handleSubmit}
