@@ -1071,9 +1071,6 @@ insert into combodetail (
            29,
            1 );
 
-select *
-  from combodetail;
-
 -- =============================================
 -- 11. SHIPCOMPANY (10 dòng)
 -- =============================================
@@ -1228,9 +1225,6 @@ insert into shipcompany (
            N'Be Group',
            1 );
 
-select *
-  from shipcompany;
-
 -- =============================================
 -- 12. CUSTOMER (10 dòng, CustomerTypeID có thể NULL)
 -- =============================================
@@ -1277,7 +1271,7 @@ insert into customer (
    address,
    email,
    totalaccumulatedspent
-) values ( null,
+) values ( 3,
            N'Khách',
            N'Lẻ',
            null,
@@ -1294,7 +1288,7 @@ insert into customer (
    address,
    email,
    totalaccumulatedspent
-) values ( 3,
+) values ( 4,
            N'Lê',
            N'Hoàng Nam',
            null,
@@ -1311,7 +1305,7 @@ insert into customer (
    address,
    email,
    totalaccumulatedspent
-) values ( 4,
+) values ( 5,
            N'Trần',
            N'Kim Chi',
            null,
@@ -1328,7 +1322,7 @@ insert into customer (
    address,
    email,
    totalaccumulatedspent
-) values ( 1,
+) values ( 6,
            N'Hoàng',
            N'Văn Doanh',
            N'Công ty CP Đầu Tư',
@@ -1345,7 +1339,7 @@ insert into customer (
    address,
    email,
    totalaccumulatedspent
-) values ( 2,
+) values ( 7,
            N'Đinh',
            N'Thị Ngọc',
            null,
@@ -1362,7 +1356,7 @@ insert into customer (
    address,
    email,
    totalaccumulatedspent
-) values ( 3,
+) values ( 8,
            N'Vũ',
            N'Tuấn Anh',
            null,
@@ -1379,7 +1373,7 @@ insert into customer (
    address,
    email,
    totalaccumulatedspent
-) values ( 4,
+) values ( 9,
            N'Bùi',
            N'Lan Hương',
            null,
@@ -1396,7 +1390,7 @@ insert into customer (
    address,
    email,
    totalaccumulatedspent
-) values ( null,
+) values ( 10,
            N'Tập đoàn',
            N'SGF Partner',
            N'SGF Partner Corp',
@@ -1404,9 +1398,6 @@ insert into customer (
            N'KCN Sóng Thần',
            'contact@sgfpartner.vn',
            3500000 );
-
-select *
-  from customer;
 
 -- =============================================
 -- 13. PAYMENTMETHOD (10 dòng)
@@ -1461,9 +1452,6 @@ insert into paymentmethod (
    status
 ) values ( N'ShopeePay',
            1 );
-
-select *
-  from paymentmethod;
 
 -- =============================================
 -- 14. RETURNPOLICY (8 dòng)
