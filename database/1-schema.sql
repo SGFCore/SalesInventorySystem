@@ -119,7 +119,7 @@ ALTER TABLE WAREHOUSE ADD CONSTRAINT fk_warehouse_employee FOREIGN KEY (ManagerI
 -- 10. ROLE TABLE
 -- =============================================
 CREATE TABLE ROLE (
-    RoleID   NUMBER PRIMARY KEY CHECK (RoleID IN (0,1,2)),
+    RoleID   NUMBER PRIMARY KEY CHECK (RoleID IN (1,2,3,4)),
     RoleName VARCHAR2(100) NOT NULL
 );
 
