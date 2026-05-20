@@ -63,16 +63,16 @@ public class OrderService {
         } else {
             existing.setInvoiceid(null);
         }
-        if (dto.getShipCompanyId() != null) {
-            Shipcompany comp = shipcompanyRepository.findById(dto.getShipCompanyId())
-                    .orElseThrow(() -> new RuntimeException("Shipcompany not found: " + dto.getShipCompanyId()));
+        if (dto.getShipcompanyId() != null) {
+            Shipcompany comp = shipcompanyRepository.findById(dto.getShipcompanyId())
+                    .orElseThrow(() -> new RuntimeException("Shipcompany not found: " + dto.getShipcompanyId()));
             existing.setShipcompanyid(comp);
         } else {
             existing.setShipcompanyid(null);
         }
-        if (dto.getExportreceiptid() != null) {
-            Exportreceipt rec = exportreceiptRepository.findById(dto.getExportreceiptid())
-                    .orElseThrow(() -> new RuntimeException("Exportreceipt not found: " + dto.getExportreceiptid()));
+        if (dto.getExportreceiptId() != null) {
+            Exportreceipt rec = exportreceiptRepository.findById(dto.getExportreceiptId())
+                    .orElseThrow(() -> new RuntimeException("Exportreceipt not found: " + dto.getExportreceiptId()));
             existing.setExportreceiptid(rec);
         } else {
             existing.setExportreceiptid(null);
@@ -113,14 +113,14 @@ public class OrderService {
                     .orElseThrow(() -> new RuntimeException("Invoice not found: " + dto.getInvoiceId()));
             entity.setInvoiceid(inv);
         }
-        if (dto.getShipCompanyId() != null) {
-            Shipcompany comp = shipcompanyRepository.findById(dto.getShipCompanyId())
-                    .orElseThrow(() -> new RuntimeException("Shipcompany not found: " + dto.getShipCompanyId()));
+        if (dto.getShipcompanyId() != null) {
+            Shipcompany comp = shipcompanyRepository.findById(dto.getShipcompanyId())
+                    .orElseThrow(() -> new RuntimeException("Shipcompany not found: " + dto.getShipcompanyId()));
             entity.setShipcompanyid(comp);
         }
-        if (dto.getExportreceiptid() != null) {
-            Exportreceipt rec = exportreceiptRepository.findById(dto.getExportreceiptid())
-                    .orElseThrow(() -> new RuntimeException("Exportreceipt not found: " + dto.getExportreceiptid()));
+        if (dto.getExportreceiptId() != null) {
+            Exportreceipt rec = exportreceiptRepository.findById(dto.getExportreceiptId())
+                    .orElseThrow(() -> new RuntimeException("Exportreceipt not found: " + dto.getExportreceiptId()));
             entity.setExportreceiptid(rec);
         }
         entity.setShipcode(dto.getShipcode());

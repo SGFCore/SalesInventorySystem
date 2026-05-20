@@ -1,1 +1,26 @@
-package dev.uit.project.dto;\n\nimport lombok.Data;\nimport dev.uit.project.entity.Combodetail;\n\n@Data\npublic class CombodetailDTO {\n\n\n    public static CombodetailDTO fromEntity(Combodetail entity) {\n        if (entity == null) return null;\n        CombodetailDTO dto = new CombodetailDTO();\n        return dto;\n    }\n\n    public Combodetail toEntity() {\n        Combodetail entity = new Combodetail();\n        return entity;\n    }\n}\n
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.Combodetail;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CombodetailDTO {
+    private Long comboId;
+    private Long productId;
+    private Long quantity;
+
+    public static CombodetailDTO fromEntity(Combodetail entity) {
+        if (entity == null) return null;
+        Long comboId = entity.getComboid() != null ? entity.getComboid().getId() : null;
+        Long productId = entity.getProductid() != null ? entity.getProductid().getId() : null;
+        return new CombodetailDTO(
+                comboId,
+                productId,
+                entity.getQuantity()
+        );
+    }
+}

@@ -11,4 +11,4 @@ RUN mvn dependency:go-offline
 # Expose port Spring Boot
 EXPOSE 8080
 
-CMD ["sh", "-c", "echo '===================================' && echo '  BACKEND BUILT SUCCESSFULLY' && echo '===================================' && tail -f /dev/null"]
+CMD ["sh", "-c", "echo '===================================' && echo '  STARTING SPRING BOOT APPLICATION' && echo '===================================' && mvn spring-boot:run"]

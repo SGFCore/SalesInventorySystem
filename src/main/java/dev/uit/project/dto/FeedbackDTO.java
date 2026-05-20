@@ -48,4 +48,24 @@ public class FeedbackDTO {
                 entity.getRating()
         );
     }
+
+    public Feedback toEntity() {
+        Feedback entity = new Feedback();
+        entity.setId(this.id);
+        entity.setFeedbackcomment(this.feedbackcomment);
+        entity.setFeedbackdate(this.feedbackdate);
+        entity.setAttachmenturl(this.attachmenturl);
+        entity.setRating(this.rating);
+        if (this.orderdetailId != null) {
+            dev.uit.project.entity.Orderdetail od = new dev.uit.project.entity.Orderdetail();
+            od.setId(this.orderdetailId);
+            entity.setOrderdetailid(od);
+        }
+        if (this.customerId != null) {
+            dev.uit.project.entity.Customer c = new dev.uit.project.entity.Customer();
+            c.setId(this.customerId);
+            entity.setCustomerid(c);
+        }
+        return entity;
+    }
 }

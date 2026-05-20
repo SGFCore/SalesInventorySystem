@@ -45,42 +45,56 @@ public class ProductService {
      * Tạo mới một sản phẩm
      */
     public ProductDTO create(ProductDTO productDTO) {
-        Product product = convertToEntity(productDTO);
-        product.setId(null); // đảm bảo tạo mới
+        Product product = new Product();
+        product.setProductname(productDTO.getProductname());
+        product.setDetail(productDTO.getDetail());
+        product.setProductprice(productDTO.getProductprice());
+        product.setProductstatus(productDTO.getProductstatus());
+        product.setAllowreturn(productDTO.getAllowreturn());
+        product.setImageurl(productDTO.getImageurl());
+
+        if (productDTO.getCategoryId() != null) {
+            Category category = categoryRepository.findById(productDTO.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found: " + productDTO.getCategoryId()));
+            product.setCategoryid(category);
+        }
+
+        // Nếu có truyền productTypeId -> map
+        if (productDTO.getProducttypeId() != null) {
+            Producttype producttype = producttypeRepository.findById(productDTO.getProducttypeId())
+                    .orElseThrow(() -> new RuntimeException("ProductType not found: " + productDTO.getProducttypeId()));
+            product.setProducttypeid(producttype);
+        }
+
         Product saved = productRepository.save(product);
-        return convertToDTO(saved);
+        return ProductDTO.fromEntity(saved);
     }
 
     /**
      * Cập nhật thông tin sản phẩm
      */
-    public ProductDTO update(Long id, ProductDTO productDTO) {
+    public ProductDTO update(Long id, ProductDTO dto) {
         Product existing = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Product not found: " + id));
 
-        // Cập nhật các trường đơn giản
-        existing.setProductname(productDTO.getProductname());
-        existing.setDetail(productDTO.getDetail());
-        existing.setProductprice(productDTO.getProductprice());
-        existing.setProductstatus(productDTO.getProductstatus());
-        existing.setAllowreturn(productDTO.getAllowreturn());
-        existing.setImageurl(productDTO.getImageurl());
+        existing.setProductname(dto.getProductname());
+        existing.setDetail(dto.getDetail());
+        existing.setProductprice(dto.getProductprice());
+        existing.setProductstatus(dto.getProductstatus());
+        existing.setAllowreturn(dto.getAllowreturn());
+        existing.setImageurl(dto.getImageurl());
 
-        // Xử lý category
-        CategoryDTO catDTO = productDTO.getCategoryid();
-        if (catDTO != null && catDTO.getId() != null) {
-            Category category = categoryRepository.findById(catDTO.getId())
-                    .orElseThrow(() -> new RuntimeException("Category not found with id: " + catDTO.getId()));
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found: " + dto.getCategoryId()));
             existing.setCategoryid(category);
         } else {
             existing.setCategoryid(null);
         }
 
-        // Xử lý producttype
-        ProducttypeDTO typeDTO = productDTO.getProducttypeid();
-        if (typeDTO != null && typeDTO.getId() != null) {
-            Producttype producttype = producttypeRepository.findById(typeDTO.getId())
-                    .orElseThrow(() -> new RuntimeException("Producttype not found with id: " + typeDTO.getId()));
+        if (dto.getProducttypeId() != null) {
+            Producttype producttype = producttypeRepository.findById(dto.getProducttypeId())
+                    .orElseThrow(() -> new RuntimeException("ProductType not found: " + dto.getProducttypeId()));
             existing.setProducttypeid(producttype);
         } else {
             existing.setProducttypeid(null);
@@ -116,20 +130,18 @@ public class ProductService {
         product.setImageurl(dto.getImageurl());
 
         // Xử lý category
-        CategoryDTO catDTO = dto.getCategoryid();
-        if (catDTO != null && catDTO.getId() != null) {
-            Category category = categoryRepository.findById(catDTO.getId())
-                    .orElseThrow(() -> new RuntimeException("Category not found with id: " + catDTO.getId()));
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found with id: " + dto.getCategoryId()));
             product.setCategoryid(category);
         } else {
             product.setCategoryid(null);
         }
 
         // Xử lý producttype
-        ProducttypeDTO typeDTO = dto.getProducttypeid();
-        if (typeDTO != null && typeDTO.getId() != null) {
-            Producttype producttype = producttypeRepository.findById(typeDTO.getId())
-                    .orElseThrow(() -> new RuntimeException("Producttype not found with id: " + typeDTO.getId()));
+        if (dto.getProducttypeId() != null) {
+            Producttype producttype = producttypeRepository.findById(dto.getProducttypeId())
+                    .orElseThrow(() -> new RuntimeException("Producttype not found with id: " + dto.getProducttypeId()));
             product.setProducttypeid(producttype);
         } else {
             product.setProducttypeid(null);

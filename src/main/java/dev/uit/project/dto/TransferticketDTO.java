@@ -46,4 +46,27 @@ public class TransferticketDTO {
                 entity.getCreateddate()
         );
     }
+
+    public Transferticket toEntity() {
+        Transferticket entity = new Transferticket();
+        entity.setId(this.id);
+        entity.setStatus(this.status);
+        entity.setCreateddate(this.createddate);
+        if (this.employeeId != null) {
+            dev.uit.project.entity.Employee emp = new dev.uit.project.entity.Employee();
+            emp.setId(this.employeeId);
+            entity.setEmployeeid(emp);
+        }
+        if (this.sourcewhId != null) {
+            dev.uit.project.entity.Warehouse sw = new dev.uit.project.entity.Warehouse();
+            sw.setId(this.sourcewhId);
+            entity.setSourcewhid(sw);
+        }
+        if (this.destwhId != null) {
+            dev.uit.project.entity.Warehouse dw = new dev.uit.project.entity.Warehouse();
+            dw.setId(this.destwhId);
+            entity.setDestwhid(dw);
+        }
+        return entity;
+    }
 }

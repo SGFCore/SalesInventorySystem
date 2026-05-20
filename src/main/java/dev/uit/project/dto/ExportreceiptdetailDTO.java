@@ -26,4 +26,14 @@ public class ExportreceiptdetailDTO {
         ExportreceiptdetailId id = entity.getId();
         return new ExportreceiptdetailDTO(id.getExportreceiptid(), id.getProductid(), entity.getQuantity());
     }
+
+    public Exportreceiptdetail toEntity() {
+        Exportreceiptdetail entity = new Exportreceiptdetail();
+        dev.uit.project.entity.ExportreceiptdetailId cid = new dev.uit.project.entity.ExportreceiptdetailId();
+        cid.setExportreceiptid(this.exportreceiptId);
+        cid.setProductid(this.productId);
+        entity.setId(cid);
+        entity.setQuantity(this.quantity);
+        return entity;
+    }
 }

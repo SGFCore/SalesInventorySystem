@@ -1,7 +1,7 @@
 package dev.uit.project.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dev.uit.project.entity.Returnpolicy;
+import dev.uit.project.entity.ReturnPolicy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReturnpolicyDTO {
+public class ReturnPolicyDTO {
 
     @JsonProperty("PolicyID")
     private Long id;
@@ -32,9 +32,9 @@ public class ReturnpolicyDTO {
     @JsonProperty("IsActive")
     private Long isactive;
 
-    public static ReturnpolicyDTO fromEntity(Returnpolicy entity) {
+    public static ReturnPolicyDTO fromEntity(ReturnPolicy entity) {
         if (entity == null) return null;
-        return new ReturnpolicyDTO(
+        return new ReturnPolicyDTO(
                 entity.getId(),
                 entity.getPolicyname(),
                 entity.getMaxreturndays(),

@@ -9,7 +9,6 @@ import dev.uit.project.repository.EmployeeroleRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +22,6 @@ public class AuthController {
 
     private final EmployeeRepository employeeRepository;
     private final EmployeeroleRepository employeeroleRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestBody LoginCredentials credentials) {
@@ -43,7 +41,7 @@ public class AuthController {
         Employee employee = empOpt.get();
 
         // Kiểm tra mật khẩu (đối chiếu bằng password encoder)
-        if (!passwordEncoder.matches(credentials.getPassword(), employee.getPasswordhash())) {
+        if (!credentials.getPassword().equals(employee.getPassword())) {
             return ResponseEntity.badRequest().body(new ErrorResponse("Mật khẩu không chính xác"));
         }
 

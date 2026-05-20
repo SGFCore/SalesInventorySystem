@@ -21,7 +21,7 @@ public class ImportreceiptdetailController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ImportreceiptdetailDTO> get(@PathVariable Long id) {
+    public ResponseEntity<ImportreceiptdetailDTO> get(@PathVariable dev.uit.project.entity.ImportreceiptdetailId id) {
         return ResponseEntity.ok(importreceiptdetailService.get(id));
     }
 
@@ -31,12 +31,12 @@ public class ImportreceiptdetailController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ImportreceiptdetailDTO> update(@PathVariable Long id, @RequestBody ImportreceiptdetailDTO dto) {
+    public ResponseEntity<ImportreceiptdetailDTO> update(@PathVariable dev.uit.project.entity.ImportreceiptdetailId id, @RequestBody ImportreceiptdetailDTO dto) {
         return ResponseEntity.ok(importreceiptdetailService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable dev.uit.project.entity.ImportreceiptdetailId id) {
         importreceiptdetailService.delete(id);
         return ResponseEntity.ok().build();
     }

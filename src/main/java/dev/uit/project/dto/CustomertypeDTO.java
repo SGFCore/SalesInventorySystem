@@ -1,1 +1,29 @@
-package dev.uit.project.dto;\n\nimport lombok.Data;\nimport dev.uit.project.entity.Customertype;\n\n@Data\npublic class CustomertypeDTO {\n\n\n    public static CustomertypeDTO fromEntity(Customertype entity) {\n        if (entity == null) return null;\n        CustomertypeDTO dto = new CustomertypeDTO();\n        return dto;\n    }\n\n    public Customertype toEntity() {\n        Customertype entity = new Customertype();\n        return entity;\n    }\n}\n
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.Customertype;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CustomertypeDTO {
+    private Long id;
+    private String customertypename;
+    private BigDecimal discount;
+    private String detail;
+    private Long spendinglimit;
+
+    public static CustomertypeDTO fromEntity(Customertype entity) {
+        if (entity == null) return null;
+        return new CustomertypeDTO(
+                entity.getId(),
+                entity.getCustomertypename(),
+                entity.getDiscount(),
+                entity.getDetail(),
+                entity.getSpendinglimit()
+        );
+    }
+}

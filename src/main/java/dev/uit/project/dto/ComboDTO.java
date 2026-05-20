@@ -1,1 +1,23 @@
-package dev.uit.project.dto;\n\nimport lombok.Data;\nimport dev.uit.project.entity.Combo;\n\n@Data\npublic class ComboDTO {\n\n\n    public static ComboDTO fromEntity(Combo entity) {\n        if (entity == null) return null;\n        ComboDTO dto = new ComboDTO();\n        return dto;\n    }\n\n    public Combo toEntity() {\n        Combo entity = new Combo();\n        return entity;\n    }\n}\n
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.Combo;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ComboDTO {
+    private Long id;
+    private BigDecimal comboprice;
+
+    public static ComboDTO fromEntity(Combo entity) {
+        if (entity == null) return null;
+        return new ComboDTO(
+                entity.getId(),
+                entity.getComboprice()
+        );
+    }
+}

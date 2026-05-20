@@ -30,7 +30,7 @@ mvnw clean install
 mvn spring-boot:run
 ```
 
-Backend sẽ chạy tại: **http://localhost:8080**. Khi truy cập vào sẽ thấy thông báo `API is running`.
+Backend sẽ chạy tại: **http://localhost:8080/api**. Khi truy cập vào sẽ thấy thông báo `API is running`.
 
 Nếu có thông báo `BUILD SUCCESS` thì đã lỗi.
 

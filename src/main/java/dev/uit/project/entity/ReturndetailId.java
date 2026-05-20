@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @Embeddable
-public class ReturndetailId implements Serializable {
+public class ReturnDetailId implements Serializable {
     private static final long serialVersionUID = -8972803962287852464L;
     @NotNull
     @Column(name = "RETURNID", nullable = false)
@@ -22,6 +22,4 @@ public class ReturndetailId implements Serializable {
     @NotNull
     @Column(name = "PRODUCTID", nullable = false)
     private Long productid;
-
-
 }

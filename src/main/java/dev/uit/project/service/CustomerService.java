@@ -45,6 +45,13 @@ public class CustomerService {
         Customer customer = convertToEntity(customerDTO);
         customer.setId(null); // đảm bảo tạo mới
         customer.setCreateddate(LocalDate.now()); // gán ngày tạo hiện tại
+        
+        if (customerDTO.getCustomertypeId() != null) {
+            Customertype customertype = customertypeRepository.findById(customerDTO.getCustomertypeId())
+                    .orElseThrow(() -> new RuntimeException("CustomerType not found"));
+            customer.setCustomertypeid(customertype);
+        }
+
         Customer saved = customerRepository.save(customer);
         return convertToDTO(saved);
     }
@@ -66,10 +73,9 @@ public class CustomerService {
         existing.setTotalaccumulatedspent(customerDTO.getTotalaccumulatedspent());
 
         // Xử lý customertype (nếu có)
-        CustomertypeDTO typeDTO = customerDTO.getCustomertypeid();
-        if (typeDTO != null && typeDTO.getId() != null) {
-            Customertype customertype = customertypeRepository.findById(typeDTO.getId())
-                    .orElseThrow(() -> new RuntimeException("Customertype not found with id: " + typeDTO.getId()));
+        if (customerDTO.getCustomertypeId() != null) {
+            Customertype customertype = customertypeRepository.findById(customerDTO.getCustomertypeId())
+                    .orElseThrow(() -> new RuntimeException("Customertype not found with id: " + customerDTO.getCustomertypeId()));
             existing.setCustomertypeid(customertype);
         } else {
             existing.setCustomertypeid(null);
@@ -108,10 +114,9 @@ public class CustomerService {
         // Không set createddate (sẽ gán trong create)
 
         // Xử lý customertype
-        CustomertypeDTO typeDTO = dto.getCustomertypeid();
-        if (typeDTO != null && typeDTO.getId() != null) {
-            Customertype customertype = customertypeRepository.findById(typeDTO.getId())
-                    .orElseThrow(() -> new RuntimeException("Customertype not found with id: " + typeDTO.getId()));
+        if (dto.getCustomertypeId() != null) {
+            Customertype customertype = customertypeRepository.findById(dto.getCustomertypeId())
+                    .orElseThrow(() -> new RuntimeException("Customertype not found with id: " + dto.getCustomertypeId()));
             customer.setCustomertypeid(customertype);
         } else {
             customer.setCustomertypeid(null);

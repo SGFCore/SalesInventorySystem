@@ -1,8 +1,8 @@
 package dev.uit.project.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dev.uit.project.entity.Returndetail;
-import dev.uit.project.entity.ReturndetailId;
+import dev.uit.project.entity.ReturnDetail;
+import dev.uit.project.entity.ReturnDetailId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReturndetailDTO {
+public class ReturnDetailDTO {
 
     @JsonProperty("ReturnID")
     private Long returnId;
@@ -30,11 +30,11 @@ public class ReturndetailDTO {
     @JsonProperty("ActionTaken")
     private String actiontaken;
 
-    public static ReturndetailDTO fromEntity(Returndetail entity) {
+    public static ReturnDetailDTO fromEntity(ReturnDetail entity) {
         if (entity == null) return null;
-        ReturndetailId id = entity.getId();
+        ReturnDetailId id = entity.getId();
         Long targetId = entity.getTargetwarehouseid() != null ? entity.getTargetwarehouseid().getId() : null;
-        return new ReturndetailDTO(
+        return new ReturnDetailDTO(
                 id.getReturnid(),
                 id.getProductid(),
                 entity.getQuantity(),

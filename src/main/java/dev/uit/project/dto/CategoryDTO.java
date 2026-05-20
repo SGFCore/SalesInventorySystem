@@ -1,1 +1,22 @@
-package dev.uit.project.dto;\n\nimport lombok.Data;\nimport dev.uit.project.entity.Category;\n\n@Data\npublic class CategoryDTO {\n\n\n    public static CategoryDTO fromEntity(Category entity) {\n        if (entity == null) return null;\n        CategoryDTO dto = new CategoryDTO();\n        return dto;\n    }\n\n    public Category toEntity() {\n        Category entity = new Category();\n        return entity;\n    }\n}\n
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.Category;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CategoryDTO {
+    private Long id;
+    private String categoryname;
+
+    public static CategoryDTO fromEntity(Category entity) {
+        if (entity == null) return null;
+        return new CategoryDTO(
+                entity.getId(),
+                entity.getCategoryname()
+        );
+    }
+}

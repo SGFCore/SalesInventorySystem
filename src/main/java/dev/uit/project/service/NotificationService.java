@@ -61,7 +61,7 @@ public class NotificationService {
         existing.setTitle(dto.getTitle());
         existing.setMessage(dto.getMessage());
         existing.setType(dto.getType());
-        existing.setStatus(dto.getStatus() != null && dto.getStatus() == 1);
+        existing.setStatus((dto.getStatus() != null && dto.getStatus() == 1) ? 1 : 0);
         existing.setCreateddate(dto.getCreateddate());
 
         Notification updated = notificationRepository.save(existing);
@@ -90,7 +90,7 @@ public class NotificationService {
         entity.setTitle(dto.getTitle());
         entity.setMessage(dto.getMessage());
         entity.setType(dto.getType());
-        entity.setStatus(dto.getStatus() != null && dto.getStatus() == 1);
+        entity.setStatus((dto.getStatus() != null && dto.getStatus() == 1) ? 1 : 0);
         entity.setCreateddate(dto.getCreateddate());
         return entity;
     }

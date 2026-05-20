@@ -14,7 +14,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { btn, dialog } from "@/pages/page-classes";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import type { Product, CustomerType } from "@/lib/types";
+import type { Product, Customertype } from "@/lib/types";
 
 interface NewProps {
   open: boolean;
@@ -25,7 +25,7 @@ interface NewProps {
 export function NewDiscountDialog({ open, onOpenChange, onSave }: NewProps) {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
-  const [customerTypes, setCustomerTypes] = useState<CustomerType[]>([]);
+  const [customerTypes, setCustomerTypes] = useState<Customertype[]>([]);
 
   const [discountName, setDiscountName] = useState("");
   const [value, setValue] = useState<number>(0);
@@ -187,8 +187,8 @@ export function NewDiscountDialog({ open, onOpenChange, onSave }: NewProps) {
                 disabled={loading}
               >
                 {customerTypes.map((t) => (
-                  <option key={t.CustomerTypeID} value={t.CustomerTypeID}>
-                    {t.CustomerTypeName}
+                  <option key={t.id} value={t.id}>
+                    {t.customertypename}
                   </option>
                 ))}
               </NativeSelect>

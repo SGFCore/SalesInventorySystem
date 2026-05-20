@@ -21,7 +21,7 @@ public class ImportreceiptdetailService {
                 .collect(Collectors.toList());
     }
 
-    public ImportreceiptdetailDTO get(Long id) {
+    public ImportreceiptdetailDTO get(dev.uit.project.entity.ImportreceiptdetailId id) {
         return importreceiptdetailRepository.findById(id)
                 .map(ImportreceiptdetailDTO::fromEntity)
                 .orElse(null);
@@ -33,7 +33,7 @@ public class ImportreceiptdetailService {
         return ImportreceiptdetailDTO.fromEntity(saved);
     }
 
-    public ImportreceiptdetailDTO update(Long id, ImportreceiptdetailDTO dto) {
+    public ImportreceiptdetailDTO update(dev.uit.project.entity.ImportreceiptdetailId id, ImportreceiptdetailDTO dto) {
         if (!importreceiptdetailRepository.existsById(id)) {
             return null;
         }
@@ -42,7 +42,7 @@ public class ImportreceiptdetailService {
         return ImportreceiptdetailDTO.fromEntity(saved);
     }
 
-    public void delete(Long id) {
+    public void delete(dev.uit.project.entity.ImportreceiptdetailId id) {
         importreceiptdetailRepository.deleteById(id);
     }
 }

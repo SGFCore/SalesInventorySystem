@@ -58,4 +58,30 @@ public class ImportreceiptDTO {
                 entity.getHasdiscrepancy()
         );
     }
+
+    public Importreceipt toEntity() {
+        Importreceipt entity = new Importreceipt();
+        entity.setId(this.id);
+        entity.setStatus(this.status);
+        entity.setCreateddate(this.createddate);
+        entity.setDiscrepancyreason(this.discrepancyreason);
+        entity.setDiscrepancyimageurl(this.discrepancyimageurl);
+        entity.setHasdiscrepancy(this.hasdiscrepancy);
+        if (this.employeeId != null) {
+            dev.uit.project.entity.Employee emp = new dev.uit.project.entity.Employee();
+            emp.setId(this.employeeId);
+            entity.setEmployeeid(emp);
+        }
+        if (this.warehouseId != null) {
+            dev.uit.project.entity.Warehouse wh = new dev.uit.project.entity.Warehouse();
+            wh.setId(this.warehouseId);
+            entity.setWarehouseid(wh);
+        }
+        if (this.requestId != null) {
+            dev.uit.project.entity.Requestform rf = new dev.uit.project.entity.Requestform();
+            rf.setId(this.requestId);
+            entity.setRequestid(rf);
+        }
+        return entity;
+    }
 }

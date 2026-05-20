@@ -41,7 +41,7 @@ public class NotificationDTO {
         if (entity == null) return null;
         Long employeeIdVal = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
         Long productIdVal = entity.getProductid() != null ? entity.getProductid().getId() : null;
-        Integer statusVal = entity.getStatus() != null ? (entity.getStatus() ? 1 : 0) : 0;
+        Integer statusVal = entity.getStatus() != null ? entity.getStatus() : 0;
         return new NotificationDTO(
                 entity.getId(),
                 employeeIdVal,

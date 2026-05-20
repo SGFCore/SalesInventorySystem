@@ -21,7 +21,7 @@ public class CountsheetdetailController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CountsheetdetailDTO> get(@PathVariable Long id) {
+    public ResponseEntity<CountsheetdetailDTO> get(@PathVariable dev.uit.project.entity.CountsheetdetailId id) {
         return ResponseEntity.ok(countsheetdetailService.get(id));
     }
 
@@ -31,12 +31,12 @@ public class CountsheetdetailController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CountsheetdetailDTO> update(@PathVariable Long id, @RequestBody CountsheetdetailDTO dto) {
+    public ResponseEntity<CountsheetdetailDTO> update(@PathVariable dev.uit.project.entity.CountsheetdetailId id, @RequestBody CountsheetdetailDTO dto) {
         return ResponseEntity.ok(countsheetdetailService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable dev.uit.project.entity.CountsheetdetailId id) {
         countsheetdetailService.delete(id);
         return ResponseEntity.ok().build();
     }

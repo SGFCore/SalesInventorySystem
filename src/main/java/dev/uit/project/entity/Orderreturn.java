@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "ORDERRETURN")
-public class Orderreturn {
+public class OrderReturn {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "RETURNID", nullable = false)
@@ -55,6 +55,4 @@ public class Orderreturn {
     @Nationalized
     @Column(name = "STATUS", length = 50)
     private String status;
-
-
 }

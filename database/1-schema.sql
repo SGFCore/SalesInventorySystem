@@ -108,7 +108,7 @@ CREATE TABLE EMPLOYEE (
     Fullname     NVARCHAR2(100) NOT NULL,
     Email        VARCHAR2(100) UNIQUE,
     Phone        VARCHAR2(15) NOT NULL CHECK (LENGTH(Phone) >= 10),
-    PasswordHash VARCHAR2(255) NOT NULL,
+    password VARCHAR2(255) NOT NULL,
     Status       NUMBER(1) DEFAULT 1 CHECK (Status IN (0,1))
 );
 

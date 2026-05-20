@@ -30,15 +30,23 @@ Lưu ý: Phải đổi path trước khi chạy lệnh này:
   - Right click vào folder `/database/` và chọn `Copy Path`.
   - Vào file này, gõ `Ctrl H` để thay thế path bên trên thành path bạn đã copy.
 
-```sh
-docker run --name sgf-db --network sgf-network -p 1521:1521 -e ORACLE_PASSWORD=Admin123 -v sgf-data:/opt/oracle/oradata -v "D:\UNI DOCS\SalesInventorySystem\database:/docker-entrypoint-initdb.d" --health-cmd="healthcheck.sh" gvenzl/oracle-free:23-slim
-```
-
 **Xóa database**:
 
 ```sh
 docker rm -f sgf-db
 docker volume rm sgf-data
+```
+
+**Chạy container**:
+
+```sh
+docker run --name sgf-db --network sgf-network -p 1521:1521 -e ORACLE_PASSWORD=Admin123 -v sgf-data:/opt/oracle/oradata -v "D:\UNI DOCS\SalesInventorySystem\database:/docker-entrypoint-initdb.d" --health-cmd="healthcheck.sh" gvenzl/oracle-free:23-slim
+```
+
+Vào terminal:
+
+```sh
+docker exec -it sgf-db sqlplus sgf_admin/Admin123@FREEPDB1
 ```
 
 **Lưu ý**:
@@ -48,7 +56,13 @@ docker volume rm sgf-data
 
 ### Backend
 
-**Build** (chỉ chạy ở lần đầu tiên):
+**Xóa container**:
+
+```sh
+docker rm -f sgf-backend
+```
+
+**Build container** (chỉ chạy ở lần đầu tiên):
 
 ```sh
 docker build -t sgf-backend .
@@ -60,10 +74,10 @@ docker build -t sgf-backend .
 docker run -it --name sgf-backend --network sgf-network -p 8080:8080 -v "D:\UNI DOCS\SalesInventorySystem":/app sgf-backend
 ```
 
-**Xóa container**:
+Vào terminal:
 
 ```sh
-docker rm -f sgf-backend
+docker exec -it sgf-backend bash
 ```
 
 # Lập trình backend trong container

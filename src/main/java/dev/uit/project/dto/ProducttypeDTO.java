@@ -1,1 +1,24 @@
-package dev.uit.project.dto;\n\nimport lombok.Data;\nimport dev.uit.project.entity.Producttype;\n\n@Data\npublic class ProducttypeDTO {\n\n\n    public static ProducttypeDTO fromEntity(Producttype entity) {\n        if (entity == null) return null;\n        ProducttypeDTO dto = new ProducttypeDTO();\n        return dto;\n    }\n\n    public Producttype toEntity() {\n        Producttype entity = new Producttype();\n        return entity;\n    }\n}\n
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.Producttype;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProducttypeDTO {
+    private Long id;
+    private String producttypename;
+    private Long categoryid;
+
+    public static ProducttypeDTO fromEntity(Producttype entity) {
+        if (entity == null) return null;
+        return new ProducttypeDTO(
+                entity.getId(),
+                entity.getProducttypename(),
+                entity.getCategoryid()
+        );
+    }
+}

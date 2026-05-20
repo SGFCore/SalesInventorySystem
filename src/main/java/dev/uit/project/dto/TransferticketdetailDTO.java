@@ -38,4 +38,16 @@ public class TransferticketdetailDTO {
                 entity.getRequestquantity()
         );
     }
+
+    public Transferticketdetail toEntity() {
+        Transferticketdetail entity = new Transferticketdetail();
+        dev.uit.project.entity.TransferticketdetailId cid = new dev.uit.project.entity.TransferticketdetailId();
+        cid.setTransferid(this.transferId);
+        cid.setProductid(this.productId);
+        entity.setId(cid);
+        entity.setExportquantity(this.exportquantity);
+        entity.setReceivequantity(this.receivequantity);
+        entity.setRequestquantity(this.requestquantity);
+        return entity;
+    }
 }

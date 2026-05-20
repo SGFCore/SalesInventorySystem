@@ -1,3 +1,6 @@
+ALTER SESSION SET CONTAINER = FREEPDB1;
+ALTER SESSION SET CURRENT_SCHEMA = sgf_admin;
+
 -- INSERT DỮ LIỆU DEMO
 -- =============================================
 -- 1. CUSTOMERTYPE (4 dòng - tối đa với CHECK hiện tại)
@@ -84,7 +87,7 @@ insert into employee (
    fullname,
    email,
    phone,
-   passwordhash,
+   password,
    status
 ) values ( N'Phạm Văn Quản Lý',
            'quanly.pham@sgf.vn',
@@ -95,7 +98,7 @@ insert into employee (
    fullname,
    email,
    phone,
-   passwordhash,
+   password,
    status
 ) values ( N'Nguyễn Thủ Kho',
            'thukho.nguyen@sgf.vn',
@@ -106,7 +109,7 @@ insert into employee (
    fullname,
    email,
    phone,
-   passwordhash,
+   password,
    status
 ) values ( N'Hoàng Thị Bán Hàng',
            'banhang.hoang@sgf.vn',
@@ -117,7 +120,7 @@ insert into employee (
    fullname,
    email,
    phone,
-   passwordhash,
+   password,
    status
 ) values ( N'Lê Thị Kế Toán',
            'ketoan.le@sgf.vn',

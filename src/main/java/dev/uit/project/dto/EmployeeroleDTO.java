@@ -1,1 +1,24 @@
-package dev.uit.project.dto;\n\nimport lombok.Data;\nimport dev.uit.project.entity.Employeerole;\n\n@Data\npublic class EmployeeroleDTO {\n\n\n    public static EmployeeroleDTO fromEntity(Employeerole entity) {\n        if (entity == null) return null;\n        EmployeeroleDTO dto = new EmployeeroleDTO();\n        return dto;\n    }\n\n    public Employeerole toEntity() {\n        Employeerole entity = new Employeerole();\n        return entity;\n    }\n}\n
+package dev.uit.project.dto;
+
+import dev.uit.project.entity.Employeerole;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class EmployeeroleDTO {
+    private Long employeeId;
+    private Long roleId;
+
+    public static EmployeeroleDTO fromEntity(Employeerole entity) {
+        if (entity == null) return null;
+        Long employeeId = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
+        Long roleId = entity.getRoleid() != null ? entity.getRoleid().getId() : null;
+        return new EmployeeroleDTO(
+                employeeId,
+                roleId
+        );
+    }
+}

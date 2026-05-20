@@ -21,7 +21,7 @@ public class CountsheetdetailService {
                 .collect(Collectors.toList());
     }
 
-    public CountsheetdetailDTO get(Long id) {
+    public CountsheetdetailDTO get(dev.uit.project.entity.CountsheetdetailId id) {
         return countsheetdetailRepository.findById(id)
                 .map(CountsheetdetailDTO::fromEntity)
                 .orElse(null);
@@ -33,7 +33,7 @@ public class CountsheetdetailService {
         return CountsheetdetailDTO.fromEntity(saved);
     }
 
-    public CountsheetdetailDTO update(Long id, CountsheetdetailDTO dto) {
+    public CountsheetdetailDTO update(dev.uit.project.entity.CountsheetdetailId id, CountsheetdetailDTO dto) {
         if (!countsheetdetailRepository.existsById(id)) {
             return null;
         }
@@ -42,7 +42,7 @@ public class CountsheetdetailService {
         return CountsheetdetailDTO.fromEntity(saved);
     }
 
-    public void delete(Long id) {
+    public void delete(dev.uit.project.entity.CountsheetdetailId id) {
         countsheetdetailRepository.deleteById(id);
     }
 }

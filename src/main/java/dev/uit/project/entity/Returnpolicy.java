@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "RETURNPOLICY")
-public class Returnpolicy {
+public class ReturnPolicy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "POLICYID", nullable = false)
@@ -38,6 +38,4 @@ public class Returnpolicy {
 
     @Column(name = "ISACTIVE")
     private Long isactive;
-
-
 }

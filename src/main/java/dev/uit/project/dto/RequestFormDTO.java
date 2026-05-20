@@ -1,1 +1,45 @@
-package dev.uit.project.dto;\n\nimport lombok.Data;\nimport dev.uit.project.entity.RequestForm;\n\n@Data\npublic class RequestFormDTO {\n\n\n    public static RequestFormDTO fromEntity(RequestForm entity) {\n        if (entity == null) return null;\n        RequestFormDTO dto = new RequestFormDTO();\n        return dto;\n    }\n\n    public RequestForm toEntity() {\n        RequestForm entity = new RequestForm();\n        return entity;\n    }\n}\n
+package dev.uit.project.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.uit.project.entity.Requestform;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.time.LocalDate;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RequestFormDTO {
+    @JsonProperty("RequestID")
+    private Long id;
+
+    @JsonProperty("EmployeeID")
+    private Long employeeId;
+
+    @JsonProperty("CreatedDate")
+    private LocalDate createddate;
+
+    @JsonProperty("Status")
+    private String status;
+
+    @JsonProperty("ApproverID")
+    private Long approverId;
+
+    @JsonProperty("RejectReason")
+    private String rejectreason;
+
+    public static RequestFormDTO fromEntity(Requestform entity) {
+        if (entity == null) return null;
+        Long employeeId = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
+        Long approverId = entity.getApproverid() != null ? entity.getApproverid().getId() : null;
+        return new RequestFormDTO(
+                entity.getId(),
+                employeeId,
+                entity.getCreateddate(),
+                entity.getStatus(),
+                approverId,
+                entity.getRejectreason()
+        );
+    }
+}

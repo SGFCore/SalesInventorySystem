@@ -41,8 +41,8 @@ public class EmployeeService {
     public EmployeeDTO create(EmployeeDTO employeeDTO) {
         Employee employee = convertToEntity(employeeDTO);
         employee.setId(null); // đảm bảo tạo mới
-        if (employeeDTO.getPasswordhash() != null && !employeeDTO.getPasswordhash().isEmpty()) {
-            employee.setPasswordhash(encodePassword(employeeDTO.getPasswordhash()));
+        if (employeeDTO.getPassword() != null && !employeeDTO.getPassword().isEmpty()) {
+            employee.setPassword(encodePassword(employeeDTO.getPassword()));
         }
         Employee saved = employeeRepository.save(employee);
         return convertToDTO(saved);
@@ -59,8 +59,8 @@ public class EmployeeService {
         existing.setEmail(employeeDTO.getEmail());
         existing.setPhone(employeeDTO.getPhone());
         
-        if (employeeDTO.getPasswordhash() != null && !employeeDTO.getPasswordhash().isEmpty()) {
-            existing.setPasswordhash(encodePassword(employeeDTO.getPasswordhash()));
+        if (employeeDTO.getPassword() != null && !employeeDTO.getPassword().isEmpty()) {
+            existing.setPassword(employeeDTO.getPassword());
         }
         
         existing.setStatus(employeeDTO.getStatus());
@@ -102,8 +102,8 @@ public class EmployeeService {
         employee.setFullname(dto.getFullname());
         employee.setEmail(dto.getEmail());
         employee.setPhone(dto.getPhone());
-        employee.setPasswordhash(dto.getPasswordhash()); // convertToEntity maps raw, Service.create/update handles encoding
+        employee.setPassword(dto.getPassword()); // convertToEntity maps raw, Service.create/update handles encoding
         employee.setStatus(dto.getStatus());
         return employee;
     }
-}
+}

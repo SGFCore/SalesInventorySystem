@@ -1,6 +1,6 @@
 package dev.uit.project.repository;
 
-import dev.uit.project.entities.ReturnDetail;
+import dev.uit.project.entity.ReturnDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

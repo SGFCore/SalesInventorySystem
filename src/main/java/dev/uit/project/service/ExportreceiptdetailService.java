@@ -21,7 +21,7 @@ public class ExportreceiptdetailService {
                 .collect(Collectors.toList());
     }
 
-    public ExportreceiptdetailDTO get(Long id) {
+    public ExportreceiptdetailDTO get(dev.uit.project.entity.ExportreceiptdetailId id) {
         return exportreceiptdetailRepository.findById(id)
                 .map(ExportreceiptdetailDTO::fromEntity)
                 .orElse(null);
@@ -33,7 +33,7 @@ public class ExportreceiptdetailService {
         return ExportreceiptdetailDTO.fromEntity(saved);
     }
 
-    public ExportreceiptdetailDTO update(Long id, ExportreceiptdetailDTO dto) {
+    public ExportreceiptdetailDTO update(dev.uit.project.entity.ExportreceiptdetailId id, ExportreceiptdetailDTO dto) {
         if (!exportreceiptdetailRepository.existsById(id)) {
             return null;
         }
@@ -42,7 +42,7 @@ public class ExportreceiptdetailService {
         return ExportreceiptdetailDTO.fromEntity(saved);
     }
 
-    public void delete(Long id) {
+    public void delete(dev.uit.project.entity.ExportreceiptdetailId id) {
         exportreceiptdetailRepository.deleteById(id);
     }
 }
