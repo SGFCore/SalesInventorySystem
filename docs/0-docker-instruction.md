@@ -43,6 +43,8 @@ docker volume rm sgf-data
 docker run --name sgf-db --network sgf-network -p 1521:1521 -e ORACLE_PASSWORD=Admin123 -v sgf-data:/opt/oracle/oradata -v "D:\UNI DOCS\SalesInventorySystem\database:/docker-entrypoint-initdb.d" --health-cmd="healthcheck.sh" gvenzl/oracle-free:23-slim
 ```
 
+f.write("ALTER SESSION SET CONTAINER = FREEPDB1;\nALTER SESSION SET CURRENT_SCHEMA = sgf_admin;\n")
+
 Vào terminal:
 
 ```sh

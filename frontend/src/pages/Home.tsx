@@ -1,22 +1,16 @@
-import { useNavigate } from "react-router-dom";
 import { useEmp } from "@/context/empContext";
-import { btn } from "@/pages/page-classes";
-import { 
-  Package, 
-  AlertTriangle, 
-  Warehouse, 
-  ClipboardList, 
-  ArrowRight, 
-  Bell, 
-  FileText, 
-  PlusCircle, 
-  Activity,
-  Loader2
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import React, { useState, useEffect } from "react";
 import { api } from "@/lib/api";
-import type { Product, Warehouse as WarehouseType, DetailInventory, RequestForm } from "@/lib/types";
+import {
+  AlertTriangle,
+  ClipboardList,
+  Loader2,
+  Package,
+  Warehouse
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
+import Dashboard from "@/pages/Dashboard";
 
 interface LowStockItem {
   id: string;
@@ -88,13 +82,13 @@ export default function Home() {
 
         // 4. Đề xuất chờ kiểm duyệt (Status === "0" hoặc "Chờ duyệt")
         const pendingReqForms = reqList.filter((r) => r.Status === "0" || r.Status === "Chờ duyệt");
-        
+
         const pendingItems: PendingReqItem[] = pendingReqForms.map((rf) => {
           const creatorEmp = empList.find((e) => e.EmployeeID === rf.EmployeeID);
           const creatorName = creatorEmp ? creatorEmp.Fullname : `Nhân viên #${rf.EmployeeID}`;
-          
+
           const detailsCount = reqDetailsList.filter((d) => d.RequestID === rf.RequestID).length;
-          
+
           return {
             id: `YC-${rf.RequestID}`,
             title: `Yêu cầu bổ sung vật tư #${rf.RequestID}`,
@@ -127,7 +121,7 @@ export default function Home() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       {/* Header section with User Info */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-blue-600 to-indigo-700 p-6 rounded-xl text-white shadow-md shadow-blue-100/50">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-blue-600 p-6 rounded-xl text-white">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white">
             Xin chào, {emp?.Fullname || "Thành viên hệ thống"}!
@@ -148,7 +142,7 @@ export default function Home() {
           {/* Metrics Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Metric 1 */}
-            <div 
+            <div
               onClick={() => navigate("/product-management?tab=products")}
               className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
             >
@@ -164,7 +158,7 @@ export default function Home() {
             </div>
 
             {/* Metric 2 */}
-            <div 
+            <div
               onClick={() => navigate("/warehouse-management")}
               className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
             >
@@ -180,7 +174,7 @@ export default function Home() {
             </div>
 
             {/* Metric 3 */}
-            <div 
+            <div
               onClick={() => navigate("/warehouse-management")}
               className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
             >
@@ -196,9 +190,9 @@ export default function Home() {
             </div>
 
             {/* Metric 4 */}
-            <div 
+            <div
               onClick={() => navigate("/circulating-slips-management?tab=replenishment-requests")}
-              className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
+              className="bg-white p-5 rounded-xl border border-slate-200 group cursor-pointer"
             >
               <div className="flex justify-between items-start">
                 <span className="p-3 bg-purple-50 text-purple-600 rounded-lg group-hover:bg-purple-600 group-hover:text-white transition-colors duration-200">
@@ -210,6 +204,13 @@ export default function Home() {
                 <p className="text-xs text-slate-500 font-bold mt-1">Đề xuất chờ phê duyệt</p>
               </div>
             </div>
+          </div>
+
+          <Separator className="bg-slate-200 my-6" />
+
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-slate-950">Báo cáo hiệu quả kinh doanh & KPI</h2>
+            <Dashboard />
           </div>
         </>
       )}

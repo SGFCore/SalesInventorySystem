@@ -18,6 +18,8 @@ import ComboManagementPage from "@/pages/6.2-combo-management/ComboManagementPag
 import WarehouseManagementPage from "@/pages/11.1-warehouse-management-page/WarehouseManagementPage";
 import NotificationManagementPage from "@/pages/0-notification-management/NotificationManagementPage";
 
+import { DashboardProvider } from "@/context/dashboardContext";
+
 // New Grouped Pages
 import CustomerPartnerManagement from "@/pages/grouped/CustomerPartnerManagement";
 import ProductManagementGroup from "@/pages/grouped/ProductManagementGroup";
@@ -30,8 +32,9 @@ function App() {
     <EmpProvider>
       <AuthProvider>
         <NotificationProvider>
-          <SidebarProvider>
-            <Router>
+          <DashboardProvider>
+            <SidebarProvider>
+              <Router>
               <Routes>
                 {/* Public Routes */}
                 <Route
@@ -187,8 +190,9 @@ function App() {
               {/* Catch all */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </Router>
-        </SidebarProvider>
+            </Router>
+          </SidebarProvider>
+        </DashboardProvider>
       </NotificationProvider>
     </AuthProvider>
   </EmpProvider>
