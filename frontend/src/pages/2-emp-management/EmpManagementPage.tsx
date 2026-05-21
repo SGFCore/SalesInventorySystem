@@ -111,7 +111,7 @@ export default function EmpManagementPage() {
           />
         </div>
         <Button className={btn.primary} onClick={() => setIsNewDialogOpen(true)}>
-          Thêm người dùng mới
+          Thêm nhân viên mới
         </Button>
       </div>
 

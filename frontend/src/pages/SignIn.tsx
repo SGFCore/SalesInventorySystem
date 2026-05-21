@@ -15,11 +15,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { 
-  User, 
-  Lock, 
-  Eye, 
-  EyeOff, 
+import {
+  User,
+  Lock,
+  Eye,
+  EyeOff,
   HelpCircle,
   Key
 } from "lucide-react";
@@ -28,24 +28,11 @@ export function SignIn() {
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const navigate = useNavigate();
   const { login } = useAuth();
   const { setEmp, setRoles } = useEmp();
-
-  // Dữ liệu mẫu phục vụ Prototype chạy thử
-  const SAMPLE_CREDENTIALS = {
-    employeeId: "NV001",
-    password: "123456"
-  };
-
-  const handleFillSample = () => {
-    setEmployeeId(SAMPLE_CREDENTIALS.employeeId);
-    setPassword(SAMPLE_CREDENTIALS.password);
-    toast.success("Đã điền thông tin tài khoản mẫu!");
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +69,7 @@ export function SignIn() {
     <div className="fixed inset-0 flex items-center justify-center bg-slate-100 p-4">
       {/* Container thẻ đăng nhập với thiết kế siêu phẳng (flat) và tối ưu diện tích */}
       <Card className="w-[340px] bg-white border border-slate-200 rounded-none p-0">
-        
+
         {/* Header rút gọn để tiết kiệm không gian */}
         <CardHeader className="p-4 pb-2 border-b border-slate-100 text-center">
           <CardTitle className="text-xl font-bold tracking-tight text-blue-600">
@@ -98,11 +85,11 @@ export function SignIn() {
 
             {/* Input Mã nhân viên */}
             <div className="space-y-1">
-              <Label 
-                htmlFor="employeeId" 
+              <Label
+                htmlFor="employeeId"
                 className="text-[10px] font-bold text-slate-500 uppercase tracking-wide"
               >
-                Mã nhân viên
+                SĐT nhân viên
               </Label>
               <div className="relative">
                 <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400">
@@ -110,7 +97,7 @@ export function SignIn() {
                 </div>
                 <Input
                   id="employeeId"
-                  placeholder="Nhập mã nhân viên..."
+                  placeholder="Nhập SĐT nhân viên..."
                   value={employeeId}
                   onChange={(e) => setEmployeeId(e.target.value)}
                   className="pl-8 h-8.5 text-xs border-slate-200 rounded-none bg-white focus-visible:ring-0 focus-visible:border-blue-600 focus-visible:ring-offset-0 placeholder:text-slate-400"
@@ -121,8 +108,8 @@ export function SignIn() {
 
             {/* Input Mật khẩu */}
             <div className="space-y-1">
-              <Label 
-                htmlFor="password" 
+              <Label
+                htmlFor="password"
                 className="text-[10px] font-bold text-slate-500 uppercase tracking-wide"
               >
                 Mật khẩu

@@ -1,12 +1,18 @@
+"use client";
+
 import * as React from "react";
-import { format, parse } from "date-fns";
-import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
 export interface DatePickerProps
-  extends Omit<React.ComponentProps<typeof Input>, "value" | "onChange"> {
+  extends Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "value" | "onChange"
+  > {
   value?: Date;
-  onChange?: (date: Date) => void;
+  onChange?: (date: Date | undefined) => void;
 }
 
 export function DatePicker({
@@ -15,40 +21,39 @@ export function DatePicker({
   className,
   ...props
 }: DatePickerProps) {
-  // Chuyển Date sang định dạng YYYY-MM-DD cho input[type="date"]
-  const stringValue = React.useMemo(() => {
-    if (!value) return "";
-    return format(value, "yyyy-MM-dd");
-  }, [value]);
+  const stringValue = value
+    ? format(value, "yyyy-MM-dd")
+    : "";
 
-  const handleChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value;
-      if (!val) return;
-      
-      try {
-        // Parse chuỗi YYYY-MM-DD sang đối tượng Date chuẩn
-        const parsedDate = parse(val, "yyyy-MM-dd", new Date());
-        if (onChange) {
-          onChange(parsedDate);
-        }
-      } catch (err) {
-        console.error("Lỗi parse ngày trong DatePicker:", err);
-      }
-    },
-    [onChange]
-  );
+  const displayValue = value
+    ? format(value, "dd/MM/yyyy")
+    : "Chọn ngày";
 
   return (
-    <Input
-      type="date"
-      value={stringValue}
-      onChange={handleChange}
-      className={cn(
-        "border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 px-3 h-10 rounded-md bg-white text-slate-900",
-        className
-      )}
-      {...props}
-    />
+    <div className="relative w-full overflow-hidden">
+      {/* Native picker */}
+      <input
+        type="date"
+        value={stringValue}
+        onChange={(e) => {
+          const val = e.target.value;
+
+          if (!val) {
+            onChange?.(undefined);
+            return;
+          }
+
+          onChange?.(new Date(val));
+        }}
+        className={cn(
+          "w-full h-10 rounded-md border border-input",
+          "appearance-none",
+          "cursor-pointer",
+          "relative z-0",
+          className
+        )}
+        {...props}
+      />
+    </div>
   );
 }

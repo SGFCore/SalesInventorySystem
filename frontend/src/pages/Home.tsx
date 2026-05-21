@@ -1,16 +1,11 @@
 import { useEmp } from "@/context/empContext";
 import { api } from "@/lib/api";
+import Dashboard from "@/pages/Dashboard";
 import {
-  AlertTriangle,
-  ClipboardList,
-  Loader2,
-  Package,
-  Warehouse
+  Loader2
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Separator } from "@/components/ui/separator";
-import Dashboard from "@/pages/Dashboard";
 
 interface LowStockItem {
   id: string;
@@ -28,7 +23,6 @@ interface PendingReqItem {
 }
 
 export default function Home() {
-  const navigate = useNavigate();
   const { emp } = useEmp();
 
   const [loading, setLoading] = useState(true);
@@ -138,81 +132,10 @@ export default function Home() {
           <span className="ml-2 text-slate-500 font-semibold">Đang chuẩn bị báo cáo tổng quan...</span>
         </div>
       ) : (
-        <>
-          {/* Metrics Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Metric 1 */}
-            <div
-              onClick={() => navigate("/product-management?tab=products")}
-              className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
-            >
-              <div className="flex justify-between items-start">
-                <span className="p-3 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200">
-                  <Package className="h-5 w-5" />
-                </span>
-              </div>
-              <div className="mt-4">
-                <h3 className="text-2xl font-bold text-slate-900">{metrics.productsCount}</h3>
-                <p className="text-xs text-slate-500 font-bold mt-1">Sản phẩm trên hệ thống</p>
-              </div>
-            </div>
-
-            {/* Metric 2 */}
-            <div
-              onClick={() => navigate("/warehouse-management")}
-              className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
-            >
-              <div className="flex justify-between items-start">
-                <span className="p-3 bg-red-50 text-red-600 rounded-lg group-hover:bg-red-600 group-hover:text-white transition-colors duration-200">
-                  <AlertTriangle className="h-5 w-5" />
-                </span>
-              </div>
-              <div className="mt-4">
-                <h3 className="text-2xl font-bold text-slate-900">{metrics.lowStockCount}</h3>
-                <p className="text-xs text-slate-500 font-bold mt-1">Sản phẩm tồn kho thấp</p>
-              </div>
-            </div>
-
-            {/* Metric 3 */}
-            <div
-              onClick={() => navigate("/warehouse-management")}
-              className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
-            >
-              <div className="flex justify-between items-start">
-                <span className="p-3 bg-green-50 text-green-600 rounded-lg group-hover:bg-green-600 group-hover:text-white transition-colors duration-200">
-                  <Warehouse className="h-5 w-5" />
-                </span>
-              </div>
-              <div className="mt-4">
-                <h3 className="text-2xl font-bold text-slate-900">{metrics.warehousesCount}</h3>
-                <p className="text-xs text-slate-500 font-bold mt-1">Kho hàng đang hoạt động</p>
-              </div>
-            </div>
-
-            {/* Metric 4 */}
-            <div
-              onClick={() => navigate("/circulating-slips-management?tab=replenishment-requests")}
-              className="bg-white p-5 rounded-xl border border-slate-200 group cursor-pointer"
-            >
-              <div className="flex justify-between items-start">
-                <span className="p-3 bg-purple-50 text-purple-600 rounded-lg group-hover:bg-purple-600 group-hover:text-white transition-colors duration-200">
-                  <ClipboardList className="h-5 w-5" />
-                </span>
-              </div>
-              <div className="mt-4">
-                <h3 className="text-2xl font-bold text-slate-900">{metrics.pendingReqsCount}</h3>
-                <p className="text-xs text-slate-500 font-bold mt-1">Đề xuất chờ phê duyệt</p>
-              </div>
-            </div>
-          </div>
-
-          <Separator className="bg-slate-200 my-6" />
-
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-slate-950">Báo cáo hiệu quả kinh doanh & KPI</h2>
-            <Dashboard />
-          </div>
-        </>
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold text-slate-950">Báo cáo hiệu quả kinh doanh & KPI</h2>
+          <Dashboard />
+        </div>
       )}
     </div>
   );

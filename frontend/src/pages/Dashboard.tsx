@@ -30,7 +30,7 @@ import {
 
 export default function Dashboard() {
   const { loading, metrics, chartData, getData } = useDashboard();
-  
+
   // State cục bộ phục vụ việc chọn ngày trước khi nhấn Tra cứu
   const [tempStart, setTempStart] = useState<Date>(new Date());
   const [tempEnd, setTempEnd] = useState<Date>(new Date());
@@ -69,8 +69,8 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Bộ lọc khoảng thời gian */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-end gap-4">
-        <div className="flex-1 grid grid-cols-2 gap-4 w-full">
+      <div className="bg-white border border-slate-200 rounded-xl p-2 flex flex-col md:flex-row items-end gap-4">
+        <div className="flex-1 grid grid-cols-2 gap-2 w-full">
           <div className="grid gap-2">
             <Label htmlFor="start-date" className="font-semibold text-slate-700">Từ ngày</Label>
             <DatePicker
@@ -99,60 +99,80 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* KPI 1: Doanh thu */}
-        <Card className="bg-white border border-slate-200 rounded-xl shadow-none">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-slate-500">Tổng doanh thu</CardTitle>
-            <DollarSign className="h-5 w-5 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {metrics.totalRevenue.toLocaleString("vi-VN")} đ
+      <div className="grid grid-cols-4 gap-3">
+        {/* KPI 1 */}
+        <Card className="border border-slate-200 shadow-none rounded-lg">
+          <CardContent className="p-2 flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-slate-500 truncate">
+                Tổng doanh thu
+              </p>
+
+              <p className="text-lg font-bold text-slate-900 whitespace-nowrap">
+                {metrics.totalRevenue.toLocaleString("vi-VN")} đ
+              </p>
             </div>
-            <p className="text-xs text-slate-400 font-bold mt-1">Từ hóa đơn hoàn thành</p>
+
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-50 shrink-0">
+              <DollarSign className="h-4 w-4 text-blue-600" />
+            </div>
           </CardContent>
         </Card>
 
-        {/* KPI 2: Số đơn */}
-        <Card className="bg-white border border-slate-200 rounded-xl shadow-none">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-slate-500">Số lượng đơn</CardTitle>
-            <FileText className="h-5 w-5 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {metrics.totalOrders.toLocaleString("vi-VN")}
+        {/* KPI 2 */}
+        <Card className="border border-slate-200 shadow-none rounded-lg">
+          <CardContent className="p-2 flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-slate-500 truncate">
+                Số lượng đơn
+              </p>
+
+              <p className="text-lg font-bold text-slate-900 whitespace-nowrap">
+                {metrics.totalOrders.toLocaleString("vi-VN")}
+              </p>
             </div>
-            <p className="text-xs text-slate-400 font-bold mt-1">Đơn hàng được xuất kho</p>
+
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-50 shrink-0">
+              <FileText className="h-4 w-4 text-blue-600" />
+            </div>
           </CardContent>
         </Card>
 
-        {/* KPI 3: Bán ra */}
-        <Card className="bg-white border border-slate-200 rounded-xl shadow-none">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-slate-500">Sản phẩm bán ra</CardTitle>
-            <Package className="h-5 w-5 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {metrics.productsSold.toLocaleString("vi-VN")}
+        {/* KPI 3 */}
+        <Card className="border border-slate-200 shadow-none rounded-lg">
+          <CardContent className="p-2 flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-slate-500 truncate">
+                SP bán ra
+              </p>
+
+              <p className="text-lg font-bold text-slate-900 whitespace-nowrap">
+                {metrics.productsSold.toLocaleString("vi-VN")}
+              </p>
             </div>
-            <p className="text-xs text-slate-400 font-bold mt-1">Sản phẩm đến tay khách hàng</p>
+
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-green-50 shrink-0">
+              <Package className="h-4 w-4 text-green-600" />
+            </div>
           </CardContent>
         </Card>
 
-        {/* KPI 4: Trả về */}
-        <Card className="bg-white border border-slate-200 rounded-xl shadow-none">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-slate-500">Sản phẩm trả về</CardTitle>
-            <RotateCcw className="h-5 w-5 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {metrics.productsReturned.toLocaleString("vi-VN")}
+        {/* KPI 4 */}
+        <Card className="border border-slate-200 shadow-none rounded-lg">
+          <CardContent className="p-2 flex items-center justify-between">
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-slate-500 truncate">
+                SP trả về
+              </p>
+
+              <p className="text-lg font-bold text-slate-900 whitespace-nowrap">
+                {metrics.productsReturned.toLocaleString("vi-VN")}
+              </p>
             </div>
-            <p className="text-xs text-slate-400 font-bold mt-1">Sản phẩm bị hoàn trả QC</p>
+
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-red-50 shrink-0">
+              <RotateCcw className="h-4 w-4 text-red-600" />
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -167,9 +187,9 @@ export default function Dashboard() {
           Không có dữ liệu trong khoảng thời gian đã chọn.
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-2">
           {/* Biểu đồ doanh thu */}
-          <Card className="bg-white border border-slate-200 rounded-xl shadow-none p-4">
+          <Card className="bg-white border border-slate-200 rounded-xl shadow-none p-2">
             <CardHeader className="pb-4">
               <CardTitle className="text-base font-semibold text-slate-900">Biến động doanh thu</CardTitle>
               <CardDescription>Biểu đồ thể hiện sự thay đổi của doanh thu theo thời gian</CardDescription>
@@ -207,7 +227,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Biểu đồ sản lượng */}
-          <Card className="bg-white border border-slate-200 rounded-xl shadow-none p-4">
+          <Card className="bg-white border border-slate-200 rounded-xl shadow-none p-2">
             <CardHeader className="pb-4">
               <CardTitle className="text-base font-semibold text-slate-900">Đơn hàng & Sản lượng</CardTitle>
               <CardDescription>Biểu đồ cột thể hiện số đơn, sản phẩm bán ra và sản phẩm trả về</CardDescription>
