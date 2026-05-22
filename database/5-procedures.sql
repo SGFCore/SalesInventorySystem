@@ -1,4 +1,0 @@
-ALTER SESSION SET CONTAINER = FREEPDB1;
-ALTER SESSION SET CURRENT_SCHEMA = sgf_admin;
-
--- Code ở phía sau 2 dòng lệnh trên

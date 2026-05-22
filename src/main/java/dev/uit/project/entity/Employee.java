@@ -35,7 +35,7 @@ public class Employee {
 
     @Size(max = 255)
     @NotNull
-    @Column(name = "password", nullable = false)
+    @Column(name = "PASSWORD", nullable = false)
     private String password;
 
     @ColumnDefault("1")
