@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import dev.uit.project.dto.ReturnPolicyDTO;
-import dev.uit.project.entity.ReturnPolicy;
+import dev.uit.project.entity.Returnpolicy;
 import dev.uit.project.repository.ReturnPolicyRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -37,8 +37,8 @@ public class ReturnPolicyService {
      * Tạo mới một chính sách đổi trả
      */
     public ReturnPolicyDTO create(ReturnPolicyDTO returnPolicyDTO) {
-        ReturnPolicy returnPolicy = convertToEntity(returnPolicyDTO);
-        ReturnPolicy savedReturnPolicy = returnPolicyRepository.save(returnPolicy);
+        Returnpolicy returnPolicy = convertToEntity(returnPolicyDTO);
+        Returnpolicy savedReturnPolicy = returnPolicyRepository.save(returnPolicy);
         return convertToDTO(savedReturnPolicy);
     }
     
@@ -46,11 +46,11 @@ public class ReturnPolicyService {
      * Cập nhật thông tin chính sách đổi trả
      */
     public ReturnPolicyDTO update(Long id, ReturnPolicyDTO returnPolicyDTO) {
-        ReturnPolicy existingReturnPolicy = returnPolicyRepository.findById(id)
+        Returnpolicy existingReturnPolicy = returnPolicyRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("ReturnPolicy not found with id: " + id));
         
         BeanUtils.copyProperties(returnPolicyDTO, existingReturnPolicy, "id");
-        ReturnPolicy updatedReturnPolicy = returnPolicyRepository.save(existingReturnPolicy);
+        Returnpolicy updatedReturnPolicy = returnPolicyRepository.save(existingReturnPolicy);
         return convertToDTO(updatedReturnPolicy);
     }
     
@@ -67,7 +67,7 @@ public class ReturnPolicyService {
     /**
      * Chuyển đổi Entity sang DTO
      */
-    private ReturnPolicyDTO convertToDTO(ReturnPolicy returnPolicy) {
+    private ReturnPolicyDTO convertToDTO(Returnpolicy returnPolicy) {
         ReturnPolicyDTO returnPolicyDTO = new ReturnPolicyDTO();
         BeanUtils.copyProperties(returnPolicy, returnPolicyDTO);
         return returnPolicyDTO;
@@ -76,8 +76,8 @@ public class ReturnPolicyService {
     /**
      * Chuyển đổi DTO sang Entity
      */
-    private ReturnPolicy convertToEntity(ReturnPolicyDTO returnPolicyDTO) {
-        ReturnPolicy returnPolicy = new ReturnPolicy();
+    private Returnpolicy convertToEntity(ReturnPolicyDTO returnPolicyDTO) {
+        Returnpolicy returnPolicy = new Returnpolicy();
         BeanUtils.copyProperties(returnPolicyDTO, returnPolicy);
         return returnPolicy;
     }

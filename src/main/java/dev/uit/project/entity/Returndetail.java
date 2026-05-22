@@ -12,15 +12,15 @@ import org.hibernate.annotations.OnDeleteAction;
 @Setter
 @Entity
 @Table(name = "RETURNDETAIL")
-public class ReturnDetail {
+public class Returndetail {
     @EmbeddedId
-    private ReturnDetailId id;
+    private ReturndetailId id;
 
     @MapsId("returnid")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "RETURNID", nullable = false)
-    private OrderReturn returnid;
+    private Orderreturn returnid;
 
     @MapsId("productid")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

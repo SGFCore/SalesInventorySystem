@@ -1,6 +1,6 @@
 package dev.uit.project.dto;
 
-import dev.uit.project.entity.OrderReturn;
+import dev.uit.project.entity.Orderreturn;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +20,7 @@ public class OrderReturnDTO {
     private String returnrefcode;
     private String status;
 
-    public static OrderReturnDTO fromEntity(OrderReturn entity) {
+    public static OrderReturnDTO fromEntity(Orderreturn entity) {
         if (entity == null) return null;
         Long orderId = entity.getOrderid() != null ? entity.getOrderid().getId() : null;
         Long employeeId = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
@@ -36,8 +36,8 @@ public class OrderReturnDTO {
         );
     }
 
-    public OrderReturn toEntity() {
-        OrderReturn entity = new OrderReturn();
+    public Orderreturn toEntity() {
+        Orderreturn entity = new Orderreturn();
         entity.setId(this.id);
         entity.setReturndate(this.returndate);
         entity.setReason(this.reason);

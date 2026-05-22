@@ -1,7 +1,7 @@
 package dev.uit.project.service;
 
 import dev.uit.project.dto.OrderReturnDTO;
-import dev.uit.project.entity.OrderReturn;
+import dev.uit.project.entity.Orderreturn;
 import dev.uit.project.repository.OrderReturnRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,8 +28,8 @@ public class OrderReturnService {
     }
 
     public OrderReturnDTO create(OrderReturnDTO dto) {
-        OrderReturn entity = dto.toEntity();
-        OrderReturn saved = orderReturnRepository.save(entity);
+        Orderreturn entity = dto.toEntity();
+        Orderreturn saved = orderReturnRepository.save(entity);
         return OrderReturnDTO.fromEntity(saved);
     }
 
@@ -37,8 +37,8 @@ public class OrderReturnService {
         if (!orderReturnRepository.existsById(id)) {
             return null;
         }
-        OrderReturn entity = dto.toEntity();
-        OrderReturn saved = orderReturnRepository.save(entity);
+        Orderreturn entity = dto.toEntity();
+        Orderreturn saved = orderReturnRepository.save(entity);
         return OrderReturnDTO.fromEntity(saved);
     }
 

@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "ORDERRETURN")
-public class OrderReturn {
+public class Orderreturn {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "RETURNID", nullable = false)

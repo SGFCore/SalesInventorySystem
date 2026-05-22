@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import dev.uit.project.dto.ReturnDetailDTO;
-import dev.uit.project.entity.ReturnDetail;
+import dev.uit.project.entity.Returndetail;
 import dev.uit.project.repository.ReturnDetailRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -37,8 +37,8 @@ public class ReturnDetailService {
      * Tạo mới một bản ghi trả hàng
      */
     public ReturnDetailDTO create(ReturnDetailDTO returnDetailDTO) {
-        ReturnDetail returnDetail = convertToEntity(returnDetailDTO);
-        ReturnDetail savedReturnDetail = returnDetailRepository.save(returnDetail);
+        Returndetail returnDetail = convertToEntity(returnDetailDTO);
+        Returndetail savedReturnDetail = returnDetailRepository.save(returnDetail);
         return convertToDTO(savedReturnDetail);
     }
 
@@ -46,12 +46,12 @@ public class ReturnDetailService {
      * Cập nhật thông tin trả hàng
      */
     public ReturnDetailDTO update(Long id, ReturnDetailDTO returnDetailDTO) {
-        ReturnDetail existingReturnDetail = returnDetailRepository.findById(id)
+        Returndetail existingReturnDetail = returnDetailRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("ReturnDetail not found with id: " + id));
 
         BeanUtils.copyProperties(returnDetailDTO, existingReturnDetail, "id");
 
-        ReturnDetail updatedReturnDetail = returnDetailRepository.save(existingReturnDetail);
+        Returndetail updatedReturnDetail = returnDetailRepository.save(existingReturnDetail);
         return convertToDTO(updatedReturnDetail);
     }
 
@@ -68,7 +68,7 @@ public class ReturnDetailService {
     /**
      * Chuyển đổi Entity sang DTO
      */
-    private ReturnDetailDTO convertToDTO(ReturnDetail returnDetail) {
+    private ReturnDetailDTO convertToDTO(Returndetail returnDetail) {
         ReturnDetailDTO returnDetailDTO = new ReturnDetailDTO();
         BeanUtils.copyProperties(returnDetail, returnDetailDTO);
         return returnDetailDTO;
@@ -77,8 +77,8 @@ public class ReturnDetailService {
     /**
      * Chuyển đổi DTO sang Entity
      */
-    private ReturnDetail convertToEntity(ReturnDetailDTO returnDetailDTO) {
-        ReturnDetail returnDetail = new ReturnDetail();
+    private Returndetail convertToEntity(ReturnDetailDTO returnDetailDTO) {
+        Returndetail returnDetail = new Returndetail();
         BeanUtils.copyProperties(returnDetailDTO, returnDetail);
         return returnDetail;
     }
