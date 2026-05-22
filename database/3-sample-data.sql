@@ -85,7 +85,7 @@ insert into employee (
    fullname,
    email,
    phone,
-   password,
+   passwordhash,
    status
 ) values ( N'Phạm Văn Quản Lý',
            'quanly.pham@sgf.vn',
@@ -96,7 +96,7 @@ insert into employee (
    fullname,
    email,
    phone,
-   password,
+   passwordhash,
    status
 ) values ( N'Nguyễn Thủ Kho',
            'thukho.nguyen@sgf.vn',
@@ -107,7 +107,7 @@ insert into employee (
    fullname,
    email,
    phone,
-   password,
+   passwordhash,
    status
 ) values ( N'Hoàng Thị Bán Hàng',
            'banhang.hoang@sgf.vn',
@@ -118,7 +118,7 @@ insert into employee (
    fullname,
    email,
    phone,
-   password,
+   passwordhash,
    status
 ) values ( N'Lê Thị Kế Toán',
            'ketoan.le@sgf.vn',
