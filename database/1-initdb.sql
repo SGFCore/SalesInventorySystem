@@ -6779,10 +6779,10 @@ REM INSERTING into SGF_ADMIN.DMRS_VIEW_ORDER_GROUPBY
 SET DEFINE OFF;
 REM INSERTING into SGF_ADMIN.EMPLOYEE
 SET DEFINE OFF;
-Insert into SGF_ADMIN.EMPLOYEE (EMPLOYEEID,FULLNAME,EMAIL,PHONE,PASSWORD,STATUS) values (1,'Nguyễn Giám Đốc','giamdoc.nguyen@sgf.vn','0988111222','hashed_admin',1);
-Insert into SGF_ADMIN.EMPLOYEE (EMPLOYEEID,FULLNAME,EMAIL,PHONE,PASSWORD,STATUS) values (2,'Lê Thị Kế Toán','ketoan.le@sgf.vn','0988333444','hashed_kt',1);
-Insert into SGF_ADMIN.EMPLOYEE (EMPLOYEEID,FULLNAME,EMAIL,PHONE,PASSWORD,STATUS) values (3,'Phạm Văn Quản Lý','quanly.pham@sgf.vn','0988444555','hashed_mgr',1);
-Insert into SGF_ADMIN.EMPLOYEE (EMPLOYEEID,FULLNAME,EMAIL,PHONE,PASSWORD,STATUS) values (4,'Hoàng Thị Bán Hàng','banhang.hoang@sgf.vn','0988555666','hashed_sale',1);
+Insert into SGF_ADMIN.EMPLOYEE (EMPLOYEEID,FULLNAME,EMAIL,PHONE,PASSWORD,STATUS) values (2,'Nguyễn Thủ Kho','thukho.nguyen@sgf.vn','0988111222','hashed_thukho',1);
+Insert into SGF_ADMIN.EMPLOYEE (EMPLOYEEID,FULLNAME,EMAIL,PHONE,PASSWORD,STATUS) values (4,'Lê Thị Kế Toán','ketoan.le@sgf.vn','0988333444','hashed_kt',1);
+Insert into SGF_ADMIN.EMPLOYEE (EMPLOYEEID,FULLNAME,EMAIL,PHONE,PASSWORD,STATUS) values (1,'Phạm Văn Quản Lý','quanly.pham@sgf.vn','0988444555','hashed_mgr',1);
+Insert into SGF_ADMIN.EMPLOYEE (EMPLOYEEID,FULLNAME,EMAIL,PHONE,PASSWORD,STATUS) values (3,'Hoàng Thị Bán Hàng','banhang.hoang@sgf.vn','0988555666','hashed_sale',1);
 REM INSERTING into SGF_ADMIN.EMPLOYEEROLE
 SET DEFINE OFF;
 Insert into SGF_ADMIN.EMPLOYEEROLE (EMPLOYEEID,ROLEID) values (1,1);
