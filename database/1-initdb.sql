@@ -9364,7 +9364,7 @@ BEGIN
     WHERE o.OrderID = :NEW.OrderID;
 
     -- Chọn kho tương ứng: có vận chuyển -> kho gốc (1), không -> kho trực tiếp (2)
-    v_warehouse_id := CASE WHEN v_has_shipping = 1 THEN 1 ELSE 2 END;
+    v_warehouse_id := CASE WHEN v_has_shipping = 1 THEN 2 ELSE 1 END;
 
     -- Lấy tồn kho khả dụng
     SELECT AvailableStock
