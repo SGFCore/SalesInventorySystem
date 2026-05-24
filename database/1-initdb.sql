@@ -7122,6 +7122,7 @@ Insert into SGF_ADMIN.ORDERDETAIL (ORDERDETAILID,ORDERID,PRODUCTID,COMBOID,QUANT
 Insert into SGF_ADMIN.ORDERDETAIL (ORDERDETAILID,ORDERID,PRODUCTID,COMBOID,QUANTITY,UNITPRICE,DISCOUNTAMOUNT,TOTALAMOUNT) values (112,112,1,null,1,85000,0,85000);
 Insert into SGF_ADMIN.ORDERDETAIL (ORDERDETAILID,ORDERID,PRODUCTID,COMBOID,QUANTITY,UNITPRICE,DISCOUNTAMOUNT,TOTALAMOUNT) values (113,113,4,null,1,65000,0,65000);
 Insert into SGF_ADMIN.ORDERDETAIL (ORDERDETAILID,ORDERID,PRODUCTID,COMBOID,QUANTITY,UNITPRICE,DISCOUNTAMOUNT,TOTALAMOUNT) values (115,115,13,null,2,85000,0,170000);
+Insert into SGF_ADMIN.ORDERDETAIL (ORDERDETAILID,ORDERID,PRODUCTID,COMBOID,QUANTITY,UNITPRICE,DISCOUNTAMOUNT,TOTALAMOUNT) values (116,116,1,null,2,85000,0,170000);
 Insert into SGF_ADMIN.ORDERDETAIL (ORDERDETAILID,ORDERID,PRODUCTID,COMBOID,QUANTITY,UNITPRICE,DISCOUNTAMOUNT,TOTALAMOUNT) values (117,117,16,null,1,100000,0,100000);
 Insert into SGF_ADMIN.ORDERDETAIL (ORDERDETAILID,ORDERID,PRODUCTID,COMBOID,QUANTITY,UNITPRICE,DISCOUNTAMOUNT,TOTALAMOUNT) values (119,119,19,null,1,220000,0,220000);
 Insert into SGF_ADMIN.ORDERDETAIL (ORDERDETAILID,ORDERID,PRODUCTID,COMBOID,QUANTITY,UNITPRICE,DISCOUNTAMOUNT,TOTALAMOUNT) values (120,120,31,null,2,150000,0,300000);
@@ -9515,46 +9516,46 @@ END;
 
 /
 ALTER TRIGGER "SGF_ADMIN"."TRG_CHECK_UNIQUE_PRODUCT_NAME" ENABLE;
---------------------------------------------------------
---  DDL for Trigger TRG_INVOICE_SAME_CUSTOMER
---------------------------------------------------------
+-- --------------------------------------------------------
+-- --  DDL for Trigger TRG_INVOICE_SAME_CUSTOMER
+-- --------------------------------------------------------
 
-  CREATE OR REPLACE EDITIONABLE TRIGGER "SGF_ADMIN"."TRG_INVOICE_SAME_CUSTOMER" 
-BEFORE UPDATE OF InvoiceID ON Orders
-FOR EACH ROW
- WHEN (NEW.InvoiceID IS NOT NULL) DECLARE
-    v_customer_id NUMBER;
-    v_existing_customer NUMBER;
-    v_count NUMBER;
-BEGIN
-    -- Lấy CustomerID của Invoice
-    SELECT CustomerID INTO v_customer_id
-    FROM Invoice
-    WHERE InvoiceID = :NEW.InvoiceID;
+--   CREATE OR REPLACE EDITIONABLE TRIGGER "SGF_ADMIN"."TRG_INVOICE_SAME_CUSTOMER" 
+-- BEFORE UPDATE OF InvoiceID ON Orders
+-- FOR EACH ROW
+--  WHEN (NEW.InvoiceID IS NOT NULL) DECLARE
+--     v_customer_id NUMBER;
+--     v_existing_customer NUMBER;
+--     v_count NUMBER;
+-- BEGIN
+--     -- Lấy CustomerID của Invoice
+--     SELECT CustomerID INTO v_customer_id
+--     FROM Invoice
+--     WHERE InvoiceID = :NEW.InvoiceID;
 
-    -- Kiểm tra CustomerID của Order có khớp không
-    IF :NEW.CustomerID != v_customer_id THEN
-        RAISE_APPLICATION_ERROR(-20020,
-            'Đơn hàng có CustomerID=' || :NEW.CustomerID ||
-            ' không khớp với CustomerID=' || v_customer_id || ' của hóa đơn.');
-    END IF;
+--     -- Kiểm tra CustomerID của Order có khớp không
+--     IF :NEW.CustomerID != v_customer_id THEN
+--         RAISE_APPLICATION_ERROR(-20020,
+--             'Đơn hàng có CustomerID=' || :NEW.CustomerID ||
+--             ' không khớp với CustomerID=' || v_customer_id || ' của hóa đơn.');
+--     END IF;
 
-    -- Kiểm tra các Order khác trong cùng Invoice
-    SELECT COUNT(*)
-    INTO v_count
-    FROM Orders
-    WHERE InvoiceID = :NEW.InvoiceID
-      AND CustomerID != :NEW.CustomerID
-      AND OrderID != :NEW.OrderID;
+--     -- Kiểm tra các Order khác trong cùng Invoice
+--     SELECT COUNT(*)
+--     INTO v_count
+--     FROM Orders
+--     WHERE InvoiceID = :NEW.InvoiceID
+--       AND CustomerID != :NEW.CustomerID
+--       AND OrderID != :NEW.OrderID;
 
-    IF v_count > 0 THEN
-        RAISE_APPLICATION_ERROR(-20021,
-            'Tồn tại đơn hàng khác trong hóa đơn có CustomerID không đồng nhất.');
-    END IF;
-END;
+--     IF v_count > 0 THEN
+--         RAISE_APPLICATION_ERROR(-20021,
+--             'Tồn tại đơn hàng khác trong hóa đơn có CustomerID không đồng nhất.');
+--     END IF;
+-- END;
 
-/
-ALTER TRIGGER "SGF_ADMIN"."TRG_INVOICE_SAME_CUSTOMER" ENABLE;
+-- /
+-- ALTER TRIGGER "SGF_ADMIN"."TRG_INVOICE_SAME_CUSTOMER" ENABLE;
 --------------------------------------------------------
 --  DDL for Trigger TRG_LOCK_PAYMENT_METHOD
 --------------------------------------------------------
