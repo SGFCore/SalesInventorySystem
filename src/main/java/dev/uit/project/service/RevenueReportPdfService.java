@@ -5,11 +5,13 @@ import com.itextpdf.text.pdf.PdfPTable;
 import dev.uit.project.dto.RevenueReportDTO;
 import dev.uit.project.dto.RevenueReportLineDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 
 @Service
+@Transactional
 public class RevenueReportPdfService extends PdfReportService {
     
     public ByteArrayOutputStream generateRevenueReportPdf(RevenueReportDTO report) throws DocumentException {

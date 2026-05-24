@@ -6,6 +6,7 @@ import dev.uit.project.entity.Customer;
 import dev.uit.project.entity.Customertype;
 import dev.uit.project.repository.CustomerRepository;
 import dev.uit.project.repository.CustomertypeRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CustomerService {
 
     private final CustomerRepository customerRepository;

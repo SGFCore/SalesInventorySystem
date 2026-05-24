@@ -5,11 +5,13 @@ import dev.uit.project.entity.Role;
 import dev.uit.project.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class RoleService {
 
     private final RoleRepository roleRepository;

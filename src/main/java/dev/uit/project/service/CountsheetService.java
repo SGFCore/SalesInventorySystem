@@ -3,6 +3,7 @@ package dev.uit.project.service;
 import dev.uit.project.dto.CountsheetDTO;
 import dev.uit.project.entity.Countsheet;
 import dev.uit.project.repository.CountsheetRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CountsheetService {
 
     private final CountsheetRepository countsheetRepository;

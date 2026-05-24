@@ -5,11 +5,13 @@ import dev.uit.project.entity.Paymentmethod;
 import dev.uit.project.repository.PaymentMethodRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PaymentMethodService {
 
     private final PaymentMethodRepository paymentMethodRepository;

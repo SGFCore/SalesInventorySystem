@@ -5,11 +5,13 @@ import dev.uit.project.entity.Shipcompany;
 import dev.uit.project.repository.ShipcompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ShipcompanyService {
 
     private final ShipcompanyRepository shipcompanyRepository;

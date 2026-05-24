@@ -11,11 +11,13 @@ import dev.uit.project.repository.InvoicedetailRepository;
 import dev.uit.project.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class InvoicedetailService {
 
     private final InvoicedetailRepository invoicedetailRepository;

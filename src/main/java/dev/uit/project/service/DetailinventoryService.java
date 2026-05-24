@@ -8,6 +8,7 @@ import dev.uit.project.entity.Warehouse;
 import dev.uit.project.repository.DetailinventoryRepository;
 import dev.uit.project.repository.ProductRepository;
 import dev.uit.project.repository.WarehouseRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DetailinventoryService {
 
     private final DetailinventoryRepository detailinventoryRepository;

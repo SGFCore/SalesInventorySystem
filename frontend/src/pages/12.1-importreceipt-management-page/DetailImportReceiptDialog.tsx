@@ -68,11 +68,11 @@ export function DetailImportReceiptDialog({
     setLoading(true);
     try {
       const approverId = emp ? emp.EmployeeID : 999;
-      
+
       // 1. Cập nhật trạng thái phiếu nhập kho
       await api.importReceipts.update(importReceipt.ImportReceiptID, {
         ...importReceipt,
-        Status: isApproved ? "1" : "2", // "1": Đã duyệt, "2": Từ chối
+        Status: isApproved ? "Đã nhập kho" : "Đã từ chối",
         DiscrepancyReason: isApproved ? importReceipt.DiscrepancyReason : rejectReason,
       });
 
@@ -120,12 +120,6 @@ export function DetailImportReceiptDialog({
     }
   };
 
-  const getStatusText = (status: string) => {
-    if (status === "1" || status === "Đã duyệt") return "Đã duyệt";
-    if (status === "2" || status === "Từ chối") return "Từ chối";
-    return "Chờ duyệt";
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn("sm:max-w-[550px]", dialog.content)}>
@@ -155,12 +149,12 @@ export function DetailImportReceiptDialog({
                 <p
                   className={cn(
                     "font-bold text-xs mt-0.5",
-                    (importReceipt.Status === "1" || importReceipt.Status === "Đã duyệt") && "text-green-600",
-                    (importReceipt.Status === "0" || importReceipt.Status === "Chờ duyệt" || !importReceipt.Status) && "text-amber-500",
-                    (importReceipt.Status === "2" || importReceipt.Status === "Từ chối") && "text-red-500",
+                    (importReceipt.Status === "Đã nhập kho") && "text-green-600",
+                    (importReceipt.Status === "Chờ duyệt") && "text-amber-500",
+                    (importReceipt.Status === "Đã từ chối") && "text-red-500",
                   )}
                 >
-                  {getStatusText(importReceipt.Status)}
+                  {importReceipt.Status}
                 </p>
               </div>
             </div>
@@ -246,7 +240,7 @@ export function DetailImportReceiptDialog({
             </div>
 
             {/* Form nhập lý do khi thực hiện duyệt từ chối */}
-            {mode === "approve" && (importReceipt.Status === "0" || importReceipt.Status === "Chờ duyệt" || !importReceipt.Status) && (
+            {mode === "approve" && importReceipt.Status === "Chờ duyệt" && (
               <div className="mt-2 grid gap-2 border-t border-slate-200 pt-4">
                 <Label
                   htmlFor="rejectReason"
@@ -268,7 +262,7 @@ export function DetailImportReceiptDialog({
         )}
 
         <DialogFooter className="border-t border-slate-200 pt-4 mt-2">
-          {mode === "approve" && (importReceipt.Status === "0" || importReceipt.Status === "Chờ duyệt" || !importReceipt.Status) ? (
+          {mode === "approve" && importReceipt.Status === "Chờ duyệt" ? (
             <div className="flex gap-2 justify-end w-full">
               <Button
                 variant="outline"

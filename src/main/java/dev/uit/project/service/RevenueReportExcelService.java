@@ -6,12 +6,14 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 
 @Service
+@Transactional
 public class RevenueReportExcelService extends ExcelReportService {
     
     public ByteArrayOutputStream generateRevenueReportExcel(RevenueReportDTO report) throws IOException {

@@ -136,12 +136,12 @@ export type Importreceiptdetail = {
   ActualQuantity: number;
 }
 
-// importreceipt.dto.ts
+
 export type Importreceipt = {
   ImportReceiptID: number;
   EmployeeID: number;
   WarehouseID: number;
-  Status: string;
+  Status: "Bản nháp" | "Chờ duyệt" | "Đã từ chối" | "Đã nhập kho";
   CreatedDate: string; // LocalDate -> ISO date string
   RequestID: number;
   DiscrepancyReason: string;

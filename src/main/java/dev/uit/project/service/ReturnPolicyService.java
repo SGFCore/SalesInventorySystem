@@ -3,6 +3,8 @@ package dev.uit.project.service;
 import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import dev.uit.project.dto.ReturnPolicyDTO;
 import dev.uit.project.entity.Returnpolicy;
 import dev.uit.project.repository.ReturnPolicyRepository;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReturnPolicyService {
     
     private final ReturnPolicyRepository returnPolicyRepository;

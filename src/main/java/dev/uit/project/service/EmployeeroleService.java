@@ -10,12 +10,14 @@ import dev.uit.project.repository.EmployeeRepository;
 import dev.uit.project.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class EmployeeroleService {
 
     private final EmployeeroleRepository employeeroleRepository;

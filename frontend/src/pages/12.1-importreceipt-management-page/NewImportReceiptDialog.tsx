@@ -61,7 +61,7 @@ export function NewImportReceiptDialog({ open, onOpenChange, onSave }: Props) {
             api.requestForms.list(),
           ]);
           setWarehouses(whList.filter((w) => w.Status === 1));
-          
+
           // Chỉ hiện các yêu cầu đã duyệt ("1" hoặc "Đã duyệt")
           const approvedReqs = reqList.filter(
             (r) => r.Status === "1" || r.Status === "Đã duyệt"
@@ -92,7 +92,7 @@ export function NewImportReceiptDialog({ open, onOpenChange, onSave }: Props) {
           const reqDetails = allDetails.filter(
             (d) => d.RequestID === Number(selectedRequestId)
           );
-          
+
           const prefilled = reqDetails.map((d) => ({
             ProductID: d.ProductID,
             ProductName: (d as any).ProductName || "",
@@ -117,14 +117,14 @@ export function NewImportReceiptDialog({ open, onOpenChange, onSave }: Props) {
     setItems((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], ActualQuantity: actualVal };
-      
+
       // Tự động bật checkbox chênh lệch nếu số thực nhập khác số yêu cầu
       const anyMismatch = updated.some((it) => it.ExpectedQuantity !== it.ActualQuantity);
       setHasDiscrepancy(anyMismatch);
       if (anyMismatch && !discrepancyReason) {
         setDiscrepancyReason("Có chênh lệch thực tế khi nhập kho");
       }
-      
+
       return updated;
     });
   };
@@ -155,7 +155,7 @@ export function NewImportReceiptDialog({ open, onOpenChange, onSave }: Props) {
         ImportReceiptID: receiptId,
         EmployeeID: empId,
         WarehouseID: Number(warehouseId),
-        Status: isDraft ? "0" : "1", // "0": Chờ duyệt/Bản nháp, "1": Đã hoàn thành/Đã duyệt
+        Status: isDraft && "Chờ duyệt", // Draft or Pending
         CreatedDate: new Date(),
         RequestID: Number(selectedRequestId),
         HasDiscrepancy: hasDiscrepancy ? 1 : 0,

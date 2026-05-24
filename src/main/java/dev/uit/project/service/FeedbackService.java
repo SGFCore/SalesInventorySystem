@@ -5,12 +5,14 @@ import dev.uit.project.entity.Feedback;
 import dev.uit.project.repository.FeedbackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;

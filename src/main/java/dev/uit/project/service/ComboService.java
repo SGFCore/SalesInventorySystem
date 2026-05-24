@@ -5,11 +5,13 @@ import dev.uit.project.entity.Combo;
 import dev.uit.project.repository.ComboRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ComboService {
 
     private final ComboRepository comboRepository;

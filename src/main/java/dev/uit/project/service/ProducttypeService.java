@@ -5,11 +5,13 @@ import dev.uit.project.entity.Producttype;
 import dev.uit.project.repository.ProducttypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProducttypeService {
 
     private final ProducttypeRepository producttypeRepository;
