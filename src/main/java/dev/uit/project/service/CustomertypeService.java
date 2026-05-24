@@ -6,9 +6,11 @@ import dev.uit.project.dto.CustomertypeDTO;
 import dev.uit.project.entity.Customertype;
 import dev.uit.project.repository.CustomertypeRepository;
 import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CustomertypeService {
     
     private final CustomertypeRepository customertypeRepository;

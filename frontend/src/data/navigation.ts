@@ -12,7 +12,7 @@ export const sidebarData: SidebarItem[] = [
   {
     directionTo: "/",
     label: "Trang chủ",
-    availableRole: [1],
+    availableRole: [1, 2, 3, 4],
   },
   {
     directionTo: "/emp-management",

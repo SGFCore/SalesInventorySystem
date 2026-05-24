@@ -12,7 +12,7 @@ export function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <nav className="bg-blue-600 text-white flex items-center justify-between px-4 h-12 shadow-sm">
+    <nav className="bg-blue-600 text-white flex items-center justify-between px-4 h-12">
       {/* Left: App Name */}
       <div className="flex items-center shrink-0">
         <h1

@@ -22,9 +22,10 @@ interface NewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: () => void;
+  saleChannelCode?: number;
 }
 
-export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
+export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: NewProps) {
   const { emp } = useEmp();
   const [loading, setLoading] = useState(false);
   const [orderData, setOrderData] = useState({
@@ -171,7 +172,7 @@ export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
           {/* Thông tin chung */}
           <div className="grid gap-3">
             <Label className="text-blue-600 font-bold uppercase text-xs tracking-wider">
-              Thông tin giao hàng
+              {saleChannelCode !== 0 ? "Thông tin giao hàng" : "Thông tin chung"}
             </Label>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
@@ -205,59 +206,63 @@ export function NewOrderDialog({ open, onOpenChange, onSave }: NewProps) {
                   disabled={loading}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label className="text-xs text-slate-500 font-medium">
-                  Đối tác vận chuyển
-                </Label>
-                <NativeSelect
-                  value={orderData.ShipCompanyID}
-                  onChange={(e) =>
-                    setOrderData({
-                      ...orderData,
-                      ShipCompanyID: e.target.value,
-                    })
-                  }
-                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
-                  disabled={loading}
-                >
-                  {shipCompanies.map((ship) => (
-                    <option key={ship.ShipCompanyID} value={ship.ShipCompanyID}>
-                      {ship.ShipCompanyName}
-                    </option>
-                  ))}
-                </NativeSelect>
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-xs text-slate-500 font-medium">
-                  Phí vận chuyển (đ)
-                </Label>
-                <Input
-                  type="number"
-                  value={orderData.ShippingFee}
-                  onChange={(e) =>
-                    setOrderData({
-                      ...orderData,
-                      ShippingFee: Number(e.target.value),
-                    })
-                  }
-                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm text-center"
-                  disabled={loading}
-                />
-              </div>
-              <div className="grid gap-2 col-span-2">
-                <Label className="text-xs text-slate-500 font-medium">
-                  Ghi chú giao hàng
-                </Label>
-                <Input
-                  placeholder="Ghi chú cho shipper..."
-                  value={orderData.ShipmentNote}
-                  onChange={(e) =>
-                    setOrderData({ ...orderData, ShipmentNote: e.target.value })
-                  }
-                  className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
-                  disabled={loading}
-                />
-              </div>
+              {saleChannelCode !== 0 && (
+                <>
+                  <div className="grid gap-2">
+                    <Label className="text-xs text-slate-500 font-medium">
+                      Đối tác vận chuyển
+                    </Label>
+                    <NativeSelect
+                      value={orderData.ShipCompanyID}
+                      onChange={(e) =>
+                        setOrderData({
+                          ...orderData,
+                          ShipCompanyID: e.target.value,
+                        })
+                      }
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9"
+                      disabled={loading}
+                    >
+                      {shipCompanies.map((ship) => (
+                        <option key={ship.ShipCompanyID} value={ship.ShipCompanyID}>
+                          {ship.ShipCompanyName}
+                        </option>
+                      ))}
+                    </NativeSelect>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="text-xs text-slate-500 font-medium">
+                      Phí vận chuyển (đ)
+                    </Label>
+                    <Input
+                      type="number"
+                      value={orderData.ShippingFee}
+                      onChange={(e) =>
+                        setOrderData({
+                          ...orderData,
+                          ShippingFee: Number(e.target.value),
+                        })
+                      }
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm text-center"
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="grid gap-2 col-span-2">
+                    <Label className="text-xs text-slate-500 font-medium">
+                      Ghi chú giao hàng
+                    </Label>
+                    <Input
+                      placeholder="Ghi chú cho shipper..."
+                      value={orderData.ShipmentNote}
+                      onChange={(e) =>
+                        setOrderData({ ...orderData, ShipmentNote: e.target.value })
+                      }
+                      className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 h-9 text-sm"
+                      disabled={loading}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

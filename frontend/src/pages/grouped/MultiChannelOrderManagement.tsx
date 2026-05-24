@@ -6,15 +6,22 @@ import { ShoppingBag, Receipt } from "lucide-react";
 export default function MultiChannelOrderManagement() {
   const tabs: TabConfig[] = [
     {
-      id: "orders",
-      label: "Quản lý đơn hàng",
+      id: "orders-offline",
+      label: "Đơn hàng tại quầy",
       icon: <ShoppingBag className="h-4 w-4" />,
-      component: OrderManagementPage,
+      component: () => <OrderManagementPage saleChannelCode={0} />,
+      roles: [1, 2, 3],
+    },
+    {
+      id: "orders-online",
+      label: "Đơn hàng trực tuyến",
+      icon: <ShoppingBag className="h-4 w-4" />,
+      component: () => <OrderManagementPage saleChannelCode={1} />,
       roles: [1, 2, 3],
     },
     {
       id: "invoices",
-      label: "Quản lý hóa đơn",
+      label: "Hóa đơn",
       icon: <Receipt className="h-4 w-4" />,
       component: InvoiceManagementPage,
       roles: [3, 4],

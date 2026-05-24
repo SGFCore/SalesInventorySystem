@@ -10,10 +10,13 @@ import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { useEmp } from "@/context/empContext";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function RequestManagementPage() {
+  const { hasRole } = useEmp();
+
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [requests, setRequests] = useState<RequestForm[]>([]);
@@ -163,7 +166,7 @@ export default function RequestManagementPage() {
                           variant="outline"
                           size="sm"
                           className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
-                          disabled={r.Status === "1" || r.Status === "2" || r.Status === "Đã duyệt" || r.Status === "Từ chối"}
+                          disabled={!hasRole(1) || r.Status === "1" || r.Status === "2" || r.Status === "Đã duyệt" || r.Status === "Từ chối"}
                           onClick={() => openAction(r, "approve")}
                         >
                           Phê duyệt

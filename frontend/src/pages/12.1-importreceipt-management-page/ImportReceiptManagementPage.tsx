@@ -10,10 +10,12 @@ import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { useEmp } from "@/context/empContext";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function ImportReceiptManagementPage() {
+  const { hasRole } = useEmp();
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [receipts, setReceipts] = useState<Importreceipt[]>([]);
@@ -80,12 +82,6 @@ export default function ImportReceiptManagementPage() {
     setIsDetailOpen(true);
   };
 
-  const getStatusText = (status: string) => {
-    if (status === "1" || status === "Đã duyệt") return "Đã duyệt";
-    if (status === "2" || status === "Từ chối") return "Từ chối";
-    return "Chờ duyệt";
-  };
-
   return (
     <div className={page.shell}>
       <div ref={topRef} />
@@ -132,19 +128,17 @@ export default function ImportReceiptManagementPage() {
                     <TableCell className="text-slate-500 text-xs font-semibold">
                       Ngày tạo: {new Date(r.CreatedDate).toLocaleDateString("vi-VN")}
                     </TableCell>
-                    <TableCell className="text-xs text-slate-500 font-semibold">
-                      Yêu cầu gốc: <span className="font-bold text-slate-900">#{r.RequestID}</span>
-                    </TableCell>
                     <TableCell>
                       <span
                         className={cn(
                           "font-bold text-xs px-2.5 py-0.5 rounded-full border",
-                          (r.Status === "1" || r.Status === "Đã duyệt") && "bg-green-50 text-green-700 border-green-200",
-                          (r.Status === "0" || r.Status === "Chờ duyệt" || !r.Status) && "bg-yellow-50 text-yellow-700 border-yellow-200",
-                          (r.Status === "2" || r.Status === "Từ chối") && "bg-red-50 text-red-700 border-red-200",
+                          (r.Status === "Bản nháp") && "bg-gray-50 text-gray-700 border-gray-200",
+                          (r.Status === "Đã nhập kho") && "bg-green-50 text-green-700 border-green-200",
+                          (r.Status === "Chờ duyệt" || !r.Status) && "bg-yellow-50 text-yellow-700 border-yellow-200",
+                          (r.Status === "Đã từ chối") && "bg-red-50 text-red-700 border-red-200",
                         )}
                       >
-                        {getStatusText(r.Status)}
+                        {r.Status}
                       </span>
                       {r.HasDiscrepancy === 1 && (
                         <span className="ml-2 text-[10px] bg-red-100 text-red-700 px-2 py-0.5 border border-red-200 font-bold rounded uppercase">
@@ -162,11 +156,30 @@ export default function ImportReceiptManagementPage() {
                         >
                           Xem chi tiết
                         </Button>
+                        {hasRole(2) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
+                            disabled={r.Status !== "Bản nháp"}
+                            onClick={async () => {
+                              try {
+                                await api.importReceipts.update(r.ImportReceiptID, { ...r, Status: "Chờ duyệt" });
+                                toast.success("Cập nhật trạng thái thành công");
+                                loadReceipts();
+                              } catch (e: any) {
+                                toast.error(e.message || "Lỗi cập nhật trạng thái");
+                              }
+                            }}
+                          >
+                            Đã đếm xong
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           size="sm"
                           className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
-                          disabled={r.Status === "1" || r.Status === "2" || r.Status === "Đã duyệt" || r.Status === "Từ chối"}
+                          disabled={!hasRole(1) || r.Status === "Bản nháp" || r.Status === "Đã nhập kho" || r.Status === "Đã từ chối"}
                           onClick={() => openAction(r, "approve")}
                         >
                           Phê duyệt

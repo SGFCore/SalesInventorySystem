@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { useEmp } from "@/context/empContext";
 
 export const MAP_STATUS: Record<number, { text: string; className: string }> = {
   0: { text: "Chưa kiểm kê", className: "bg-slate-50 text-slate-600 border-slate-200" },
@@ -23,6 +24,8 @@ export const MAP_STATUS: Record<number, { text: string; className: string }> = {
 const ITEMS_PER_PAGE = 10;
 
 export default function CountsheetManagementPage() {
+  const { hasRole } = useEmp();
+
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [countsheets, setCountsheets] = useState<Countsheet[]>([]);
@@ -164,23 +167,23 @@ export default function CountsheetManagementPage() {
                             disabled={c.status === 2 || c.status === 4}
                             onClick={() => {
                               setSelectedCountsheet(c);
-                              setDialogMode("approve");
-                              setIsDetailOpen(true);
+                              setIsEditOpen(true);
                             }}
                           >
-                            Phê duyệt
+                            Cập nhật
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
                             className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
-                            disabled={c.status === 2 || c.status === 4}
+                            disabled={!hasRole(1) || c.status === 2 || c.status === 4}
                             onClick={() => {
                               setSelectedCountsheet(c);
-                              setIsEditOpen(true);
+                              setDialogMode("approve");
+                              setIsDetailOpen(true);
                             }}
                           >
-                            Cập nhật
+                            Phê duyệt
                           </Button>
                         </div>
                       </TableCell>

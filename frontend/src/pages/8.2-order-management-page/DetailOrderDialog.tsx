@@ -19,9 +19,10 @@ interface DetailProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   order: Order | null;
+  saleChannelCode?: number;
 }
 
-export function DetailOrderDialog({ open, onOpenChange, order }: DetailProps) {
+export function DetailOrderDialog({ open, onOpenChange, order, saleChannelCode }: DetailProps) {
   const [loading, setLoading] = useState(false);
   const [details, setDetails] = useState<OrderDetail[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -88,26 +89,30 @@ export function DetailOrderDialog({ open, onOpenChange, order }: DetailProps) {
                   #{order.invoiceId || "Không có"}
                 </span>
               </div>
-              <div className="grid gap-1">
-                <Label className="text-slate-500 text-xs">Mã Vận Đơn</Label>
-                <span className="font-semibold text-slate-900 text-blue-600">
-                  {order.shipcode || "Chưa có"}
-                </span>
-              </div>
-              <div className="grid gap-1">
-                <Label className="text-slate-500 text-xs">Phí vận chuyển</Label>
-                <span className="font-semibold text-slate-900">
-                  {(order.shippingfee || 0).toLocaleString("vi-VN")} đ
-                </span>
-              </div>
-              <div className="grid gap-1 md:col-span-2">
-                <Label className="text-slate-500 text-xs">
-                  Ghi chú giao hàng
-                </Label>
-                <span className="font-semibold text-slate-900">
-                  {order.shipmentnote || "Không có"}
-                </span>
-              </div>
+              {saleChannelCode !== 0 && (
+                <>
+                  <div className="grid gap-1">
+                    <Label className="text-slate-500 text-xs">Mã Vận Đơn</Label>
+                    <span className="font-semibold text-slate-900 text-blue-600">
+                      {order.shipcode || "Chưa có"}
+                    </span>
+                  </div>
+                  <div className="grid gap-1">
+                    <Label className="text-slate-500 text-xs">Phí vận chuyển</Label>
+                    <span className="font-semibold text-slate-900">
+                      {(order.shippingfee || 0).toLocaleString("vi-VN")} đ
+                    </span>
+                  </div>
+                  <div className="grid gap-1 md:col-span-2">
+                    <Label className="text-slate-500 text-xs">
+                      Ghi chú giao hàng
+                    </Label>
+                    <span className="font-semibold text-slate-900">
+                      {order.shipmentnote || "Không có"}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="grid gap-2 mt-4">

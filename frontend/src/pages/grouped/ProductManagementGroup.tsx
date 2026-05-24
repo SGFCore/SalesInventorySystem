@@ -8,21 +8,21 @@ export default function ProductManagementGroup() {
   const tabs: TabConfig[] = [
     {
       id: "products",
-      label: "Quản lý sản phẩm",
+      label: "Sản phẩm",
       icon: <Package className="h-4 w-4" />,
       component: ProductManagementPage,
       roles: [1, 2, 3, 4],
     },
     {
       id: "categories",
-      label: "Quản lý danh mục sản phẩm",
+      label: "Danh mục sản phẩm",
       icon: <FolderTree className="h-4 w-4" />,
       component: CatManagementPage,
       roles: [1],
     },
     {
       id: "product-types",
-      label: "Quản lý loại sản phẩm",
+      label: "Loại sản phẩm",
       icon: <Layers className="h-4 w-4" />,
       component: ProductTypeManagementPage,
       roles: [1],

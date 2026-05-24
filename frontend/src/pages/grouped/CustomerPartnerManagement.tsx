@@ -8,21 +8,21 @@ export default function CustomerPartnerManagement() {
   const tabs: TabConfig[] = [
     {
       id: "partners",
-      label: "Quản lý đối tác",
+      label: "Đối tác",
       icon: <Handshake className="h-4 w-4" />,
       component: CompManagementPage,
       roles: [1, 3],
     },
     {
       id: "customers",
-      label: "Quản lý khách hàng",
+      label: "Khách hàng",
       icon: <Users className="h-4 w-4" />,
       component: CustomerManagementPage,
-      roles: [3],
+      roles: [1, 3, 4],
     },
     {
       id: "customer-types",
-      label: "Quản lý nhóm khách hàng",
+      label: "Nhóm khách hàng",
       icon: <UserCheck className="h-4 w-4" />,
       component: CustomerTypeManagementPage,
       roles: [1],

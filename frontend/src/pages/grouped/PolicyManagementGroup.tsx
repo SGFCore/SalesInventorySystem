@@ -8,21 +8,21 @@ export default function PolicyManagementGroup() {
   const tabs: TabConfig[] = [
     {
       id: "promotions",
-      label: "Quản lý khuyến mãi",
+      label: "Khuyến mãi",
       icon: <Sparkles className="h-4 w-4" />,
       component: DiscountManagementPage,
       roles: [1],
     },
     {
       id: "returns",
-      label: "Quản lý hoàn tiền",
+      label: "Hoàn tiền",
       icon: <RefreshCw className="h-4 w-4" />,
       component: OrderReturnManagementPage,
       roles: [4],
     },
     {
       id: "policies",
-      label: "Quản lý chính sách đổi trả",
+      label: "Chính sách đổi trả",
       icon: <FileText className="h-4 w-4" />,
       component: PolicyManagementPage,
       roles: [1],

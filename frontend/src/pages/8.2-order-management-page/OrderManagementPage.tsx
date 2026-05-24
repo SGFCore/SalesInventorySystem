@@ -23,7 +23,7 @@ import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 20;
 
-export default function OrderManagementPage() {
+export default function OrderManagementPage({ saleChannelCode }: { saleChannelCode?: number }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,17 +43,26 @@ export default function OrderManagementPage() {
   const loadOrders = async () => {
     setLoading(true);
     try {
-      const [orderData, customerData] = await Promise.all([
+      const [orderData, customerData, invoiceData] = await Promise.all([
         api.orders.list(),
         api.customers.list(),
+        api.invoices.list(),
       ]);
       setCustomers(customerData);
-      if (!orderData || orderData.length === 0) {
-        toast.error("Không có dữ liệu đơn hàng");
+
+      let filteredOrders = orderData || [];
+      if (saleChannelCode !== undefined) {
+        filteredOrders = filteredOrders.filter(order => {
+          const invoice = invoiceData.find(inv => inv.InvoiceID === order.invoiceId);
+          return invoice && invoice.SaleChannelCode === saleChannelCode;
+        });
+      }
+
+      if (!filteredOrders || filteredOrders.length === 0) {
         setOrders([]);
       } else {
         // Sort newest first
-        setOrders(orderData);
+        setOrders(filteredOrders);
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải danh sách đơn hàng");
@@ -65,7 +74,7 @@ export default function OrderManagementPage() {
 
   useEffect(() => {
     loadOrders();
-  }, []);
+  }, [saleChannelCode]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -295,14 +304,16 @@ export default function OrderManagementPage() {
                       </div>
                     </TableCell>
 
-                    <TableCell>
-                      <div className="flex flex-col items-start text-sm">
-                        <span className="font-semibold text-xs text-slate-400 mb-1">
-                          Trạng thái Giao
-                        </span>
-                        {renderShippingStatus(order.shippingstatus)}
-                      </div>
-                    </TableCell>
+                    {saleChannelCode !== 0 && (
+                      <TableCell>
+                        <div className="flex flex-col items-start text-sm">
+                          <span className="font-semibold text-xs text-slate-400 mb-1">
+                            Trạng thái Giao
+                          </span>
+                          {renderShippingStatus(order.shippingstatus)}
+                        </div>
+                      </TableCell>
+                    )}
 
                     <TableCell>
                       <div className="flex flex-col items-start text-sm">
@@ -360,15 +371,17 @@ export default function OrderManagementPage() {
                           >
                             Trả hàng
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            disabled={
-                              order.orderstatus === 4 || order.shippingstatus >= 2
-                            }
-                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
-                            onClick={() => handleAction(order, "ship")}
-                          >
-                            Giao vận
-                          </DropdownMenuItem>
+                          {saleChannelCode !== 0 && (
+                            <DropdownMenuItem
+                              disabled={
+                                order.orderstatus === 4 || order.shippingstatus >= 2
+                              }
+                              className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
+                              onClick={() => handleAction(order, "ship")}
+                            >
+                              Giao vận
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
                             disabled={
                               order.orderstatus === 4 || order.shippingstatus >= 2
@@ -378,24 +391,28 @@ export default function OrderManagementPage() {
                           >
                             Hủy đơn hàng
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            disabled={
-                              order.orderstatus === 4 || order.shippingstatus >= 2
-                            }
-                            className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-semibold disabled:opacity-50"
-                            onClick={() => handleAction(order, "cancelshipping")}
-                          >
-                            Hủy giao vận
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            disabled={
-                              order.orderstatus === 4 || order.shippingstatus >= 2
-                            }
-                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
-                            onClick={() => handleAction(order, "packeted")}
-                          >
-                            Đóng gói xong
-                          </DropdownMenuItem>
+                          {saleChannelCode !== 0 && (
+                            <>
+                              <DropdownMenuItem
+                                disabled={
+                                  order.orderstatus === 4 || order.shippingstatus >= 2
+                                }
+                                className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-semibold disabled:opacity-50"
+                                onClick={() => handleAction(order, "cancelshipping")}
+                              >
+                                Hủy giao vận
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                disabled={
+                                  order.orderstatus === 4 || order.shippingstatus >= 2
+                                }
+                                className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
+                                onClick={() => handleAction(order, "packeted")}
+                              >
+                                Đóng gói xong
+                              </DropdownMenuItem>
+                            </>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -468,11 +485,13 @@ export default function OrderManagementPage() {
         open={isDetailOpen}
         onOpenChange={setIsDetailOpen}
         order={selectedOrder}
+        saleChannelCode={saleChannelCode}
       />
       <NewOrderDialog
         open={isNewOpen}
         onOpenChange={setIsNewOpen}
         onSave={loadOrders}
+        saleChannelCode={saleChannelCode}
       />
       {selectedOrder && (
         <EditOrderDialog
@@ -480,6 +499,7 @@ export default function OrderManagementPage() {
           onOpenChange={setIsEditOpen}
           order={selectedOrder}
           onSave={loadOrders}
+          saleChannelCode={saleChannelCode}
         />
       )}
       {selectedOrder && (
