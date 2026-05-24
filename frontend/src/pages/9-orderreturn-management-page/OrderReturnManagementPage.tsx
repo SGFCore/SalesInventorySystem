@@ -34,7 +34,7 @@ export default function OrderReturnManagementPage() {
         toast.error("Không có dữ liệu hoàn trả");
         setOrderReturns([]);
       } else {
-        setOrderReturns(data.sort((a, b) => b.id - a.id));
+        setOrderReturns(data);
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải danh sách hoàn tiền");

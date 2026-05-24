@@ -33,7 +33,7 @@ export default function PolicyManagementPage() {
         toast.error("Không có dữ liệu chính sách");
         setPolicies([]);
       } else {
-        setPolicies(data.sort((a, b) => b.PolicyID - a.PolicyID));
+        setPolicies(data);
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải chính sách đổi trả");

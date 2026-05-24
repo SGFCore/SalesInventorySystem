@@ -8,8 +8,14 @@ import { DetailProductDialog } from "@/pages/6.1-product-management/DetailProduc
 import { EditProductDialog } from "@/pages/6.1-product-management/EditProductDialog";
 import { NewProductDialog } from "@/pages/6.1-product-management/NewProductDialog";
 import { page, btn, entity, input } from "@/pages/page-classes";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, MoreHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
@@ -26,25 +32,59 @@ export default function ProductManagementPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isNewOpen, setIsNewOpen] = useState(false);
+  // New state for inventory totals
+  const [inventoryLoading, setInventoryLoading] = useState(true);
+  const [totalQuantities, setTotalQuantities] = useState<Record<number, number>>({});
+  const [totalByWarehouse, setTotalByWarehouse] = useState<Record<number, Record<number, number>>>({});
+  const [warehouseMap, setWarehouseMap] = useState<Record<number, number>>({});
+
 
   // State cho phân trang
   const [currentPage, setCurrentPage] = useState(1);
 
   const loadProducts = async () => {
     setLoading(true);
+    setInventoryLoading(true);
     try {
-      const data = await api.products.list();
-      if (!data || data.length === 0) {
+      const [productData, inventoryData, warehouseData] = await Promise.all([
+        api.products.list(),
+        api.detailInventories.list(),
+        api.warehouses.list(),
+      ]);
+      if (!productData || productData.length === 0) {
         toast.error("Không có dữ liệu");
         setProducts([]);
       } else {
-        setProducts(data);
+        setProducts(productData);
       }
+      // Compute total quantities per product
+      const qtyMap: Record<number, number> = {};
+      const byWarehouse: Record<number, Record<number, number>> = {};
+      const whMap: Record<number, number> = {};
+      // Build warehouse ID -> type map
+      warehouseData.forEach((wh: any) => {
+        whMap[wh.WareHouseID] = wh.WarehouseType as number;
+      });
+      setWarehouseMap(whMap);
+      inventoryData.forEach((inv: any) => {
+        const pid = inv.ProductID as number;
+        const wid = inv.WarehouseID as number;
+        const wtype = whMap[wid];
+        // total quantity per product
+        qtyMap[pid] = (qtyMap[pid] || 0) + (inv.CurrentQuantity as number);
+        // per warehouse type
+        if (!byWarehouse[pid]) byWarehouse[pid] = {};
+        byWarehouse[pid][wtype] = (byWarehouse[pid][wtype] || 0) + (inv.CurrentQuantity as number);
+      });
+      setTotalByWarehouse(byWarehouse);
+      setTotalQuantities(qtyMap);
     } catch (error: any) {
-      toast.error(error.message || "Lỗi lấy dữ liệu sản phẩm");
+      toast.error(error.message || "Lỗi lấy dữ liệu");
       setProducts([]);
+      setTotalQuantities({});
     } finally {
       setLoading(false);
+      setInventoryLoading(false);
     }
   };
 
@@ -178,7 +218,10 @@ export default function ProductManagementPage() {
                         )}
                       >
                         <span className={entity.cellMeta}>
-                          DM: {product.CategoryID} • Loại: {product.ProductTypeID}
+                          DM: {product.CategoryID} • Loại: {product.ProductTypeID}  • SL: {totalQuantities[product.ProductID]}
+                        </span>
+                        <span className={entity.cellMeta}>
+                          Kho gốc: {totalByWarehouse[product.ProductID]?.[1] ?? 0} • Kho VL: {totalByWarehouse[product.ProductID]?.[2] ?? 0} • Kho lỗi: {totalByWarehouse[product.ProductID]?.[3] ?? 0}
                         </span>
                         <span className={cn(entity.price, 'mt-0.5')}>
                           {product.ProductPrice.toLocaleString("vi-VN")} đ
@@ -186,57 +229,26 @@ export default function ProductManagementPage() {
                       </div>
                     </TableCell>
 
-                    {/* Các nút hành động với grid bằng nhau */}
-                    <TableCell>
-                      <div className="grid grid-cols-3 gap-2 w-full max-w-[400px] ml-auto">
-                        {/* Cột 1: Xem chi tiết */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className={cn(btn.actionSecondary, "w-full")}
-                          onClick={() => handleDetailClick(product)}
-                        >
-                          Xem chi tiết
-                        </Button>
-
-                        {/* Cột 2: Cập nhật */}
-                        {hasRole(1) && (
-                          <Button
-                            disabled={product.ProductStatus === 0}
-                            variant="outline"
-                            size="sm"
-                            className="text-blue-600 border-blue-200 hover:bg-blue-50 w-full"
-                            onClick={() => handleEditClick(product)}
-                          >
-                            Cập nhật
+                    {/* Các nút hành động */}
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
                           </Button>
-                        )}
-
-                        {/* Cột 3: Trạng thái Kinh doanh */}
-                        {hasRole(1) && (
-                          <>
-                            {product.ProductStatus === 1 ? (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 w-full"
-                                onClick={() => handleToggleStatus(product)}
-                              >
-                                Ngưng KD
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className={cn(btn.actionSecondary, "w-full")}
-                                onClick={() => handleToggleStatus(product)}
-                              >
-                                KD lại
-                              </Button>
-                            )}
-                          </>
-                        )}
-                      </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border border-slate-200 min-w-[140px]">
+                          <DropdownMenuItem className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 font-medium" onClick={() => handleDetailClick(product)}>
+                            Xem chi tiết
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 font-medium" onClick={() => handleEditClick(product)}>
+                            Chỉnh sửa
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 font-medium" onClick={() => handleToggleStatus(product)}>
+                            {product.ProductStatus === 1 ? "Ngừng kinh doanh" : "Kinh doanh lại"}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -300,6 +312,8 @@ export default function ProductManagementPage() {
         open={isDetailOpen}
         onOpenChange={setIsDetailOpen}
         product={selectedProduct}
+        loading={inventoryLoading}
+        totalQuantity={selectedProduct ? totalQuantities[selectedProduct.ProductID] ?? null : null}
       />
 
       <EditProductDialog

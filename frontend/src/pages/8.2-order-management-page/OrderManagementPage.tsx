@@ -53,7 +53,7 @@ export default function OrderManagementPage() {
         setOrders([]);
       } else {
         // Sort newest first
-        setOrders(orderData.sort((a, b) => b.id - a.id));
+        setOrders(orderData);
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải danh sách đơn hàng");

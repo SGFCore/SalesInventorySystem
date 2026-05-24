@@ -32,7 +32,7 @@ export default function RequestManagementPage() {
         toast.error("Không có dữ liệu yêu cầu đề xuất");
         setRequests([]);
       } else {
-        setRequests(data.sort((a, b) => b.RequestID - a.RequestID));
+        setRequests(data);
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải yêu cầu đề xuất");

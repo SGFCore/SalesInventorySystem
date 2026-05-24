@@ -1,59 +1,30 @@
+
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import type { Product, Detailinventory } from "@/lib/types";
-import { dialog } from "@/pages/page-classes";
-import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
+import type { Product } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { dialog } from "@/pages/page-classes";
 import { Loader2 } from "lucide-react";
+
 
 interface DetailProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   product: Product | null;
+  loading: boolean;
+  totalQuantity: number | null;
 }
 
 export function DetailProductDialog({
   open,
   onOpenChange,
   product,
+  loading,
+  totalQuantity,
 }: DetailProps) {
-  const [loading, setLoading] = useState(false);
-  const [totalQuantity, setTotalQuantity] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (open && product) {
-      const fetchStock = async () => {
-        setLoading(true);
-        try {
-          const invList = await api.detailInventories.list();
-          const matchedInv = invList.filter(
-            (inv) => inv.ProductID === product.ProductID
-          );
-          const total = matchedInv.reduce(
-            (sum, inv) => sum + inv.CurrentQuantity,
-            0
-          );
-          setTotalQuantity(total);
-        } catch (error) {
-          console.error("Lỗi khi tải thông tin tồn kho:", error);
-          setTotalQuantity(0);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchStock();
-    } else {
-      setTotalQuantity(null);
-    }
-  }, [open, product]);
+  // loading and totalQuantity are now provided via props
 
   if (!product) return null;
 

@@ -32,7 +32,7 @@ export default function ImportReceiptManagementPage() {
         toast.error("Không có dữ liệu phiếu nhập kho");
         setReceipts([]);
       } else {
-        setReceipts(data.sort((a, b) => b.ImportReceiptID - a.ImportReceiptID));
+        setReceipts(data);
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải danh sách phiếu nhập kho");

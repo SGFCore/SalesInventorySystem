@@ -62,6 +62,7 @@ async function request<T>(
     const error = await response
       .json()
       .catch(() => ({ message: response.statusText }));
+    console.log(error.message || `HTTP ${response.status}`);
     throw new Error(error.message || `HTTP ${response.status}`);
   }
 
@@ -72,7 +73,37 @@ async function request<T>(
 
   // Safe parse empty body for successful responses (e.g. 200 OK with no content)
   const responseText = await response.text();
-  return responseText ? (JSON.parse(responseText) as T) : (undefined as T);
+
+  if (!responseText) {
+    return undefined as T;
+  }
+
+  const data = JSON.parse(responseText);
+
+  // Auto sort array by first property (assume id-like field)
+  if (
+    Array.isArray(data) &&
+    data.length > 0 &&
+    typeof data[0] === "object" &&
+    data[0] !== null
+  ) {
+    const firstKey = Object.keys(data[0])[0];
+
+    data.sort((a, b) => {
+      const av = a[firstKey];
+      const bv = b[firstKey];
+
+      // Number sort DESC
+      if (typeof av === "number" && typeof bv === "number") {
+        return bv - av;
+      }
+
+      // String sort DESC
+      return String(bv).localeCompare(String(av));
+    });
+  }
+
+  return data as T;
 }
 
 export const apiClient = {

@@ -40,7 +40,7 @@ export default function WarehouseManagementPage() {
         toast.error("Không có dữ liệu nhà kho");
         setWarehouses([]);
       } else {
-        setWarehouses(data.sort((a, b) => b.WareHouseID - a.WareHouseID));
+        setWarehouses(data);
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải danh sách nhà kho");

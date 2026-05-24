@@ -40,7 +40,7 @@ export default function CountsheetManagementPage() {
         toast.error("Không có dữ liệu phiếu kiểm kho");
         setCountsheets([]);
       } else {
-        setCountsheets(data.sort((a, b) => b.id - a.id));
+        setCountsheets(data);
       }
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải phiếu kiểm kho");

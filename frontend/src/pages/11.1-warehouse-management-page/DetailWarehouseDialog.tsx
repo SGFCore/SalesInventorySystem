@@ -67,7 +67,7 @@ export function DetailWarehouseDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-2 text-sm max-h-[70vh] overflow-y-auto pr-1">
+        <div className="grid gap-4 py-2 text-sm pr-1">
           <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-2">
             <div>
               <Label className="text-slate-500 text-xs font-semibold">Mã kho hàng</Label>

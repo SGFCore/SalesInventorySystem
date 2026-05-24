@@ -162,7 +162,7 @@ export default function Dashboard() {
           <CardContent className="p-2 flex items-center justify-between">
             <div className="min-w-0">
               <p className="text-xs font-medium text-slate-500 truncate">
-                SP trả về
+                SP hoàn trả
               </p>
 
               <p className="text-lg font-bold text-slate-900 whitespace-nowrap">

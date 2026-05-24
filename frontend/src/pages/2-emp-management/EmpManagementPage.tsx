@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import type { Employee } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { EditEmpDialog } from "@/pages/2-emp-management/EditEmpDialog";
@@ -83,7 +89,11 @@ export default function EmpManagementPage() {
         ...emp,
         Status: newStatus,
       });
-      toast.success(newStatus === 1 ? "Kích hoạt nhân viên thành công!" : "Vô hiệu hóa nhân viên thành công!");
+      toast.success(
+        newStatus === 1
+          ? "Kích hoạt nhân viên thành công!"
+          : "Vô hiệu hóa nhân viên thành công!",
+      );
       loadEmps();
     } catch (error: any) {
       toast.error("Thay đổi trạng thái thất bại: " + error.message);
@@ -110,7 +120,10 @@ export default function EmpManagementPage() {
             className={input.search}
           />
         </div>
-        <Button className={btn.primary} onClick={() => setIsNewDialogOpen(true)}>
+        <Button
+          className={btn.primary}
+          onClick={() => setIsNewDialogOpen(true)}
+        >
           Thêm nhân viên mới
         </Button>
       </div>
@@ -120,7 +133,9 @@ export default function EmpManagementPage() {
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <span className="ml-2 text-slate-500 font-medium">Đang tải dữ liệu nhân viên...</span>
+            <span className="ml-2 text-slate-500 font-medium">
+              Đang tải dữ liệu nhân viên...
+            </span>
           </div>
         ) : paginatedEmps.length === 0 ? (
           <div className="text-center py-20 text-slate-400 font-medium">
@@ -131,10 +146,7 @@ export default function EmpManagementPage() {
             <Table>
               <TableBody>
                 {paginatedEmps.map((emp) => (
-                  <TableRow
-                    key={emp.EmployeeID}
-                    className={page.tableRow}
-                  >
+                  <TableRow key={emp.EmployeeID} className={page.tableRow}>
                     {/* General info */}
                     <TableCell>
                       <div className="flex flex-col items-start">
@@ -142,7 +154,10 @@ export default function EmpManagementPage() {
                           <span className={entity.id}>{emp.EmployeeID}</span>
                           <span className={entity.separator}>·</span>
                           <span
-                            className={cn(entity.name, emp.Status === 0 && entity.nameInactive)}
+                            className={cn(
+                              entity.name,
+                              emp.Status === 0 && entity.nameInactive,
+                            )}
                           >
                             {emp.Fullname}
                           </span>
@@ -203,7 +218,12 @@ export default function EmpManagementPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className={cn(emp.Status === 1 ? btn.actionDestructive : btn.actionSecondary, "w-full")}
+                          className={cn(
+                            emp.Status === 1
+                              ? btn.actionDestructive
+                              : btn.actionSecondary,
+                            "w-full",
+                          )}
                           onClick={() => toggleStatus(emp)}
                         >
                           {emp.Status === 1 ? "Vô hiệu hóa" : "Kích hoạt lại"}
@@ -219,14 +239,19 @@ export default function EmpManagementPage() {
             {totalPages > 0 && (
               <div className={page.pagination}>
                 <div className={page.paginationText}>
-                  Hiển thị <span className="font-medium">{paginatedEmps.length}</span>{" "}
-                  trên <span className="font-medium">{filteredEmps.length}</span> nhân viên
+                  Hiển thị{" "}
+                  <span className="font-medium">{paginatedEmps.length}</span>{" "}
+                  trên{" "}
+                  <span className="font-medium">{filteredEmps.length}</span>{" "}
+                  nhân viên
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                     className={btn.paginationNav}
                   >
@@ -238,7 +263,9 @@ export default function EmpManagementPage() {
                       (pageNum) => (
                         <Button
                           key={pageNum}
-                          variant={currentPage === pageNum ? "default" : "outline"}
+                          variant={
+                            currentPage === pageNum ? "default" : "outline"
+                          }
                           size="sm"
                           onClick={() => setCurrentPage(pageNum)}
                           className={cn(
@@ -247,7 +274,8 @@ export default function EmpManagementPage() {
                               : btn.paginationInactive,
                           )}
                         >
-                          {pageNum}</Button>
+                          {pageNum}
+                        </Button>
                       ),
                     )}
                   </div>
