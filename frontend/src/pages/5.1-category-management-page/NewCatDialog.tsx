@@ -38,9 +38,7 @@ export function NewCatDialog({ open, onOpenChange, onSave }: Props) {
     }
     setLoading(true);
     try {
-      const categoryId = Math.floor(Math.random() * 9000) + 1000;
       await api.categories.create({
-        id: categoryId,
         categoryname: formData.CategoryName,
       });
       toast.success("Thêm danh mục mới thành công!");

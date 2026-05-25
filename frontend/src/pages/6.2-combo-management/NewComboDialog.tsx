@@ -95,10 +95,8 @@ export function NewComboDialog({ open, onOpenChange, onSave }: NewProps) {
 
     setLoading(true);
     try {
-      const comboId = Math.floor(Math.random() * 9000) + 1000;
       // 1. Tạo combo
-      await api.combos.create({
-        id: comboId,
+      const newCombo = await api.combos.create({
         comboprice: comboPrice,
       });
 
@@ -106,7 +104,7 @@ export function NewComboDialog({ open, onOpenChange, onSave }: NewProps) {
       await Promise.all(
         selectedProducts.map((p) =>
           api.comboDetails.create({
-            comboId: comboId,
+            comboId: newCombo.id,
             productId: p.productID,
             quantity: p.quantity,
           }),

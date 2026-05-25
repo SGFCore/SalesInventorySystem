@@ -48,10 +48,10 @@ export function EditCustomerTypeDialog({
     try {
       await api.customerTypes.update(customerType.id, {
         ...customerType,
-        CustomerTypeName: form.customertypename,
-        Discount: form.discount || 0,
-        SpendingLimit: form.spendinglimit || 0,
-        Detail: form.detail || "",
+        customertypename: form.customertypename,
+        discount: form.discount || 0,
+        spendinglimit: form.spendinglimit || 0,
+        detail: form.detail || "",
       });
       toast.success("Cập nhật nhóm khách hàng thành công!");
       onOpenChange(false);

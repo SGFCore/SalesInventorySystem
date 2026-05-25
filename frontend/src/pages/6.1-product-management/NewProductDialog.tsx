@@ -81,17 +81,15 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
     }
     setLoading(true);
     try {
-      const productId = Math.floor(Math.random() * 90000) + 10000;
       await api.products.create({
-        ProductID: productId,
         ProductName: formData.productName,
         ProductPrice: formData.productPrice,
         CategoryID: formData.categoryId,
         ProductTypeID: formData.productTypeId,
-        Detail: formData.detail,
+        Detail: formData.detail.trim().length ? formData.detail.trim() : null,
         AllowReturn: formData.allowReturn ? 1 : 0,
         ProductStatus: 1,
-        ImageURL: "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+        ImageURL: null,
       });
       toast.success("Thêm sản phẩm mới thành công!");
       setFormData({

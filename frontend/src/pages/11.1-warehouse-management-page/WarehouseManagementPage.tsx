@@ -156,52 +156,41 @@ export default function WarehouseManagementPage() {
                       </div>
                     </TableCell>
 
-                    {/* Sức chứa */}
-                    <TableCell className="text-center text-xs text-slate-500 font-medium">
-                      Sức chứa: <span className="font-bold text-slate-800">{w.Capacity.toLocaleString()}</span>
-                    </TableCell>
-
                     {/* Địa chỉ kho hàng */}
                     <TableCell className="text-left text-slate-600 text-xs font-semibold">
                       {w.Address}
                     </TableCell>
 
                     {/* Dropdown Menu Hành động */}
-                    <TableCell className="w-16 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="h-8 w-8 p-0 focus:ring-0 focus:ring-offset-0"
-                          >
-                            <span className="sr-only">Mở menu</span>
-                            <MoreHorizontal className="h-4 w-4 text-slate-600" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="bg-white border border-slate-200 min-w-[140px]"
+                    <TableCell>
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
+                          onClick={() => openAction(w, "detail")}
                         >
-                          <DropdownMenuItem
-                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 font-medium"
-                            onClick={() => openAction(w, "detail")}
-                          >
-                            Xem chi tiết
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 font-medium"
-                            onClick={() => openAction(w, "edit")}
-                          >
-                            Cập nhật
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 font-medium"
-                            onClick={() => openAction(w, "report")}
-                          >
-                            Báo cáo thiếu hụt
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                          Xem chi tiết
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
+                          onClick={() => openAction(w, "edit")}
+                        >
+                          Cập nhật
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={cn(btn.actionPrimary, "w-32 text-xs font-semibold")}
+                          onClick={() => openAction(w, "report")}
+                        >
+                          Báo cáo thiếu hụt
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

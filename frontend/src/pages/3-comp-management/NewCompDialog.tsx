@@ -43,9 +43,7 @@ export function NewCompDialog({ open, onOpenChange, onSave }: NewProps) {
     }
     setLoading(true);
     try {
-      const shipCompanyId = Math.floor(Math.random() * 900000) + 100000;
       await api.shipCompanies.create({
-        ShipCompanyID: shipCompanyId,
         ShipCompanyName: formData.shipCompanyName,
         SupportedRegion: formData.supportedRegion,
         Phone: formData.phone,

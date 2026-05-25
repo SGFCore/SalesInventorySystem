@@ -103,7 +103,6 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
 
     setLoading(true);
     try {
-      const orderId = Math.floor(Math.random() * 900000) + 100000;
       const shipCode = "SHIP" + Math.floor(Math.random() * 900000 + 100000);
 
       // Calculate Total Amount
@@ -116,19 +115,18 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
       });
 
       // 1. Create Order
-      await api.orders.create({
-        id: orderId,
+      const newOrder = await api.orders.create({
         customerId: Number(selectedCustomerId),
-        employeeId: emp?.EmployeeID || 1,
-        invoiceId: orderData.InvoiceID ? Number(orderData.InvoiceID) : 0,
-        shipcode: shipCode,
-        shipcompanyId: Number(orderData.ShipCompanyID),
+        employeeId: emp?.EmployeeID || null,
+        invoiceId: orderData.InvoiceID ? Number(orderData.InvoiceID) : null,
+        shipcode: shipCode.trim().length ? shipCode.trim() : null,
+        shipcompanyId: orderData.ShipCompanyID ? Number(orderData.ShipCompanyID) : null,
         totalamount: totalAmount + orderData.ShippingFee,
         orderstatus: 0, // 0: Chờ xác nhận, 1: Đang chuẩn bị, 2: Đang giao, 3: Đã giao, 4: Đã hủy
         shippingstatus: 0, // 0: Chưa giao, 1: Đang giao, 2: Đã giao thành công, 3: Trả về
-        shipmentnote: orderData.ShipmentNote,
-        shippingfee: orderData.ShippingFee,
-        exportreceiptId: 0,
+        shipmentnote: orderData.ShipmentNote.trim().length ? orderData.ShipmentNote.trim() : null,
+        shippingfee: orderData.ShippingFee ?? null,
+        exportreceiptId: null,
       });
 
       // 2. Create OrderDetails
@@ -137,8 +135,7 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
           const prod = products.find((p) => p.ProductID === item.productID);
           const price = prod ? prod.ProductPrice : 0;
           return api.orderDetails.create({
-            OrderDetailID: Math.floor(Math.random() * 900000) + 100000 + index,
-            OrderID: orderId,
+            OrderID: newOrder.id,
             ProductID: item.productID,
             ComboID: 0,
             Quantity: item.quantity,
@@ -304,9 +301,9 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
                         prev.map((p, i) =>
                           i === index
                             ? {
-                                ...p,
-                                quantity: Math.max(1, Number(e.target.value)),
-                              }
+                              ...p,
+                              quantity: Math.max(1, Number(e.target.value)),
+                            }
                             : p,
                         ),
                       )

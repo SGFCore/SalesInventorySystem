@@ -114,11 +114,8 @@ export function NewCountsheetDialog({ open, onOpenChange, onSave }: Props) {
 
     setLoading(true);
     try {
-      const countSheetId = Math.floor(Math.random() * 900000) + 100000;
-      
       // 1. Tạo phiếu kiểm Master
-      await api.countSheets.create({
-        id: countSheetId,
+      const newCountsheet = await api.countSheets.create({
         createddate: new Date().toISOString(),
         status: isDraftMode ? 0 : 1, // 0: Bản nháp, 1: Chờ phê duyệt
       });
@@ -127,7 +124,7 @@ export function NewCountsheetDialog({ open, onOpenChange, onSave }: Props) {
       await Promise.all(
         items.map((item) =>
           api.countSheetDetails.create({
-            countsheetId: countSheetId,
+            countsheetId: newCountsheet.id,
             warehouseId: item.WarehouseID,
             productId: item.ProductId,
             quantity: item.Quantity,

@@ -85,12 +85,10 @@ export function NewRequestDialog({ open, onOpenChange, onSave }: Props) {
 
     setLoading(true);
     try {
-      const requestId = Math.floor(Math.random() * 900000) + 100000;
       const empId = emp ? emp.EmployeeID : 1;
 
       // 1. Create request form
-      await api.requestForms.create({
-        RequestID: requestId,
+      const newRequest = await api.requestForms.create({
         EmployeeID: empId,
         CreatedDate: new Date().toISOString(),
         Status: "0", // "0": Chờ duyệt
@@ -102,7 +100,7 @@ export function NewRequestDialog({ open, onOpenChange, onSave }: Props) {
       await Promise.all(
         items.map((item) => {
           return api.requestDetails.create({
-            RequestID: requestId,
+            RequestID: newRequest.RequestID,
             ProductID: item.ProductID,
             Quantity: item.Quantity,
           });

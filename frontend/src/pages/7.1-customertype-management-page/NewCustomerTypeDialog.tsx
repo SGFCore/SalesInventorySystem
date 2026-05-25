@@ -54,10 +54,7 @@ export function NewCustomerTypeDialog({ open, onOpenChange, onSave }: Props) {
     setLoading(true);
 
     try {
-      const typeId = Math.floor(Math.random() * 9000) + 1000;
-
       await api.customerTypes.create({
-        id: typeId,
         customertypename: formData.customertypename.trim(),
         discount: formData.discount,
         spendinglimit: formData.spendinglimit,

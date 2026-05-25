@@ -108,12 +108,10 @@ export function ReturnProductDialog({
         }
       });
 
-      const returnId = Math.floor(Math.random() * 900000) + 100000;
       const refCode = "RET" + Math.floor(Math.random() * 900000 + 100000);
 
       // 3. Create OrderReturn entry
-      await api.orderReturns.create({
-        id: returnId,
+      const newReturn = await api.orderReturns.create({
         orderId: order.id,
         employeeId: emp?.EmployeeID || 1,
         returndate: new Date().toISOString().split("T")[0],
@@ -128,7 +126,7 @@ export function ReturnProductDialog({
         selectedProductIds.map((pid) => {
           const qty = getProductQty(pid);
           return api.returnDetails.create({
-            ReturnID: returnId,
+            ReturnID: newReturn.id,
             ProductID: pid,
             Quantity: qty,
             QC_Status: "Chờ kiểm định",

@@ -41,20 +41,18 @@ export function NewWarehouseDialog({ open, onOpenChange, onSave }: Props) {
 
   const handleSubmit = async () => {
     if (!formData.WareHouseName.trim() || !formData.Address.trim()) {
-      toast.error("Vui lòng điền tên kho hàng và địa chỉ!");
+      toast.error("Điền thiếu dữ liệu");
       return;
     }
 
     setLoading(true);
     try {
-      const warehouseId = Math.floor(Math.random() * 900) + 100;
       await api.warehouses.create({
-        WareHouseID: warehouseId,
         WareHouseName: formData.WareHouseName,
         Address: formData.Address,
-        ContactNumber: formData.ContactNumber || "N/A",
-        ManagerID: Number(formData.ManagerID) || 1,
-        Capacity: Number(formData.Capacity) || 10000,
+        ContactNumber: formData.ContactNumber,
+        ManagerID: Number(formData.ManagerID),
+        Capacity: Number(formData.Capacity),
         WarehouseType: Number(formData.WarehouseType),
         Status: Number(formData.Status),
       });

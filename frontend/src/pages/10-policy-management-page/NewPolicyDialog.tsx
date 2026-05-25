@@ -45,9 +45,7 @@ export function NewPolicyDialog({ open, onOpenChange, onSave }: Props) {
 
     setLoading(true);
     try {
-      const policyId = Math.floor(Math.random() * 9000) + 1000;
       await api.returnPolicies.create({
-        PolicyID: policyId,
         PolicyName: formData.PolicyName,
         MaxReturnDays: Number(formData.MaxReturnDays) || 7,
         PenaltyFeeRate: (Number(formData.PenaltyFeeRate) || 0) / 100, // Convert percentage to fraction

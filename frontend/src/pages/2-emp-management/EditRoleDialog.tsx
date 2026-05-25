@@ -36,8 +36,8 @@ export function EditRoleDialog({ open, onOpenChange, emp, onSave }: Props) {
         try {
           const list = await api.employeeRoles.list();
           const empRoles = list
-            .filter((r) => r.EmployeeID === emp.EmployeeID)
-            .map((r) => r.RoleID);
+            .filter((r) => r.employeeId === emp.EmployeeID)
+            .map((r) => r.roleId);
           setFormData({ roleIds: empRoles });
         } catch (error) {
           toast.error("Không thể tải quyền của nhân viên!");
@@ -68,15 +68,15 @@ export function EditRoleDialog({ open, onOpenChange, emp, onSave }: Props) {
     try {
       const currentList = await api.employeeRoles.list();
       const currentRoles = currentList
-        .filter((r) => r.EmployeeID === emp.EmployeeID)
-        .map((r) => r.RoleID);
+        .filter((r) => r.employeeId === emp.EmployeeID)
+        .map((r) => r.roleId);
 
       // Thêm các quyền mới
       const toAdd = formData.roleIds.filter((id) => !currentRoles.includes(id));
       for (const roleId of toAdd) {
         await api.employeeRoles.create({
-          EmployeeID: emp.EmployeeID,
-          RoleID: roleId,
+          employeeId: emp.EmployeeID,
+          roleId: roleId,
         });
       }
 

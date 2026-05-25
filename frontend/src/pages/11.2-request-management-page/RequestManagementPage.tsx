@@ -162,15 +162,20 @@ export default function RequestManagementPage() {
                         >
                           Xem chi tiết
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
-                          disabled={!hasRole(1) || r.Status === "1" || r.Status === "2" || r.Status === "Đã duyệt" || r.Status === "Từ chối"}
-                          onClick={() => openAction(r, "approve")}
-                        >
-                          Phê duyệt
-                        </Button>
+                        {
+                          hasRole(1) && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
+                              disabled={r.Status === "1" || r.Status === "2" || r.Status === "Đã duyệt" || r.Status === "Từ chối"}
+                              onClick={() => openAction(r, "approve")}
+                            >
+                              Phê duyệt
+                            </Button>
+                          )
+                        }
+
                       </div>
                     </TableCell>
                   </TableRow>

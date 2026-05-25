@@ -10,7 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { btn, dialog } from "@/pages/page-classes";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import type { Category } from "@/lib/types";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -22,13 +23,24 @@ interface Props {
 
 export function NewProductTypeDialog({ open, onOpenChange, onSave }: Props) {
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     ProductTypeName: "",
+    CategoryId: 0,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (open) {
+      api.categories
+        .list()
+        .then((data) => setCategories(data))
+        .catch(() => toast.error("Không thể tải danh sách danh mục!"));
+    }
+  }, [open]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: name === "CategoryId" ? Number(value) : value }));
   };
 
   const handleSubmit = async () => {
@@ -36,15 +48,18 @@ export function NewProductTypeDialog({ open, onOpenChange, onSave }: Props) {
       toast.error("Vui lòng điền tên loại sản phẩm!");
       return;
     }
+    if (!formData.CategoryId) {
+      toast.error("Vui lòng chọn danh mục!");
+      return;
+    }
     setLoading(true);
     try {
-      const productTypeId = Math.floor(Math.random() * 9000) + 1000;
       await api.productTypes.create({
-        id: productTypeId,
         producttypename: formData.ProductTypeName,
+        categoryid: formData.CategoryId,
       });
       toast.success("Thêm loại sản phẩm mới thành công!");
-      setFormData({ ProductTypeName: "" });
+      setFormData({ ProductTypeName: "", CategoryId: 0 });
       onOpenChange(false);
       onSave();
     } catch (error: any) {
@@ -75,6 +90,29 @@ export function NewProductTypeDialog({ open, onOpenChange, onSave }: Props) {
               placeholder="Nhập tên loại sản phẩm..."
               disabled={loading}
             />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="CategoryId">Danh mục</Label>
+            <select
+              id="CategoryId"
+              name="CategoryId"
+              value={formData.CategoryId}
+              onChange={handleChange}
+              className={cn(
+                "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                dialog.input
+              )}
+              disabled={loading}
+            >
+              <option value={0} disabled>
+                Chọn danh mục...
+              </option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.categoryname}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

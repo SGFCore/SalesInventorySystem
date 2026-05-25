@@ -135,11 +135,8 @@ export function NewOrderReturnDialog({ open, onOpenChange, onSave }: NewProps) {
 
     setLoading(true);
     try {
-      const returnId = Math.floor(Math.random() * 900000) + 100000;
-
       // 1. Create OrderReturn
-      await api.orderReturns.create({
-        id: returnId,
+      const newReturn = await api.orderReturns.create({
         orderId: parseInt(orderName.replace(/\D/g, '')) || 0,
         employeeId: emp ? emp.EmployeeID : 1,
         returndate: new Date().toISOString(),
@@ -153,7 +150,7 @@ export function NewOrderReturnDialog({ open, onOpenChange, onSave }: NewProps) {
       await Promise.all(
         selectedProducts.map((item, idx) => {
           return api.returnDetails.create({
-            ReturnID: returnId,
+            ReturnID: newReturn.id,
             ProductID: item.productID,
             Quantity: item.quantity,
             QC_Status: item.qcStatus || "Chưa QC",

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { Invoice, Invoicedetail, Product } from "@/lib/types";
+import type { Invoice, Invoicedetail, Product, Customer } from "@/lib/types";
 import { dialog } from "@/pages/page-classes";
 import React, { useState, useEffect } from "react";
 import { api } from "@/lib/api";
@@ -29,19 +29,23 @@ export function DetailInvoiceDialog({
   const [loading, setLoading] = useState(false);
   const [details, setDetails] = useState<Invoicedetail[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [customer, setCustomer] = useState<Customer | null>(null);
 
   useEffect(() => {
     if (open && invoice) {
       const loadDetails = async () => {
         setLoading(true);
         try {
-          const [allDetails, allProds] = await Promise.all([
+          const [allDetails, allProds, allCustomers] = await Promise.all([
             api.invoiceDetails.list(),
             api.products.list(),
+            api.customers.list(),
           ]);
           const filtered = allDetails.filter((d) => d.InvoiceID === invoice.InvoiceID);
           setDetails(filtered);
           setProducts(allProds);
+          const cust = allCustomers.find((c) => c.id === invoice.CustomerID);
+          setCustomer(cust || null);
         } catch (e) {
           console.error("Lỗi lấy chi tiết hóa đơn:", e);
         } finally {
@@ -71,6 +75,9 @@ export function DetailInvoiceDialog({
     const prod = products.find((p) => p.ProductID === prodId);
     return prod ? prod.ProductName : `Sản phẩm #${prodId}`;
   };
+
+  const renderValue = (val: any) =>
+    val || <span className="text-slate-400">(Không có)</span>;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -130,6 +137,60 @@ export function DetailInvoiceDialog({
                   {invoice.FinalAmount.toLocaleString("vi-VN")} đ
                 </span>
               </div>
+            </div>
+
+            <div className="grid gap-2 mt-4">
+              <Label className="text-slate-900 font-bold border-b border-slate-200 pb-2">
+                Thông tin khách hàng
+              </Label>
+              {customer ? (
+                <div className="grid gap-3 border border-slate-200 p-3 rounded-md bg-slate-50/50">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-slate-500 text-xs">Mã khách hàng</Label>
+                      <p className="font-medium text-sm">#{customer.id}</p>
+                    </div>
+                    <div>
+                      <Label className="text-slate-500 text-xs">Loại khách hàng</Label>
+                      <p className="font-medium text-sm">{customer.customertypeId}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500 text-xs">Họ và Tên</Label>
+                    <p className="font-medium text-base text-blue-700">
+                      {customer.firstname} {customer.lastname}
+                    </p>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500 text-xs">Tên công ty</Label>
+                    <p className="font-medium text-sm">{renderValue(customer.companyname)}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-slate-500 text-xs">Điện thoại</Label>
+                      <p className="font-medium text-sm text-blue-600">
+                        {renderValue(customer.phone)}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-slate-500 text-xs">Email</Label>
+                      <p className="font-medium text-sm">{renderValue(customer.email)}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500 text-xs">Địa chỉ</Label>
+                    <p className="font-medium text-sm">{renderValue(customer.address)}</p>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500 text-xs">Tổng chi tiêu</Label>
+                    <p className="font-medium text-sm text-green-600">
+                      {customer.totalaccumulatedspent?.toLocaleString()} VNĐ
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500 italic">Không có thông tin khách hàng.</p>
+              )}
             </div>
 
             {/* Danh sách sản phẩm thành phần */}

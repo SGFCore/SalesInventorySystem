@@ -175,15 +175,18 @@ export default function ImportReceiptManagementPage() {
                             Đã đếm xong
                           </Button>
                         )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
-                          disabled={!hasRole(1) || r.Status === "Bản nháp" || r.Status === "Đã nhập kho" || r.Status === "Đã từ chối"}
-                          onClick={() => openAction(r, "approve")}
-                        >
-                          Phê duyệt
-                        </Button>
+                        {
+                          hasRole(1) && (<Button
+                            variant="outline"
+                            size="sm"
+                            className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
+                            disabled={r.Status === "Bản nháp" || r.Status === "Đã nhập kho" || r.Status === "Đã từ chối"}
+                            onClick={() => openAction(r, "approve")}
+                          >
+                            Phê duyệt
+                          </Button>)
+                        }
+
                       </div>
                     </TableCell>
                   </TableRow>

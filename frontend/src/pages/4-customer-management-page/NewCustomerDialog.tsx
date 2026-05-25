@@ -45,23 +45,19 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
     }
     setLoading(true);
     try {
-      const customerId = Math.floor(Math.random() * 8000) + 3000;
-      const newCustomer: Customer = {
-        id: customerId,
+      const createdCustomer = await api.customers.create({
         customertypeId: Number(formData.CustomerTypeID) || 1,
         firstname: formData.FirstName,
         lastname: formData.LastName,
-        companyname: formData.CompanyName,
+        companyname: formData.CompanyName.trim().length ? formData.CompanyName.trim() : null,
         phone: formData.Phone,
-        email: formData.Email,
-        address: formData.Address,
+        email: formData.Email.trim().length ? formData.Address.trim() : null,
+        address: formData.Address.trim().length ? formData.Address.trim() : null,
         createddate: new Date().toISOString(),
         totalaccumulatedspent: 0,
-      };
-
-      await api.customers.create(newCustomer);
+      });
       toast.success("Thêm khách hàng mới thành công!");
-      onSave(newCustomer);
+      onSave(createdCustomer);
 
       setFormData({
         CustomerTypeID: "1",

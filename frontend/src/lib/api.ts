@@ -1,62 +1,60 @@
 import { apiClient } from "./api-client";
 import type {
-  CustomerType,
+  Customertype,
   Customer,
   Category,
   Product,
-  ProductType,
+  Producttype,
   Combo,
-  ComboDetail,
+  Combodetail,
   Warehouse,
   Employee,
   Role,
-  EmployeeRole,
-  ShipCompany,
+  Employeerole,
+  Shipcompany,
   Invoice,
   Order,
   OrderDetail,
-  InvoiceDetail,
+  Invoicedetail,
   PaymentMethod,
   Payment,
   ReturnPolicy,
   OrderReturn,
   ReturnDetail,
-  DetailInventory,
+  Detailinventory,
   Notification,
   RequestForm,
   RequestDetail,
-  TransferTicket,
-  TransferTicketDetail,
-  ImportReceipt,
-  ImportReceiptDetail,
-  ExportReceipt,
-  ExportReceiptDetail,
-  CountSheet,
-  CountSheetDetail,
+  Transferticket,
+  Transferticketdetail,
+  Importreceipt,
+  Importreceiptdetail,
+  Exportreceipt,
+  Exportreceiptdetail,
+  Countsheet,
+  Countsheetdetail,
   Discount,
-  ListDiscount,
+  Listdiscount,
   Feedback,
-  LoginCredentials,
-  LoginResponse,
 } from "./types";
 
 export const api = {
   // Auth API
   auth: {
-    signin: (credentials: LoginCredentials) =>
-      apiClient.post<LoginResponse>("/auth/signin", credentials),
+    signin: (credentials) =>
+      apiClient.post("/auth/signin", credentials),
     signout: () =>
-      apiClient.post<void>("/auth/signout", {}),
+      apiClient.post("/auth/signout", {}),
   },
 
-  // 1. CUSTOMERTYPE TABLE
+  // 1. Customertype TABLE
   customerTypes: {
-    list: () => apiClient.get<CustomerType[]>("/customer-types"),
-    get: (id: number) => apiClient.get<CustomerType>(`/customer-types/${id}`),
-    create: (data: CustomerType) =>
-      apiClient.post<CustomerType>("/customer-types", data),
-    update: (id: number, data: CustomerType) =>
-      apiClient.put<CustomerType>(`/customer-types/${id}`, data),
+    list: () => apiClient.get<Customertype[]>("/customer-types"),
+    get: (id: number) => apiClient.get<Customertype>(`/customer-types/${id}`),
+    create: (data: Omit<Customertype, "id">) =>
+      apiClient.post<Customertype>("/customer-types", data),
+    update: (id: number, data: Customertype) =>
+      apiClient.put<Customertype>(`/customer-types/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/customer-types/${id}`),
   },
 
@@ -64,7 +62,7 @@ export const api = {
   customers: {
     list: () => apiClient.get<Customer[]>("/customers"),
     get: (id: number) => apiClient.get<Customer>(`/customers/${id}`),
-    create: (data: Customer) => apiClient.post<Customer>("/customers", data),
+    create: (data: Omit<Customer, "id">) => apiClient.post<Customer>("/customers", data),
     update: (id: number, data: Customer) =>
       apiClient.put<Customer>(`/customers/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/customers/${id}`),
@@ -74,7 +72,7 @@ export const api = {
   categories: {
     list: () => apiClient.get<Category[]>("/categories"),
     get: (id: number) => apiClient.get<Category>(`/categories/${id}`),
-    create: (data: Category) => apiClient.post<Category>("/categories", data),
+    create: (data: Omit<Category, "id">) => apiClient.post<Category>("/categories", data),
     update: (id: number, data: Category) =>
       apiClient.put<Category>(`/categories/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/categories/${id}`),
@@ -84,20 +82,20 @@ export const api = {
   products: {
     list: () => apiClient.get<Product[]>("/products"),
     get: (id: number) => apiClient.get<Product>(`/products/${id}`),
-    create: (data: Product) => apiClient.post<Product>("/products", data),
+    create: (data: Omit<Product, "ProductID">) => apiClient.post<Product>("/products", data),
     update: (id: number, data: Product) =>
       apiClient.put<Product>(`/products/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/products/${id}`),
   },
 
-  // 5. PRODUCTTYPE TABLE
+  // 5. Producttype TABLE
   productTypes: {
-    list: () => apiClient.get<ProductType[]>("/product-types"),
-    get: (id: number) => apiClient.get<ProductType>(`/product-types/${id}`),
-    create: (data: ProductType) =>
-      apiClient.post<ProductType>("/product-types", data),
-    update: (id: number, data: ProductType) =>
-      apiClient.put<ProductType>(`/product-types/${id}`, data),
+    list: () => apiClient.get<Producttype[]>("/product-types"),
+    get: (id: number) => apiClient.get<Producttype>(`/product-types/${id}`),
+    create: (data: Omit<Producttype, "id">) =>
+      apiClient.post<Producttype>("/product-types", data),
+    update: (id: number, data: Producttype) =>
+      apiClient.put<Producttype>(`/product-types/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/product-types/${id}`),
   },
 
@@ -105,20 +103,20 @@ export const api = {
   combos: {
     list: () => apiClient.get<Combo[]>("/combos"),
     get: (id: number) => apiClient.get<Combo>(`/combos/${id}`),
-    create: (data: Combo) => apiClient.post<Combo>("/combos", data),
+    create: (data: Omit<Combo, "id">) => apiClient.post<Combo>("/combos", data),
     update: (id: number, data: Combo) =>
       apiClient.put<Combo>(`/combos/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/combos/${id}`),
   },
 
-  // 7. COMBODETAIL TABLE
+  // 7. Combodetail TABLE
   comboDetails: {
-    list: () => apiClient.get<ComboDetail[]>("/combo-details"),
-    get: (id: number) => apiClient.get<ComboDetail>(`/combo-details/${id}`),
-    create: (data: ComboDetail) =>
-      apiClient.post<ComboDetail>("/combo-details", data),
-    update: (id: number, data: ComboDetail) =>
-      apiClient.put<ComboDetail>(`/combo-details/${id}`, data),
+    list: () => apiClient.get<Combodetail[]>("/combo-details"),
+    get: (id: number) => apiClient.get<Combodetail>(`/combo-details/${id}`),
+    create: (data: Combodetail) =>
+      apiClient.post<Combodetail>("/combo-details", data),
+    update: (id: number, data: Combodetail) =>
+      apiClient.put<Combodetail>(`/combo-details/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/combo-details/${id}`),
   },
 
@@ -126,7 +124,7 @@ export const api = {
   warehouses: {
     list: () => apiClient.get<Warehouse[]>("/warehouses"),
     get: (id: number) => apiClient.get<Warehouse>(`/warehouses/${id}`),
-    create: (data: Warehouse) => apiClient.post<Warehouse>("/warehouses", data),
+    create: (data: Omit<Warehouse, "WareHouseID">) => apiClient.post<Warehouse>("/warehouses", data),
     update: (id: number, data: Warehouse) =>
       apiClient.put<Warehouse>(`/warehouses/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/warehouses/${id}`),
@@ -136,7 +134,7 @@ export const api = {
   employees: {
     list: () => apiClient.get<Employee[]>("/employees"),
     get: (id: number) => apiClient.get<Employee>(`/employees/${id}`),
-    create: (data: Employee) => apiClient.post<Employee>("/employees", data),
+    create: (data: Omit<Employee, "EmployeeID">) => apiClient.post<Employee>("/employees", data),
     update: (id: number, data: Employee) =>
       apiClient.put<Employee>(`/employees/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/employees/${id}`),
@@ -146,31 +144,31 @@ export const api = {
   roles: {
     list: () => apiClient.get<Role[]>("/roles"),
     get: (id: number) => apiClient.get<Role>(`/roles/${id}`),
-    create: (data: Role) => apiClient.post<Role>("/roles", data),
+    create: (data: Omit<Role, "RoleID">) => apiClient.post<Role>("/roles", data),
     update: (id: number, data: Role) =>
       apiClient.put<Role>(`/roles/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/roles/${id}`),
   },
 
-  // 11. EMPLOYEEROLE TABLE
+  // 11. Employeerole TABLE
   employeeRoles: {
-    list: () => apiClient.get<EmployeeRole[]>("/employee-roles"),
-    get: (id: number) => apiClient.get<EmployeeRole>(`/employee-roles/${id}`),
-    create: (data: EmployeeRole) =>
-      apiClient.post<EmployeeRole>("/employee-roles", data),
-    update: (id: number, data: EmployeeRole) =>
-      apiClient.put<EmployeeRole>(`/employee-roles/${id}`, data),
+    list: () => apiClient.get<Employeerole[]>("/employee-roles"),
+    get: (id: number) => apiClient.get<Employeerole>(`/employee-roles/${id}`),
+    create: (data: Employeerole) =>
+      apiClient.post<Employeerole>("/employee-roles", data),
+    update: (id: number, data: Employeerole) =>
+      apiClient.put<Employeerole>(`/employee-roles/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/employee-roles/${id}`),
   },
 
-  // 12. SHIPCOMPANY TABLE
+  // 12. Shipcompany TABLE
   shipCompanies: {
-    list: () => apiClient.get<ShipCompany[]>("/ship-companies"),
-    get: (id: number) => apiClient.get<ShipCompany>(`/ship-companies/${id}`),
-    create: (data: ShipCompany) =>
-      apiClient.post<ShipCompany>("/ship-companies", data),
-    update: (id: number, data: ShipCompany) =>
-      apiClient.put<ShipCompany>(`/ship-companies/${id}`, data),
+    list: () => apiClient.get<Shipcompany[]>("/ship-companies"),
+    get: (id: number) => apiClient.get<Shipcompany>(`/ship-companies/${id}`),
+    create: (data: Omit<Shipcompany, "ShipCompanyID">) =>
+      apiClient.post<Shipcompany>("/ship-companies", data),
+    update: (id: number, data: Shipcompany) =>
+      apiClient.put<Shipcompany>(`/ship-companies/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/ship-companies/${id}`),
   },
 
@@ -178,7 +176,7 @@ export const api = {
   invoices: {
     list: () => apiClient.get<Invoice[]>("/invoices"),
     get: (id: number) => apiClient.get<Invoice>(`/invoices/${id}`),
-    create: (data: Invoice) => apiClient.post<Invoice>("/invoices", data),
+    create: (data: Omit<Invoice, "InvoiceID">) => apiClient.post<Invoice>("/invoices", data),
     update: (id: number, data: Invoice) =>
       apiClient.put<Invoice>(`/invoices/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/invoices/${id}`),
@@ -188,7 +186,7 @@ export const api = {
   orders: {
     list: () => apiClient.get<Order[]>("/orders"),
     get: (id: number) => apiClient.get<Order>(`/orders/${id}`),
-    create: (data: Order) => apiClient.post<Order>("/orders", data),
+    create: (data: Omit<Order, "id">) => apiClient.post<Order>("/orders", data),
     update: (id: number, data: Order) =>
       apiClient.put<Order>(`/orders/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/orders/${id}`),
@@ -198,21 +196,21 @@ export const api = {
   orderDetails: {
     list: () => apiClient.get<OrderDetail[]>("/order-details"),
     get: (id: number) => apiClient.get<OrderDetail>(`/order-details/${id}`),
-    create: (data: OrderDetail) =>
+    create: (data: Omit<OrderDetail, "OrderDetailID">) =>
       apiClient.post<OrderDetail>("/order-details", data),
     update: (id: number, data: OrderDetail) =>
       apiClient.put<OrderDetail>(`/order-details/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/order-details/${id}`),
   },
 
-  // 16. INVOICEDETAIL TABLE
+  // 16. Invoicedetail TABLE
   invoiceDetails: {
-    list: () => apiClient.get<InvoiceDetail[]>("/invoice-details"),
-    get: (id: number) => apiClient.get<InvoiceDetail>(`/invoice-details/${id}`),
-    create: (data: InvoiceDetail) =>
-      apiClient.post<InvoiceDetail>("/invoice-details", data),
-    update: (id: number, data: InvoiceDetail) =>
-      apiClient.put<InvoiceDetail>(`/invoice-details/${id}`, data),
+    list: () => apiClient.get<Invoicedetail[]>("/invoice-details"),
+    get: (id: number) => apiClient.get<Invoicedetail>(`/invoice-details/${id}`),
+    create: (data: Omit<Invoicedetail, "InvoiceDetailID">) =>
+      apiClient.post<Invoicedetail>("/invoice-details", data),
+    update: (id: number, data: Invoicedetail) =>
+      apiClient.put<Invoicedetail>(`/invoice-details/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/invoice-details/${id}`),
   },
 
@@ -220,7 +218,7 @@ export const api = {
   paymentMethods: {
     list: () => apiClient.get<PaymentMethod[]>("/payment-methods"),
     get: (id: number) => apiClient.get<PaymentMethod>(`/payment-methods/${id}`),
-    create: (data: PaymentMethod) =>
+    create: (data: Omit<PaymentMethod, "PaymentMethodID">) =>
       apiClient.post<PaymentMethod>("/payment-methods", data),
     update: (id: number, data: PaymentMethod) =>
       apiClient.put<PaymentMethod>(`/payment-methods/${id}`, data),
@@ -231,7 +229,7 @@ export const api = {
   payments: {
     list: () => apiClient.get<Payment[]>("/payments"),
     get: (id: number) => apiClient.get<Payment>(`/payments/${id}`),
-    create: (data: Payment) => apiClient.post<Payment>("/payments", data),
+    create: (data: Omit<Payment, "PaymentID">) => apiClient.post<Payment>("/payments", data),
     update: (id: number, data: Payment) =>
       apiClient.put<Payment>(`/payments/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/payments/${id}`),
@@ -241,7 +239,7 @@ export const api = {
   returnPolicies: {
     list: () => apiClient.get<ReturnPolicy[]>("/return-policies"),
     get: (id: number) => apiClient.get<ReturnPolicy>(`/return-policies/${id}`),
-    create: (data: ReturnPolicy) =>
+    create: (data: Omit<ReturnPolicy, "PolicyID">) =>
       apiClient.post<ReturnPolicy>("/return-policies", data),
     update: (id: number, data: ReturnPolicy) =>
       apiClient.put<ReturnPolicy>(`/return-policies/${id}`, data),
@@ -252,7 +250,7 @@ export const api = {
   orderReturns: {
     list: () => apiClient.get<OrderReturn[]>("/order-returns"),
     get: (id: number) => apiClient.get<OrderReturn>(`/order-returns/${id}`),
-    create: (data: OrderReturn) =>
+    create: (data: Omit<OrderReturn, "id">) =>
       apiClient.post<OrderReturn>("/order-returns", data),
     update: (id: number, data: OrderReturn) =>
       apiClient.put<OrderReturn>(`/order-returns/${id}`, data),
@@ -270,15 +268,15 @@ export const api = {
     delete: (id: number) => apiClient.delete<void>(`/return-details/${id}`),
   },
 
-  // 22. DETAILINVENTORY TABLE
+  // 22. Detailinventory TABLE
   detailInventories: {
-    list: () => apiClient.get<DetailInventory[]>("/detail-inventories"),
+    list: () => apiClient.get<Detailinventory[]>("/detail-inventories"),
     get: (id: number) =>
-      apiClient.get<DetailInventory>(`/detail-inventories/${id}`),
-    create: (data: DetailInventory) =>
-      apiClient.post<DetailInventory>("/detail-inventories", data),
-    update: (id: number, data: DetailInventory) =>
-      apiClient.put<DetailInventory>(`/detail-inventories/${id}`, data),
+      apiClient.get<Detailinventory>(`/detail-inventories/${id}`),
+    create: (data: Detailinventory) =>
+      apiClient.post<Detailinventory>("/detail-inventories", data),
+    update: (id: number, data: Detailinventory) =>
+      apiClient.put<Detailinventory>(`/detail-inventories/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/detail-inventories/${id}`),
   },
 
@@ -286,7 +284,7 @@ export const api = {
   notifications: {
     list: () => apiClient.get<Notification[]>("/notifications"),
     get: (id: number) => apiClient.get<Notification>(`/notifications/${id}`),
-    create: (data: Notification) =>
+    create: (data: Omit<Notification, "NotificationID">) =>
       apiClient.post<Notification>("/notifications", data),
     update: (id: number, data: Notification) =>
       apiClient.put<Notification>(`/notifications/${id}`, data),
@@ -297,7 +295,7 @@ export const api = {
   requestForms: {
     list: () => apiClient.get<RequestForm[]>("/request-forms"),
     get: (id: number) => apiClient.get<RequestForm>(`/request-forms/${id}`),
-    create: (data: RequestForm) =>
+    create: (data: Omit<RequestForm, "RequestID">) =>
       apiClient.post<RequestForm>("/request-forms", data),
     update: (id: number, data: RequestForm) =>
       apiClient.put<RequestForm>(`/request-forms/${id}`, data),
@@ -315,28 +313,28 @@ export const api = {
     delete: (id: number) => apiClient.delete<void>(`/request-details/${id}`),
   },
 
-  // 26. TRANSFERTICKET TABLE
+  // 26. Transferticket TABLE
   transferTickets: {
-    list: () => apiClient.get<TransferTicket[]>("/transfer-tickets"),
+    list: () => apiClient.get<Transferticket[]>("/transfer-tickets"),
     get: (id: number) =>
-      apiClient.get<TransferTicket>(`/transfer-tickets/${id}`),
-    create: (data: TransferTicket) =>
-      apiClient.post<TransferTicket>("/transfer-tickets", data),
-    update: (id: number, data: TransferTicket) =>
-      apiClient.put<TransferTicket>(`/transfer-tickets/${id}`, data),
+      apiClient.get<Transferticket>(`/transfer-tickets/${id}`),
+    create: (data: Omit<Transferticket, "TransferID">) =>
+      apiClient.post<Transferticket>("/transfer-tickets", data),
+    update: (id: number, data: Transferticket) =>
+      apiClient.put<Transferticket>(`/transfer-tickets/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/transfer-tickets/${id}`),
   },
 
-  // 27. TRANSFERTICKETDETAIL TABLE
+  // 27. Transferticketdetail TABLE
   transferTicketDetails: {
     list: () =>
-      apiClient.get<TransferTicketDetail[]>("/transfer-ticket-details"),
+      apiClient.get<Transferticketdetail[]>("/transfer-ticket-details"),
     get: (id: number) =>
-      apiClient.get<TransferTicketDetail>(`/transfer-ticket-details/${id}`),
-    create: (data: TransferTicketDetail) =>
-      apiClient.post<TransferTicketDetail>("/transfer-ticket-details", data),
-    update: (id: number, data: TransferTicketDetail) =>
-      apiClient.put<TransferTicketDetail>(
+      apiClient.get<Transferticketdetail>(`/transfer-ticket-details/${id}`),
+    create: (data: Transferticketdetail) =>
+      apiClient.post<Transferticketdetail>("/transfer-ticket-details", data),
+    update: (id: number, data: Transferticketdetail) =>
+      apiClient.put<Transferticketdetail>(
         `/transfer-ticket-details/${id}`,
         data,
       ),
@@ -344,74 +342,74 @@ export const api = {
       apiClient.delete<void>(`/transfer-ticket-details/${id}`),
   },
 
-  // 28. IMPORTRECEIPT TABLE
+  // 28. Importreceipt TABLE
   importReceipts: {
-    list: () => apiClient.get<ImportReceipt[]>("/import-receipts"),
-    get: (id: number) => apiClient.get<ImportReceipt>(`/import-receipts/${id}`),
-    create: (data: ImportReceipt) =>
-      apiClient.post<ImportReceipt>("/import-receipts", data),
-    update: (id: number, data: ImportReceipt) =>
-      apiClient.put<ImportReceipt>(`/import-receipts/${id}`, data),
+    list: () => apiClient.get<Importreceipt[]>("/import-receipts"),
+    get: (id: number) => apiClient.get<Importreceipt>(`/import-receipts/${id}`),
+    create: (data: Omit<Importreceipt, "ImportReceiptID">) =>
+      apiClient.post<Importreceipt>("/import-receipts", data),
+    update: (id: number, data: Importreceipt) =>
+      apiClient.put<Importreceipt>(`/import-receipts/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/import-receipts/${id}`),
   },
 
-  // 29. IMPORTRECEIPTDETAIL TABLE
+  // 29. Importreceiptdetail TABLE
   importReceiptDetails: {
-    list: () => apiClient.get<ImportReceiptDetail[]>("/import-receipt-details"),
+    list: () => apiClient.get<Importreceiptdetail[]>("/import-receipt-details"),
     get: (id: number) =>
-      apiClient.get<ImportReceiptDetail>(`/import-receipt-details/${id}`),
-    create: (data: ImportReceiptDetail) =>
-      apiClient.post<ImportReceiptDetail>("/import-receipt-details", data),
-    update: (id: number, data: ImportReceiptDetail) =>
-      apiClient.put<ImportReceiptDetail>(`/import-receipt-details/${id}`, data),
+      apiClient.get<Importreceiptdetail>(`/import-receipt-details/${id}`),
+    create: (data: Importreceiptdetail) =>
+      apiClient.post<Importreceiptdetail>("/import-receipt-details", data),
+    update: (id: number, data: Importreceiptdetail) =>
+      apiClient.put<Importreceiptdetail>(`/import-receipt-details/${id}`, data),
     delete: (id: number) =>
       apiClient.delete<void>(`/import-receipt-details/${id}`),
   },
 
-  // 30. EXPORTRECEIPT TABLE
+  // 30. Exportreceipt TABLE
   exportReceipts: {
-    list: () => apiClient.get<ExportReceipt[]>("/export-receipts"),
-    get: (id: number) => apiClient.get<ExportReceipt>(`/export-receipts/${id}`),
-    create: (data: ExportReceipt) =>
-      apiClient.post<ExportReceipt>("/export-receipts", data),
-    update: (id: number, data: ExportReceipt) =>
-      apiClient.put<ExportReceipt>(`/export-receipts/${id}`, data),
+    list: () => apiClient.get<Exportreceipt[]>("/export-receipts"),
+    get: (id: number) => apiClient.get<Exportreceipt>(`/export-receipts/${id}`),
+    create: (data: Omit<Exportreceipt, "id">) =>
+      apiClient.post<Exportreceipt>("/export-receipts", data),
+    update: (id: number, data: Exportreceipt) =>
+      apiClient.put<Exportreceipt>(`/export-receipts/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/export-receipts/${id}`),
   },
 
-  // 31. EXPORTRECEIPTDETAIL TABLE
+  // 31. Exportreceiptdetail TABLE
   exportReceiptDetails: {
-    list: () => apiClient.get<ExportReceiptDetail[]>("/export-receipt-details"),
+    list: () => apiClient.get<Exportreceiptdetail[]>("/export-receipt-details"),
     get: (id: number) =>
-      apiClient.get<ExportReceiptDetail>(`/export-receipt-details/${id}`),
-    create: (data: ExportReceiptDetail) =>
-      apiClient.post<ExportReceiptDetail>("/export-receipt-details", data),
-    update: (id: number, data: ExportReceiptDetail) =>
-      apiClient.put<ExportReceiptDetail>(`/export-receipt-details/${id}`, data),
+      apiClient.get<Exportreceiptdetail>(`/export-receipt-details/${id}`),
+    create: (data: Exportreceiptdetail) =>
+      apiClient.post<Exportreceiptdetail>("/export-receipt-details", data),
+    update: (id: number, data: Exportreceiptdetail) =>
+      apiClient.put<Exportreceiptdetail>(`/export-receipt-details/${id}`, data),
     delete: (id: number) =>
       apiClient.delete<void>(`/export-receipt-details/${id}`),
   },
 
-  // 32. COUNTSHEET TABLE
+  // 32. Countsheet TABLE
   countSheets: {
-    list: () => apiClient.get<CountSheet[]>("/count-sheets"),
-    get: (id: number) => apiClient.get<CountSheet>(`/count-sheets/${id}`),
-    create: (data: CountSheet) =>
-      apiClient.post<CountSheet>("/count-sheets", data),
-    update: (id: number, data: CountSheet) =>
-      apiClient.put<CountSheet>(`/count-sheets/${id}`, data),
+    list: () => apiClient.get<Countsheet[]>("/count-sheets"),
+    get: (id: number) => apiClient.get<Countsheet>(`/count-sheets/${id}`),
+    create: (data: Omit<Countsheet, "id">) =>
+      apiClient.post<Countsheet>("/count-sheets", data),
+    update: (id: number, data: Countsheet) =>
+      apiClient.put<Countsheet>(`/count-sheets/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/count-sheets/${id}`),
   },
 
-  // 33. COUNTSHEETDETAIL TABLE
+  // 33. Countsheetdetail TABLE
   countSheetDetails: {
-    list: () => apiClient.get<CountSheetDetail[]>("/count-sheet-details"),
+    list: () => apiClient.get<Countsheetdetail[]>("/count-sheet-details"),
     get: (id: number) =>
-      apiClient.get<CountSheetDetail>(`/count-sheet-details/${id}`),
-    create: (data: CountSheetDetail) =>
-      apiClient.post<CountSheetDetail>("/count-sheet-details", data),
-    update: (id: number, data: CountSheetDetail) =>
-      apiClient.put<CountSheetDetail>(`/count-sheet-details/${id}`, data),
+      apiClient.get<Countsheetdetail>(`/count-sheet-details/${id}`),
+    create: (data: Countsheetdetail) =>
+      apiClient.post<Countsheetdetail>("/count-sheet-details", data),
+    update: (id: number, data: Countsheetdetail) =>
+      apiClient.put<Countsheetdetail>(`/count-sheet-details/${id}`, data),
     delete: (id: number) =>
       apiClient.delete<void>(`/count-sheet-details/${id}`),
   },
@@ -420,20 +418,20 @@ export const api = {
   discounts: {
     list: () => apiClient.get<Discount[]>("/discounts"),
     get: (id: number) => apiClient.get<Discount>(`/discounts/${id}`),
-    create: (data: Discount) => apiClient.post<Discount>("/discounts", data),
+    create: (data: Omit<Discount, "id">) => apiClient.post<Discount>("/discounts", data),
     update: (id: number, data: Discount) =>
       apiClient.put<Discount>(`/discounts/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/discounts/${id}`),
   },
 
-  // 35. LISTDISCOUNT TABLE
+  // 35. Listdiscount TABLE
   listDiscounts: {
-    list: () => apiClient.get<ListDiscount[]>("/list-discounts"),
-    get: (id: number) => apiClient.get<ListDiscount>(`/list-discounts/${id}`),
-    create: (data: ListDiscount) =>
-      apiClient.post<ListDiscount>("/list-discounts", data),
-    update: (id: number, data: ListDiscount) =>
-      apiClient.put<ListDiscount>(`/list-discounts/${id}`, data),
+    list: () => apiClient.get<Listdiscount[]>("/list-discounts"),
+    get: (id: number) => apiClient.get<Listdiscount>(`/list-discounts/${id}`),
+    create: (data: Listdiscount) =>
+      apiClient.post<Listdiscount>("/list-discounts", data),
+    update: (id: number, data: Listdiscount) =>
+      apiClient.put<Listdiscount>(`/list-discounts/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/list-discounts/${id}`),
   },
 
@@ -441,7 +439,7 @@ export const api = {
   feedbacks: {
     list: () => apiClient.get<Feedback[]>("/feedbacks"),
     get: (id: number) => apiClient.get<Feedback>(`/feedbacks/${id}`),
-    create: (data: Feedback) => apiClient.post<Feedback>("/feedbacks", data),
+    create: (data: Omit<Feedback, "FeedbackID">) => apiClient.post<Feedback>("/feedbacks", data),
     update: (id: number, data: Feedback) =>
       apiClient.put<Feedback>(`/feedbacks/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/feedbacks/${id}`),

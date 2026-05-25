@@ -60,6 +60,9 @@ export function DetailOrderDialog({ open, onOpenChange, order, saleChannelCode }
     return prod ? prod.ProductName : `Sản phẩm #${prodId}`;
   };
 
+  const renderValue = (val: any) =>
+    val || <span className="text-slate-400">(Không có)</span>;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn("sm:max-w-[650px]", dialog.content)}>
@@ -112,6 +115,60 @@ export function DetailOrderDialog({ open, onOpenChange, order, saleChannelCode }
                     </span>
                   </div>
                 </>
+              )}
+            </div>
+
+            <div className="grid gap-2 mt-4">
+              <Label className="text-slate-900 font-bold border-b border-slate-200 pb-2">
+                Thông tin khách hàng
+              </Label>
+              {customer ? (
+                <div className="grid gap-3 border border-slate-200 p-3 rounded-md bg-slate-50/50">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-slate-500 text-xs">Mã khách hàng</Label>
+                      <p className="font-medium text-sm">#{customer.id}</p>
+                    </div>
+                    <div>
+                      <Label className="text-slate-500 text-xs">Loại khách hàng</Label>
+                      <p className="font-medium text-sm">{customer.customertypeId}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500 text-xs">Họ và Tên</Label>
+                    <p className="font-medium text-base text-blue-700">
+                      {customer.firstname} {customer.lastname}
+                    </p>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500 text-xs">Tên công ty</Label>
+                    <p className="font-medium text-sm">{renderValue(customer.companyname)}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-slate-500 text-xs">Điện thoại</Label>
+                      <p className="font-medium text-sm text-blue-600">
+                        {renderValue(customer.phone)}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-slate-500 text-xs">Email</Label>
+                      <p className="font-medium text-sm">{renderValue(customer.email)}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500 text-xs">Địa chỉ</Label>
+                    <p className="font-medium text-sm">{renderValue(customer.address)}</p>
+                  </div>
+                  <div>
+                    <Label className="text-slate-500 text-xs">Tổng chi tiêu</Label>
+                    <p className="font-medium text-sm text-green-600">
+                      {customer.totalaccumulatedspent?.toLocaleString()} VNĐ
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500 italic">Không có thông tin khách hàng.</p>
               )}
             </div>
 

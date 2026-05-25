@@ -110,7 +110,6 @@ export function FeedbackDialog({
     }
     setSubmitting(true);
     try {
-      const feedbackId = Math.floor(Math.random() * 900000) + 100000;
       let orderDetailId = Math.floor(Math.random() * 8000) + 1000;
 
       if (selectedOrderDetailId !== "random") {
@@ -120,7 +119,6 @@ export function FeedbackDialog({
       }
 
       await api.feedbacks.create({
-        FeedbackID: feedbackId,
         OrderDetailID: orderDetailId,
         CustomerID: customer.id,
         FeedbackComment: newComment,

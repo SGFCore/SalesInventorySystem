@@ -153,11 +153,8 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
       const taxAmount = Math.round(totalAmount * 0.1);
       const finalAmount = Math.max(0, totalAmount + taxAmount - discountAmount);
 
-      const invoiceId = Math.floor(Math.random() * 900000) + 100000;
-
       // 1. Create Invoice record
-      await api.invoices.create({
-        InvoiceID: invoiceId,
+      const newInvoice = await api.invoices.create({
         CustomerID: selectedCustomer.id,
         EmployeeID: emp?.EmployeeID || 1,
         SaleChannelCode: saleChannelCode,
@@ -174,9 +171,7 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
           const prod = products.find((p) => p.ProductID === item.productID);
           const price = prod ? prod.ProductPrice : 0;
           return api.invoiceDetails.create({
-            InvoiceDetailID:
-              Math.floor(Math.random() * 900000) + 100000 + index,
-            InvoiceID: invoiceId,
+            InvoiceID: newInvoice.InvoiceID,
             ProductID: item.productID,
             ComboID: 0,
             Quantity: item.quantity,
@@ -194,9 +189,9 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
             const promo = discounts.find((d) => d.id === item.promoID);
             const val = promo ? promo.value : 0;
             return api.listDiscounts.create({
-              OrderID: invoiceId, // Note: listDiscounts has OrderID representing transaction ID
-              DiscountID: item.promoID,
-              AppliedValue: val,
+              orderId: newInvoice.InvoiceID, // Note: listDiscounts has OrderID representing transaction ID
+              discountId: item.promoID,
+              appliedvalue: val,
             });
           }),
         );
@@ -355,9 +350,9 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
                           prev.map((p, i) =>
                             i === index
                               ? {
-                                  ...p,
-                                  quantity: Math.max(1, Number(e.target.value)),
-                                }
+                                ...p,
+                                quantity: Math.max(1, Number(e.target.value)),
+                              }
                               : p,
                           ),
                         )

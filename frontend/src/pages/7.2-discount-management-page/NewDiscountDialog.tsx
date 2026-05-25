@@ -50,7 +50,7 @@ export function NewDiscountDialog({ open, onOpenChange, onSave }: NewProps) {
             setAppliedProductID(prods[0].ProductID.toString());
           }
           if (custTypes.length > 0) {
-            setCustomerTypeID(custTypes[0].CustomerTypeID);
+            setCustomerTypeID(custTypes[0].id);
           }
         } catch (e) {
           console.error("Lỗi tải thông tin lựa chọn:", e);
@@ -84,9 +84,7 @@ export function NewDiscountDialog({ open, onOpenChange, onSave }: NewProps) {
 
     setLoading(true);
     try {
-      const discountId = Math.floor(Math.random() * 9000) + 1000;
       await api.discounts.create({
-        id: discountId,
         discountname: discountName,
         value: value,
         customertypeId: customerTypeID,

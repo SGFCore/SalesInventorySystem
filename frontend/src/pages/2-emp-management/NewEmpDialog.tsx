@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -8,12 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import React, { useState } from "react";
-import { cn } from "@/lib/utils";
 import { ROLES } from "@/data/roles";
-import { btn, dialog } from "@/pages/page-classes";
 import { api } from "@/lib/api";
+import { cn } from "@/lib/utils";
+import { dialog } from "@/pages/page-classes";
+import React, { useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
@@ -57,9 +57,7 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
     }
     setLoading(true);
     try {
-      const empId = Math.floor(Math.random() * 900000) + 100000;
-      await api.employees.create({
-        EmployeeID: empId,
+      const newEmp = await api.employees.create({
         Fullname: formData.fullname,
         Email: formData.email,
         Phone: formData.phone,
@@ -70,8 +68,8 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
       // Tạo employee roles
       for (const roleId of formData.roleIds) {
         await api.employeeRoles.create({
-          EmployeeID: empId,
-          RoleID: roleId,
+          employeeId: newEmp.EmployeeID,
+          roleId: roleId,
         });
       }
 

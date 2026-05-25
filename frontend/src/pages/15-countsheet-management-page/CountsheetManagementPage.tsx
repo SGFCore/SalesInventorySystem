@@ -172,19 +172,24 @@ export default function CountsheetManagementPage() {
                           >
                             Cập nhật
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
-                            disabled={!hasRole(1) || c.status === 2 || c.status === 4}
-                            onClick={() => {
-                              setSelectedCountsheet(c);
-                              setDialogMode("approve");
-                              setIsDetailOpen(true);
-                            }}
-                          >
-                            Phê duyệt
-                          </Button>
+                          {
+                            hasRole(1) && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className={cn(btn.actionPrimary, "w-28 text-xs font-semibold")}
+                                disabled={c.status === 2 || c.status === 4}
+                                onClick={() => {
+                                  setSelectedCountsheet(c);
+                                  setDialogMode("approve");
+                                  setIsDetailOpen(true);
+                                }}
+                              >
+                                Phê duyệt
+                              </Button>
+                            )
+                          }
+
                         </div>
                       </TableCell>
                     </TableRow>

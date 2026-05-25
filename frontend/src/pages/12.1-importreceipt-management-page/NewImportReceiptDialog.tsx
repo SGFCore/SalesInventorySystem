@@ -147,16 +147,14 @@ export function NewImportReceiptDialog({ open, onOpenChange, onSave }: Props) {
 
     setLoading(true);
     try {
-      const receiptId = Math.floor(Math.random() * 900000) + 100000;
       const empId = emp ? emp.EmployeeID : 101;
 
       // 1. Tạo phiếu nhập kho Master
-      await api.importReceipts.create({
-        ImportReceiptID: receiptId,
+      const newImport = await api.importReceipts.create({
         EmployeeID: empId,
         WarehouseID: Number(warehouseId),
-        Status: isDraft && "Chờ duyệt", // Draft or Pending
-        CreatedDate: new Date(),
+        Status: "Chờ duyệt", // Draft or Pending
+        CreatedDate: new Date().toISOString(),
         RequestID: Number(selectedRequestId),
         HasDiscrepancy: hasDiscrepancy ? 1 : 0,
         DiscrepancyReason: hasDiscrepancy ? discrepancyReason : "",
@@ -167,7 +165,7 @@ export function NewImportReceiptDialog({ open, onOpenChange, onSave }: Props) {
       await Promise.all(
         items.map((item) =>
           api.importReceiptDetails.create({
-            ImportReceiptID: receiptId,
+            ImportReceiptID: newImport.ImportReceiptID,
             ProductID: item.ProductID,
             ProductName: item.ProductName,
             ExpectedQuantity: item.ExpectedQuantity,
@@ -397,7 +395,7 @@ export function NewImportReceiptDialog({ open, onOpenChange, onSave }: Props) {
             </Button>
             <Button
               className={btn.primary}
-              onClick={() => handleSubmit(false)}
+              // onClick={() => handleSubmit(false)}
               disabled={loading || items.length === 0}
             >
               {loading ? "Đang xử lý..." : "Hoàn thành nhập"}

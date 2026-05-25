@@ -92,7 +92,7 @@ export function EditProductDialog({ open, onOpenChange, product, onSave }: EditP
         ProductPrice: formData.productPrice,
         CategoryID: formData.categoryId,
         ProductTypeID: formData.productTypeId,
-        Detail: formData.detail,
+        Detail: formData.detail.trim().length ? formData.detail.trim() : null,
         AllowReturn: formData.allowReturn ? 1 : 0,
       });
       toast.success("Cập nhật sản phẩm thành công!");
