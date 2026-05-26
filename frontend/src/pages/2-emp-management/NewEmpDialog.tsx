@@ -51,6 +51,10 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
       toast.error("Họ và tên không được để trống!");
       return;
     }
+    if (!formData.password.trim()) {
+      toast.error("Mật khẩu không được để trống!");
+      return;
+    }
     if (formData.roleIds.length === 0) {
       toast.error("Vui lòng chọn ít nhất một quyền!");
       return;
@@ -128,6 +132,19 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
               id="phone"
               name="phone"
               value={formData.phone}
+              onChange={handleChange}
+              className={dialog.input}
+              disabled={loading}
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="password">Mật khẩu</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password}
               onChange={handleChange}
               className={dialog.input}
               disabled={loading}

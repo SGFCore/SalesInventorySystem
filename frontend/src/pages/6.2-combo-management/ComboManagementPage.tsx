@@ -5,6 +5,7 @@ import type { Combo } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { DetailComboDialog } from "@/pages/6.2-combo-management/DetailComboDialog";
 import { NewComboDialog } from "@/pages/6.2-combo-management/NewComboDialog";
+import { EditComboDetail } from "@/pages/6.2-combo-management/EditComboDetail";
 import { page, btn, entity, input } from "@/pages/page-classes";
 
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
@@ -21,6 +22,7 @@ export default function ComboManagementPage() {
   const [selectedCombo, setSelectedCombo] = useState<Combo | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isNewOpen, setIsNewOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   // State cho phân trang
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,6 +73,43 @@ export default function ComboManagementPage() {
   const handleDetailClick = (combo: Combo) => {
     setSelectedCombo(combo);
     setIsDetailOpen(true);
+  };
+
+  const handleEditClick = (combo: Combo) => {
+    setSelectedCombo(combo);
+    setIsEditOpen(true);
+  };
+
+  const handleDeleteClick = async (combo: Combo) => {
+    if (
+      window.confirm(
+        `Bạn có chắc chắn muốn xóa combo "${combo.id}"? Hành động này cũng sẽ xóa các chi tiết sản phẩm liên quan trong combo.`
+      )
+    ) {
+      setLoading(true);
+      try {
+        // 1. Tải danh sách chi tiết combo của combo cần xóa
+        const allDetails = await api.comboDetails.list();
+        const comboDetails = allDetails.filter((d) => d.comboId === combo.id);
+
+        // 2. Xóa các chi tiết combo trước (do ràng buộc RESTRICT)
+        await Promise.all(
+          comboDetails.map((d) =>
+            api.comboDetails.delete(combo.id, d.productId)
+          )
+        );
+
+        // 3. Xóa combo chính
+        await api.combos.delete(combo.id);
+
+        toast.success("Xóa combo thành công!");
+        loadCombos();
+      } catch (error: any) {
+        toast.error(error.message || "Xóa combo thất bại!");
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const topRef = useRef<HTMLDivElement>(null);
@@ -144,16 +183,34 @@ export default function ComboManagementPage() {
                       </div>
                     </TableCell>
 
-                    {/* Các nút hành động có grid ngang bằng nhau giống ProductManagementPage */}
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className={cn(btn.actionSecondary, "w-full")}
-                        onClick={() => handleDetailClick(combo)}
-                      >
-                        Xem chi tiết
-                      </Button>
+                    {/* Các nút hành động */}
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={btn.actionSecondary}
+                          onClick={() => handleDetailClick(combo)}
+                        >
+                          Xem chi tiết
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={btn.actionPrimary}
+                          onClick={() => handleEditClick(combo)}
+                        >
+                          Sửa combo
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={btn.actionDestructive}
+                          onClick={() => handleDeleteClick(combo)}
+                        >
+                          Xóa combo
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -222,6 +279,13 @@ export default function ComboManagementPage() {
       <NewComboDialog
         open={isNewOpen}
         onOpenChange={setIsNewOpen}
+        onSave={loadCombos}
+      />
+
+      <EditComboDetail
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        combo={selectedCombo}
         onSave={loadCombos}
       />
     </div>

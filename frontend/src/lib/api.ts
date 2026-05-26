@@ -112,12 +112,14 @@ export const api = {
   // 7. Combodetail TABLE
   comboDetails: {
     list: () => apiClient.get<Combodetail[]>("/combo-details"),
-    get: (id: number) => apiClient.get<Combodetail>(`/combo-details/${id}`),
+    get: (comboId: number, productId: number) =>
+      apiClient.get<Combodetail>(`/combo-details/${comboId}/${productId}`),
     create: (data: Combodetail) =>
       apiClient.post<Combodetail>("/combo-details", data),
-    update: (id: number, data: Combodetail) =>
-      apiClient.put<Combodetail>(`/combo-details/${id}`, data),
-    delete: (id: number) => apiClient.delete<void>(`/combo-details/${id}`),
+    update: (comboId: number, productId: number, data: Combodetail) =>
+      apiClient.put<Combodetail>(`/combo-details/${comboId}/${productId}`, data),
+    delete: (comboId: number, productId: number) =>
+      apiClient.delete<void>(`/combo-details/${comboId}/${productId}`),
   },
 
   // 8. WAREHOUSE TABLE
