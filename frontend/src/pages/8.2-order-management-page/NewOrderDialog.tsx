@@ -137,7 +137,7 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
           return api.orderDetails.create({
             OrderID: newOrder.id,
             ProductID: item.productID,
-            ComboID: 0,
+            ComboID: null,
             Quantity: item.quantity,
             UnitPrice: price,
             DiscountAmount: 0,
