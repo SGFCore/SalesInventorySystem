@@ -1,7 +1,6 @@
 package dev.uit.project.service;
 
 import java.util.List;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +51,12 @@ public class ReturnPolicyService {
         Returnpolicy existingReturnPolicy = returnPolicyRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("ReturnPolicy not found with id: " + id));
         
-        BeanUtils.copyProperties(returnPolicyDTO, existingReturnPolicy, "id");
+        existingReturnPolicy.setPolicyname(returnPolicyDTO.getPolicyname());
+        existingReturnPolicy.setMaxreturndays(returnPolicyDTO.getMaxreturndays());
+        existingReturnPolicy.setPenaltyfeerate(returnPolicyDTO.getPenaltyfeerate());
+        existingReturnPolicy.setEffectivedate(returnPolicyDTO.getEffectivedate());
+        existingReturnPolicy.setIsactive(returnPolicyDTO.getIsactive());
+        
         Returnpolicy updatedReturnPolicy = returnPolicyRepository.save(existingReturnPolicy);
         return convertToDTO(updatedReturnPolicy);
     }
@@ -71,17 +75,23 @@ public class ReturnPolicyService {
      * Chuyển đổi Entity sang DTO
      */
     private ReturnPolicyDTO convertToDTO(Returnpolicy returnPolicy) {
-        ReturnPolicyDTO returnPolicyDTO = new ReturnPolicyDTO();
-        BeanUtils.copyProperties(returnPolicy, returnPolicyDTO);
-        return returnPolicyDTO;
+        return ReturnPolicyDTO.fromEntity(returnPolicy);
     }
     
     /**
      * Chuyển đổi DTO sang Entity
      */
     private Returnpolicy convertToEntity(ReturnPolicyDTO returnPolicyDTO) {
+        if (returnPolicyDTO == null) {
+            return null;
+        }
         Returnpolicy returnPolicy = new Returnpolicy();
-        BeanUtils.copyProperties(returnPolicyDTO, returnPolicy);
+        returnPolicy.setId(returnPolicyDTO.getId());
+        returnPolicy.setPolicyname(returnPolicyDTO.getPolicyname());
+        returnPolicy.setMaxreturndays(returnPolicyDTO.getMaxreturndays());
+        returnPolicy.setPenaltyfeerate(returnPolicyDTO.getPenaltyfeerate());
+        returnPolicy.setEffectivedate(returnPolicyDTO.getEffectivedate());
+        returnPolicy.setIsactive(returnPolicyDTO.getIsactive());
         return returnPolicy;
     }
 }

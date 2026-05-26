@@ -111,6 +111,7 @@ export function EditOrderDialog({ open, onOpenChange, order, onSave, saleChannel
                   <option value="0">Cần lên lịch giao</option>
                   <option value="1">Đang đóng gói</option>
                   <option value="2">Đã gửi vận chuyển</option>
+                  <option value="4">Đã đóng gói</option>
                   <option value="3">Khách từ chối</option>
                 </NativeSelect>
               </div>

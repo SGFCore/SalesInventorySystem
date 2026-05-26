@@ -83,9 +83,8 @@ export function EditRoleDialog({ open, onOpenChange, emp, onSave }: Props) {
       // Xóa các quyền cũ không còn chọn
       const toDelete = currentRoles.filter((id) => !formData.roleIds.includes(id));
       for (const roleId of toDelete) {
-        // Gọi delete theo ID (hoặc nếu là composite key, API thường hỗ trợ xóa theo RoleID hoặc EmployeeID)
         try {
-          await api.employeeRoles.delete(roleId);
+          await api.employeeRoles.delete(emp.EmployeeID, roleId);
         } catch (e) {
           console.warn("Không thể xóa quyền cũ:", roleId, e);
         }

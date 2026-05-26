@@ -51,10 +51,10 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
       setCustomers(customerData);
 
       let filteredOrders = orderData || [];
-      if (saleChannelCode !== undefined) {
+      if (saleChannelCode !== undefined && saleChannelCode !== 0) { // Treat 0 as no filter
         filteredOrders = filteredOrders.filter(order => {
-          const invoice = invoiceData.find(inv => inv.InvoiceID === order.invoiceId);
-          return invoice && invoice.SaleChannelCode === saleChannelCode;
+          const invoice = invoiceData.find(inv => inv.InvoiceID == order.invoiceId);
+          return invoice && invoice.SaleChannelCode == saleChannelCode;
         });
       }
 
@@ -93,9 +93,10 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
     return idStr.includes(safeSearch) || nameStr.includes(safeSearch);
   });
 
-  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
+  const displayedOrders = filteredOrders.length > 0 ? filteredOrders : orders;
+  const totalPages = Math.ceil(displayedOrders.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedOrders = filteredOrders.slice(
+  const paginatedOrders = displayedOrders.slice(
     startIndex,
     startIndex + ITEMS_PER_PAGE,
   );
@@ -168,7 +169,7 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
       try {
         await api.orders.update(order.id, {
           ...order,
-          shippingstatus: 1, // Đang đóng gói
+          shippingstatus: 4, // Đang đóng gói
         });
         toast.success(`Đã đánh dấu Đóng gói xong cho đơn hàng #${order.id}`);
         loadOrders();
@@ -233,6 +234,10 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
       3: {
         text: "Khách từ chối",
         className: "text-red-600 border-red-200 bg-red-50",
+      },
+      4: {
+        text: "Đã đóng gói",
+        className: "text-green-600 border-green-200 bg-green-50",
       },
     };
     const current = config[status] || {
@@ -304,7 +309,7 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
                       </div>
                     </TableCell>
 
-                    {saleChannelCode !== 0 && (
+                    {saleChannelCode !== undefined && saleChannelCode !== 0 && (
                       <TableCell>
                         <div className="flex flex-col items-start text-sm">
                           <span className="font-semibold text-xs text-slate-400 mb-1">

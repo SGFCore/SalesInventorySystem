@@ -44,6 +44,9 @@ async function request<T>(
     config.body = JSON.stringify(body);
   }
 
+  console.log("TRANSACTION BEGINING");
+  console.log("Body: ", body);
+
   let response: Response;
   try {
     response = await fetch(toApiUrl(endpoint), config);
@@ -57,6 +60,8 @@ async function request<T>(
   } finally {
     clearTimeout(timeoutId);
   }
+
+  console.log("Response body: ", response.body);
 
   if (!response.ok) {
     const error = await response

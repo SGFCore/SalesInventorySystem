@@ -233,7 +233,8 @@ create table orders (
    shippingstatus  number check ( shippingstatus in ( 0,
                                                      1,
                                                      2,
-                                                     3 ) ), -- 0:Cần lên lịch giao, 1:Đang đóng gói, 2:Đã gửi vận chuyển, 3:Khách từ chối giao.
+                                                     3,
+                                                     4 ) ), -- 0:Cần lên lịch giao, 1:Đang đóng gói, 2:Đã gửi vận chuyển, 3:Khách từ chối giao, 4:Đã đóng gói
    shipmentnote    varchar2(100),
    shippingfee     number check ( shippingfee >= 0 ),
    exportreceiptid number,

@@ -153,12 +153,12 @@ export const api = {
   // 11. Employeerole TABLE
   employeeRoles: {
     list: () => apiClient.get<Employeerole[]>("/employee-roles"),
-    get: (id: number) => apiClient.get<Employeerole>(`/employee-roles/${id}`),
+    get: (employeeId: number, roleId: number) => apiClient.get<Employeerole>(`/employee-roles/${employeeId}/${roleId}`),
     create: (data: Employeerole) =>
       apiClient.post<Employeerole>("/employee-roles", data),
-    update: (id: number, data: Employeerole) =>
-      apiClient.put<Employeerole>(`/employee-roles/${id}`, data),
-    delete: (id: number) => apiClient.delete<void>(`/employee-roles/${id}`),
+    update: (employeeId: number, roleId: number, data: Employeerole) =>
+      apiClient.put<Employeerole>(`/employee-roles/${employeeId}/${roleId}`, data),
+    delete: (employeeId: number, roleId: number) => apiClient.delete<void>(`/employee-roles/${employeeId}/${roleId}`),
   },
 
   // 12. Shipcompany TABLE
