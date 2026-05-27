@@ -18,7 +18,8 @@ import java.time.Instant;
 @Table(name = "PAYMENT")
 public class Payment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PAYMENT_id_gen")
+    @SequenceGenerator(name = "PAYMENT_id_gen", sequenceName = "PAYMENT_SEQ", allocationSize = 1)
     @Column(name = "PAYMENTID", nullable = false)
     private Long id;
 
@@ -41,7 +42,7 @@ public class Payment {
     @Column(name = "REFERENCECODE", length = 100)
     private String referencecode;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
+    @ColumnDefault("current_timestamp")
     @Column(name = "PAYMENTDATE")
     private Instant paymentdate;
 

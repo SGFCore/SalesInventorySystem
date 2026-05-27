@@ -15,7 +15,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "PRODUCT")
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PRODUCT_id_gen")
+    @SequenceGenerator(name = "PRODUCT_id_gen", sequenceName = "PRODUCT_SEQ", allocationSize = 1)
     @Column(name = "PRODUCTID", nullable = false)
     private Long id;
 

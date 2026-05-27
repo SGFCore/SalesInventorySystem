@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "EXPORTRECEIPTDETAIL")
 public class Exportreceiptdetail {
     @EmbeddedId
+    @SequenceGenerator(name = "EXPORTRECEIPTDETAIL_id_gen", sequenceName = "EXPORT_RECEIPT_SEQ", allocationSize = 1)
     private ExportreceiptdetailId id;
 
     @MapsId("exportreceiptid")

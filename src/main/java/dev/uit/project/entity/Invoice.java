@@ -18,7 +18,8 @@ import java.time.LocalDate;
 @Table(name = "INVOICE")
 public class Invoice {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "INVOICE_id_gen")
+    @SequenceGenerator(name = "INVOICE_id_gen", sequenceName = "INVOICE_SEQ", allocationSize = 1)
     @Column(name = "INVOICEID", nullable = false)
     private Long id;
 
@@ -52,7 +53,7 @@ public class Invoice {
     @Column(name = "STATUS", nullable = false, length = 20)
     private String status;
 
-    @ColumnDefault("SYSDATE")
+    @ColumnDefault("sysdate")
     @Column(name = "INVOICEDATE")
     private LocalDate invoicedate;
 

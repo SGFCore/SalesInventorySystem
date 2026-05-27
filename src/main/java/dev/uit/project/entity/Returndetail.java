@@ -14,6 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "RETURNDETAIL")
 public class Returndetail {
     @EmbeddedId
+    @SequenceGenerator(name = "RETURNDETAIL_id_gen", sequenceName = "SHIPCOMPANY_SEQ", allocationSize = 1)
     private ReturndetailId id;
 
     @MapsId("returnid")
@@ -45,4 +46,6 @@ public class Returndetail {
     @Nationalized
     @Column(name = "ACTIONTAKEN", length = 100)
     private String actiontaken;
+
+
 }

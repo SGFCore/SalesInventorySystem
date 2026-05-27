@@ -14,11 +14,12 @@ import java.time.LocalDate;
 @Table(name = "COUNTSHEET")
 public class Countsheet {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "COUNTSHEET_id_gen")
+    @SequenceGenerator(name = "COUNTSHEET_id_gen", sequenceName = "COUNTSHEET_SEQ", allocationSize = 1)
     @Column(name = "COUNTSHEETID", nullable = false)
     private Long id;
 
-    @ColumnDefault("SYSDATE")
+    @ColumnDefault("sysdate")
     @Column(name = "CREATEDDATE")
     private LocalDate createddate;
 

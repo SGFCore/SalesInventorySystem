@@ -18,7 +18,8 @@ import java.time.LocalDate;
 @Table(name = "EXPORTRECEIPT")
 public class Exportreceipt {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EXPORTRECEIPT_id_gen")
+    @SequenceGenerator(name = "EXPORTRECEIPT_id_gen", sequenceName = "EXPORT_RECEIPT_SEQ", allocationSize = 1)
     @Column(name = "EXPORTRECEIPTID", nullable = false)
     private Long id;
 
@@ -43,7 +44,7 @@ public class Exportreceipt {
     @Column(name = "STATUS", length = 50)
     private String status;
 
-    @ColumnDefault("SYSDATE")
+    @ColumnDefault("sysdate")
     @Column(name = "CREATEDDATE")
     private LocalDate createddate;
 

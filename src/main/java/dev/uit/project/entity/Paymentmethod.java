@@ -13,7 +13,8 @@ import org.hibernate.annotations.Nationalized;
 @Table(name = "PAYMENTMETHOD")
 public class Paymentmethod {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PAYMENTMETHOD_id_gen")
+    @SequenceGenerator(name = "PAYMENTMETHOD_id_gen", sequenceName = "PAYMENT_METHOD_SEQ", allocationSize = 1)
     @Column(name = "PAYMENTMETHODID", nullable = false)
     private Long id;
 

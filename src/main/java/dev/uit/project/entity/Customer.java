@@ -19,7 +19,8 @@ import java.time.LocalDate;
 @Table(name = "CUSTOMER")
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CUSTOMER_id_gen")
+    @SequenceGenerator(name = "CUSTOMER_id_gen", sequenceName = "CUSTOMER_SEQ", allocationSize = 1)
     @Column(name = "CUSTOMERID", nullable = false)
     private Long id;
 
@@ -60,7 +61,7 @@ public class Customer {
     private String email;
 
     @NotNull
-    @ColumnDefault("SYSDATE")
+    @ColumnDefault("sysdate")
     @Column(name = "CREATEDDATE", nullable = false)
     private LocalDate createddate;
 

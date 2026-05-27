@@ -14,7 +14,8 @@ import org.hibernate.annotations.Nationalized;
 @Table(name = "EMPLOYEE")
 public class Employee {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EMPLOYEE_id_gen")
+    @SequenceGenerator(name = "EMPLOYEE_id_gen", sequenceName = "EMPLOYEE_SEQ", allocationSize = 1)
     @Column(name = "EMPLOYEEID", nullable = false)
     private Long id;
 

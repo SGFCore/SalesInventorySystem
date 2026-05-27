@@ -71,7 +71,7 @@ public class DetailinventoryService {
         existing.setAvailablestock(dto.getAvailablestock());
         existing.setMinstock(dto.getMinstock());
         existing.setMaxstock(dto.getMaxstock());
-        existing.setIsAlertEnabled(dto.getIsalertenabled());
+        existing.setIsalertenabled(dto.getIsalertenabled());
         existing.setStoragelocation(dto.getStoragelocation());
 
         Detailinventory updated = detailinventoryRepository.save(existing);
@@ -110,7 +110,7 @@ public class DetailinventoryService {
         entity.setAvailablestock(dto.getAvailablestock());
         entity.setMinstock(dto.getMinstock());
         entity.setMaxstock(dto.getMaxstock());
-        entity.setIsAlertEnabled(dto.getIsalertenabled());
+        entity.setIsalertenabled(dto.getIsalertenabled());
         entity.setStoragelocation(dto.getStoragelocation());
         
         return entity;

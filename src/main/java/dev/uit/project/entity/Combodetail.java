@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "COMBODETAIL")
 public class Combodetail {
     @EmbeddedId
+    @SequenceGenerator(name = "COMBODETAIL_id_gen", sequenceName = "COMBO_SEQ", allocationSize = 1)
     private CombodetailId id;
 
     @MapsId("comboid")

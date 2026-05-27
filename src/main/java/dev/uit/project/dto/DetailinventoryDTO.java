@@ -50,7 +50,7 @@ public class DetailinventoryDTO {
                 entity.getAvailablestock(),
                 entity.getMinstock(),
                 entity.getMaxstock(),
-                entity.getIsAlertEnabled(),
+                entity.getIsalertenabled(),
                 entity.getStoragelocation()
         );
     }

@@ -15,6 +15,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "COUNTSHEETDETAIL")
 public class Countsheetdetail {
     @EmbeddedId
+    @SequenceGenerator(name = "COUNTSHEETDETAIL_id_gen", sequenceName = "COUNTSHEET_SEQ", allocationSize = 1)
     private CountsheetdetailId id;
 
     @MapsId("countsheetid")

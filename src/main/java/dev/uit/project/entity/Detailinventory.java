@@ -15,6 +15,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "DETAILINVENTORY")
 public class Detailinventory {
     @EmbeddedId
+    @SequenceGenerator(name = "DETAILINVENTORY_id_gen", sequenceName = "CUSTOMER_TYPE_SEQ", allocationSize = 1)
     private DetailinventoryId id;
 
     @MapsId("warehouseid")
@@ -49,7 +50,7 @@ public class Detailinventory {
 
     @ColumnDefault("1")
     @Column(name = "ISALERTENABLED")
-    private Integer isAlertEnabled;
+    private Integer isalertenabled;
 
     @Size(max = 100)
     @Nationalized

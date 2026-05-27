@@ -4,31 +4,31 @@ alter session set current_schema = sgf_admin;
 -- Code ở phía sau 2 dòng lệnh trên
 
 -- Tạo sequence (START WITH 1, INCREMENT BY 1)
-create sequence customer_type_seq start with 1 increment by 1;
-create sequence customer_seq start with 1 increment by 1;
-create sequence category_seq start with 1 increment by 1;
-create sequence product_type_seq start with 1 increment by 1;
-create sequence product_seq start with 1 increment by 1;
-create sequence combo_seq start with 1 increment by 1;
-create sequence employee_seq start with 1 increment by 1;
-create sequence warehouse_seq start with 1 increment by 1;
-create sequence shipcompany_seq start with 1 increment by 1;
-create sequence invoice_seq start with 1 increment by 1;
-create sequence orders_seq start with 1 increment by 1;
-create sequence order_detail_seq start with 1 increment by 1;
-create sequence invoice_detail_seq start with 1 increment by 1;
-create sequence payment_method_seq start with 1 increment by 1;
-create sequence payment_seq start with 1 increment by 1;
-create sequence return_policy_seq start with 1 increment by 1;
-create sequence order_return_seq start with 1 increment by 1;
-create sequence notification_seq start with 1 increment by 1;
-create sequence request_form_seq start with 1 increment by 1;
-create sequence transfer_ticket_seq start with 1 increment by 1;
-create sequence import_receipt_seq start with 1 increment by 1;
-create sequence export_receipt_seq start with 1 increment by 1;
-create sequence countsheet_seq start with 1 increment by 1;
-create sequence discount_seq start with 1 increment by 1;
-create sequence feedback_seq start with 1 increment by 1;
+create sequence customer_type_seq start with 1 increment by 1 nocache;
+create sequence customer_seq start with 1 increment by 1 nocache;
+create sequence category_seq start with 1 increment by 1 nocache;
+create sequence product_type_seq start with 1 increment by 1 nocache;
+create sequence product_seq start with 1 increment by 1 nocache;
+create sequence combo_seq start with 1 increment by 1 nocache;
+create sequence employee_seq start with 1 increment by 1 nocache;
+create sequence warehouse_seq start with 1 increment by 1 nocache;
+create sequence shipcompany_seq start with 1 increment by 1 nocache;
+create sequence invoice_seq start with 1 increment by 1 nocache;
+create sequence orders_seq start with 1 increment by 1 nocache;
+create sequence order_detail_seq start with 1 increment by 1 nocache;
+create sequence invoice_detail_seq start with 1 increment by 1 nocache;
+create sequence payment_method_seq start with 1 increment by 1 nocache;
+create sequence payment_seq start with 1 increment by 1 nocache;
+create sequence return_policy_seq start with 1 increment by 1 nocache;
+create sequence order_return_seq start with 1 increment by 1 nocache;
+create sequence notification_seq start with 1 increment by 1 nocache;
+create sequence request_form_seq start with 1 increment by 1 nocache;
+create sequence transfer_ticket_seq start with 1 increment by 1 nocache;
+create sequence import_receipt_seq start with 1 increment by 1 nocache;
+create sequence export_receipt_seq start with 1 increment by 1 nocache;
+create sequence countsheet_seq start with 1 increment by 1 nocache;
+create sequence discount_seq start with 1 increment by 1 nocache;
+create sequence feedback_seq start with 1 increment by 1 nocache;
   
 -- =============================================
 -- 1. CUSTOMER TYPE TABLE

@@ -19,7 +19,8 @@ import java.time.LocalDate;
 @Table(name = "ORDERRETURN")
 public class Orderreturn {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ORDERRETURN_id_gen")
+    @SequenceGenerator(name = "ORDERRETURN_id_gen", sequenceName = "ORDER_RETURN_SEQ", allocationSize = 1)
     @Column(name = "RETURNID", nullable = false)
     private Long id;
 
@@ -35,7 +36,7 @@ public class Orderreturn {
     @JoinColumn(name = "EMPLOYEEID", nullable = false)
     private Employee employeeid;
 
-    @ColumnDefault("SYSDATE")
+    @ColumnDefault("sysdate")
     @Column(name = "RETURNDATE")
     private LocalDate returndate;
 
@@ -55,4 +56,6 @@ public class Orderreturn {
     @Nationalized
     @Column(name = "STATUS", length = 50)
     private String status;
+
+
 }

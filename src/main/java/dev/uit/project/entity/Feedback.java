@@ -17,7 +17,8 @@ import java.time.Instant;
 @Table(name = "FEEDBACK")
 public class Feedback {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FEEDBACK_id_gen")
+    @SequenceGenerator(name = "FEEDBACK_id_gen", sequenceName = "FEEDBACK_SEQ", allocationSize = 1)
     @Column(name = "FEEDBACKID", nullable = false)
     private Long id;
 
@@ -36,7 +37,7 @@ public class Feedback {
     @Column(name = "FEEDBACKCOMMENT", nullable = false, length = 200)
     private String feedbackcomment;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
+    @ColumnDefault("current_timestamp")
     @Column(name = "FEEDBACKDATE")
     private Instant feedbackdate;
 

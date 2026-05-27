@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "EMPLOYEEROLE")
 public class Employeerole {
     @EmbeddedId
+    @SequenceGenerator(name = "EMPLOYEEROLE_id_gen", sequenceName = "EMPLOYEE_SEQ", allocationSize = 1)
     private EmployeeroleId id;
 
     @MapsId("employeeid")

@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "TRANSFERTICKETDETAIL")
 public class Transferticketdetail {
     @EmbeddedId
+    @SequenceGenerator(name = "TRANSFERTICKETDETAIL_id_gen", sequenceName = "WAREHOUSE_SEQ", allocationSize = 1)
     private TransferticketdetailId id;
 
     @MapsId("transferid")

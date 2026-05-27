@@ -22,4 +22,6 @@ public class ReturndetailId implements Serializable {
     @NotNull
     @Column(name = "PRODUCTID", nullable = false)
     private Long productid;
+
+
 }

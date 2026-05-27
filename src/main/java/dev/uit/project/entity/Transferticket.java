@@ -18,7 +18,8 @@ import java.time.LocalDate;
 @Table(name = "TRANSFERTICKET")
 public class Transferticket {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TRANSFERTICKET_id_gen")
+    @SequenceGenerator(name = "TRANSFERTICKET_id_gen", sequenceName = "TRANSFER_TICKET_SEQ", allocationSize = 1)
     @Column(name = "TRANSFERID", nullable = false)
     private Long id;
 
@@ -46,7 +47,7 @@ public class Transferticket {
     @Column(name = "STATUS", length = 50)
     private String status;
 
-    @ColumnDefault("SYSDATE")
+    @ColumnDefault("sysdate")
     @Column(name = "CREATEDDATE")
     private LocalDate createddate;
 

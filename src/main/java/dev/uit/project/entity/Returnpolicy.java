@@ -16,7 +16,8 @@ import java.time.LocalDate;
 @Table(name = "RETURNPOLICY")
 public class Returnpolicy {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RETURNPOLICY_id_gen")
+    @SequenceGenerator(name = "RETURNPOLICY_id_gen", sequenceName = "RETURN_POLICY_SEQ", allocationSize = 1)
     @Column(name = "POLICYID", nullable = false)
     private Long id;
 
@@ -38,4 +39,6 @@ public class Returnpolicy {
 
     @Column(name = "ISACTIVE")
     private Long isactive;
+
+
 }

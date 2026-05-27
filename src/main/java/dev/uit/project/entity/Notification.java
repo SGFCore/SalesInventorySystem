@@ -18,7 +18,8 @@ import java.time.LocalDate;
 @Table(name = "NOTIFICATION")
 public class Notification {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "NOTIFICATION_id_gen")
+    @SequenceGenerator(name = "NOTIFICATION_id_gen", sequenceName = "NOTIFICATION_SEQ", allocationSize = 1)
     @Column(name = "NOTIFICATIONID", nullable = false)
     private Long id;
 
@@ -52,7 +53,7 @@ public class Notification {
     private Integer status;
 
     @NotNull
-    @ColumnDefault("SYSDATE")
+    @ColumnDefault("sysdate")
     @Column(name = "CREATEDDATE", nullable = false)
     private LocalDate createddate;
 

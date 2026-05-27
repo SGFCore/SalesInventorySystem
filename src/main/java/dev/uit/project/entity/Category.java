@@ -13,14 +13,15 @@ import org.hibernate.annotations.Nationalized;
 @Table(name = "CATEGORY")
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CATEGORY_id_gen")
+    @SequenceGenerator(name = "CATEGORY_id_gen", sequenceName = "CATEGORY_SEQ", allocationSize = 1)
     @Column(name = "CATEGORYID", nullable = false)
     private Long id;
 
-    @Size(max = 30)
+    @Size(max = 100)
     @NotNull
     @Nationalized
-    @Column(name = "CATEGORYNAME", nullable = false, length = 30)
+    @Column(name = "CATEGORYNAME", nullable = false, length = 100)
     private String categoryname;
 
 

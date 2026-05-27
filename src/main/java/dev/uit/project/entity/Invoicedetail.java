@@ -16,7 +16,8 @@ import java.math.BigDecimal;
 @Table(name = "INVOICEDETAIL")
 public class Invoicedetail {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "INVOICEDETAIL_id_gen")
+    @SequenceGenerator(name = "INVOICEDETAIL_id_gen", sequenceName = "INVOICE_DETAIL_SEQ", allocationSize = 1)
     @Column(name = "INVOICEDETAILID", nullable = false)
     private Long id;
 
@@ -26,10 +27,9 @@ public class Invoicedetail {
     @JoinColumn(name = "INVOICEID", nullable = false)
     private Invoice invoiceid;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "PRODUCTID", nullable = false)
+    @JoinColumn(name = "PRODUCTID")
     private Product productid;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -18,7 +18,8 @@ import java.time.LocalDate;
 @Table(name = "DISCOUNT")
 public class Discount {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DISCOUNT_id_gen")
+    @SequenceGenerator(name = "DISCOUNT_id_gen", sequenceName = "DISCOUNT_SEQ", allocationSize = 1)
     @Column(name = "DISCOUNTID", nullable = false)
     private Long id;
 
@@ -46,7 +47,7 @@ public class Discount {
     @Column(name = "APPLIEDPRODUCTIDS", length = 4000)
     private String appliedproductids;
 
-    @ColumnDefault("2")
+    @ColumnDefault("0")
     @Column(name = "STATUS")
     private Long status;
 

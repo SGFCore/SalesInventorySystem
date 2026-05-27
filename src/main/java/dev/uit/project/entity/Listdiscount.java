@@ -13,6 +13,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "LISTDISCOUNT")
 public class Listdiscount {
     @EmbeddedId
+    @SequenceGenerator(name = "LISTDISCOUNT_id_gen", sequenceName = "INVOICE_DETAIL_SEQ", allocationSize = 1)
     private ListdiscountId id;
 
     @MapsId("orderid")

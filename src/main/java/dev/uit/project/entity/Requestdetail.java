@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "REQUESTDETAIL")
 public class Requestdetail {
     @EmbeddedId
+    @SequenceGenerator(name = "REQUESTDETAIL_id_gen", sequenceName = "PRODUCT_TYPE_SEQ", allocationSize = 1)
     private RequestdetailId id;
 
     @MapsId("requestid")

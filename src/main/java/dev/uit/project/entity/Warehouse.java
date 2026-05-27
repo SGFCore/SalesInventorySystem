@@ -15,14 +15,15 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "WAREHOUSE")
 public class Warehouse {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "WAREHOUSE_id_gen")
+    @SequenceGenerator(name = "WAREHOUSE_id_gen", sequenceName = "WAREHOUSE_SEQ", allocationSize = 1)
     @Column(name = "WAREHOUSEID", nullable = false)
     private Long id;
 
-    @Size(max = 40)
+    @Size(max = 50)
     @NotNull
     @Nationalized
-    @Column(name = "WAREHOUSENAME", nullable = false, length = 40)
+    @Column(name = "WAREHOUSENAME", nullable = false, length = 50)
     private String warehousename;
 
     @NotNull
@@ -31,10 +32,10 @@ public class Warehouse {
     @JoinColumn(name = "MANAGERID", nullable = false)
     private Employee managerid;
 
-    @Size(max = 50)
+    @Size(max = 100)
     @NotNull
     @Nationalized
-    @Column(name = "ADDRESS", nullable = false, length = 50)
+    @Column(name = "ADDRESS", nullable = false, length = 100)
     private String address;
 
     @Size(max = 15)

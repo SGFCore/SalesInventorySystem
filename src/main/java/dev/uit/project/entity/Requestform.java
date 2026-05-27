@@ -18,7 +18,8 @@ import java.time.LocalDate;
 @Table(name = "REQUESTFORM")
 public class Requestform {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REQUESTFORM_id_gen")
+    @SequenceGenerator(name = "REQUESTFORM_id_gen", sequenceName = "REQUEST_FORM_SEQ", allocationSize = 1)
     @Column(name = "REQUESTID", nullable = false)
     private Long id;
 
@@ -28,7 +29,7 @@ public class Requestform {
     @JoinColumn(name = "EMPLOYEEID", nullable = false)
     private Employee employeeid;
 
-    @ColumnDefault("SYSDATE")
+    @ColumnDefault("sysdate")
     @Column(name = "CREATEDDATE")
     private LocalDate createddate;
 
