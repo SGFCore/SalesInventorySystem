@@ -81,10 +81,10 @@ export function NewComboDialog({ open, onOpenChange, onSave }: NewProps) {
 
   // Submit form dữ liệu
   const handleSubmit = async () => {
-    if (comboPrice <= 0) {
-      toast.error("Vui lòng nhập giá bán combo hợp lệ!");
-      return;
-    }
+    // if (comboPrice <= 0) {
+    //   toast.error("Vui lòng nhập giá bán combo hợp lệ!");
+    //   return;
+    // }
 
     // Kiểm tra tính hợp lệ của số lượng
     const hasInvalidQuantity = selectedProducts.some((p) => p.quantity <= 0);
@@ -139,7 +139,7 @@ export function NewComboDialog({ open, onOpenChange, onSave }: NewProps) {
 
         <div className={dialog.body}>
           {/* Nhập Giá bán combo */}
-          <div className="grid gap-2">
+          {/* <div className="grid gap-2">
             <Label htmlFor="comboPrice">
               Giá bán Combo (đ) <span className="text-red-500">*</span>
             </Label>
@@ -152,7 +152,7 @@ export function NewComboDialog({ open, onOpenChange, onSave }: NewProps) {
               className={dialog.input}
               disabled={loading}
             />
-          </div>
+          </div> */}
 
           <div className="border-t border-slate-100 pt-4 mt-2">
             <div className="flex items-center justify-between mb-3">

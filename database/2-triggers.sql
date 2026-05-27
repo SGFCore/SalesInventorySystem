@@ -68,7 +68,7 @@ end;
 /
 
 
--- C12: Tự động cập nhật tồn kho khả dụng khi thêm/sửa/xóa chi tiết đơn hàng
+--C12: Tự động cập nhật tồn kho khả dụng khi thêm/sửa/xóa chi tiết đơn hàng
 create or replace trigger trg_update_inventory_orderdetail after
    insert or update of quantity,productid or delete on orderdetail
    for each row
@@ -143,6 +143,7 @@ begin
    end if;
 end;
 /
+
 
 -- C13: Tự động cập nhật tồn kho khi hoàn trả hàng được nhập lại kho
 create or replace trigger trg_update_inventory_return after
