@@ -1,16 +1,27 @@
 alter session set container = freepdb1;
 alter session set current_schema = sgf_admin;
 
-
 -- =============================================
 -- TRIGGER
 -- =============================================
 
-
--- =============================================
--- TRIGGER
--- =============================================
-
+-- C0: CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG PHÙ HỢP VỚI TRẠNG THÁI VẬN CHUYỂN
+create or replace trigger trg_order_status_by_shipping before
+   insert or update of shippingstatus on orders
+   for each row
+begin
+   if :new.shippingstatus = 0 then
+      :new.orderstatus := 0;   -- Chờ xác nhận
+   elsif :new.shippingstatus in ( 1,
+                                  4 ) then
+      :new.orderstatus := 1;   -- Đã xác nhận (đang chuẩn bị hàng)
+   elsif :new.shippingstatus = 2 then
+      :new.orderstatus := 2;   -- Đang giao
+   elsif :new.shippingstatus = 3 then
+      :new.orderstatus := 4;   -- Đã hủy (khách từ chối giao)
+   end if;
+end;
+/
 -- C0: TRIGGER CẬP NHẬT LOẠI KHÁCH HÀNG THEO CHI TIÊU CỦA KHÁCH
 create or replace trigger trg_customer_type_upgrade before
    update of totalaccumulatedspent on customer
