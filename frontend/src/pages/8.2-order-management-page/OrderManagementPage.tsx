@@ -63,7 +63,10 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
           const invoice = invoiceMap.get(Number(order.invoiceId));
           const customer = customerMap.get(Number(order.customerId));
 
-          if (invoice && invoice.SaleChannelCode === saleChannelCode) {
+          if (
+            (invoice && invoice.SaleChannelCode === saleChannelCode) ||
+            (!invoice && order.shipcompanyId) // Đơn online chưa có hóa đơn
+          ) {
             acc.push({
               ...order,
               invoice,
@@ -72,10 +75,11 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
           }
           return acc;
         }, []);
+        extendedOrders.sort((a, b) => b.id - a.id);
       } else if (saleChannelCode === 0) {
         // Lấy các đơn hàng không có invoiceid từ orderData (có orderid thực sự)
         const ordersWithoutInvoice = orderData
-          .filter((order) => !order.invoiceId || order.invoiceId === 0)
+          .filter((order) => (!order.invoiceId || order.invoiceId === 0) && !order.shipcompanyId)
           .map((order) => {
             const customer = customerMap.get(Number(order.customerId));
             return {
@@ -83,8 +87,7 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
               customer,
               invoice: undefined,
             } as ExtendedOrder;
-          })
-          .sort((a, b) => b.id - a.id); // Sắp xếp giảm dần
+          });
 
         // Lấy các đơn hàng từ invoiceData (không có orderid thực sự)
         const mappedInvoices = invoiceData.reduce<ExtendedOrder[]>((acc, inv) => {
@@ -110,8 +113,9 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
           return acc;
         }, []);
 
-        // Ghép mảng: đơn hàng có orderid lên trước, đơn hàng từ invoice xuống sau
+        // Ghép mảng và sắp xếp chung
         extendedOrders = [...ordersWithoutInvoice, ...mappedInvoices];
+        extendedOrders.sort((a, b) => b.id - a.id);
       }
 
       setOrders(extendedOrders);
@@ -140,12 +144,13 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
   const filteredOrders = orders.filter((ord) => {
     if (!ord) return false;
     const safeSearch = (search || "").trim().toLowerCase();
+    if (!safeSearch) return true;
     const idStr = ord.id != null ? String(ord.id) : "";
     const nameStr = getCustomerName(ord).toLowerCase();
     return idStr.includes(safeSearch) || nameStr.includes(safeSearch);
   });
 
-  const displayedOrders = filteredOrders.length > 0 ? filteredOrders : orders;
+  const displayedOrders = filteredOrders;
   const totalPages = Math.ceil(displayedOrders.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedOrders = displayedOrders.slice(

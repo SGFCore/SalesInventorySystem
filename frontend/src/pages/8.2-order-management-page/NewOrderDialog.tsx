@@ -119,13 +119,13 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
         customerId: Number(selectedCustomerId),
         employeeId: emp?.EmployeeID || null,
         invoiceId: orderData.InvoiceID ? Number(orderData.InvoiceID) : null,
-        shipcode: shipCode.trim().length ? shipCode.trim() : null,
-        shipcompanyId: orderData.ShipCompanyID ? Number(orderData.ShipCompanyID) : null,
-        totalamount: totalAmount + orderData.ShippingFee,
+        shipcode: saleChannelCode !== 0 && shipCode.trim().length ? shipCode.trim() : null,
+        shipcompanyId: saleChannelCode !== 0 && orderData.ShipCompanyID ? Number(orderData.ShipCompanyID) : null,
+        totalamount: totalAmount + (saleChannelCode !== 0 ? orderData.ShippingFee : 0),
         orderstatus: 0, // 0: Chờ xác nhận, 1: Đang chuẩn bị, 2: Đang giao, 3: Đã giao, 4: Đã hủy
         shippingstatus: 0, // 0: Chưa giao, 1: Đang giao, 2: Đã giao thành công, 3: Trả về
-        shipmentnote: orderData.ShipmentNote.trim().length ? orderData.ShipmentNote.trim() : null,
-        shippingfee: orderData.ShippingFee ?? null,
+        shipmentnote: saleChannelCode !== 0 && orderData.ShipmentNote.trim().length ? orderData.ShipmentNote.trim() : null,
+        shippingfee: saleChannelCode !== 0 ? (orderData.ShippingFee || 0) : 0,
         exportreceiptId: null,
       });
 
