@@ -46,6 +46,15 @@ public class ImportreceiptdetailDTO {
         cid.setImportreceiptid(this.importreceiptId);
         cid.setProductid(this.productId);
         entity.setId(cid);
+
+        dev.uit.project.entity.Importreceipt importreceipt = new dev.uit.project.entity.Importreceipt();
+        importreceipt.setId(this.importreceiptId);
+        entity.setImportreceiptid(importreceipt);
+
+        dev.uit.project.entity.Product product = new dev.uit.project.entity.Product();
+        product.setId(this.productId);
+        entity.setProductid(product);
+
         entity.setExpectedquantity(this.expectedquantity);
         entity.setActualquantity(this.actualquantity);
         return entity;

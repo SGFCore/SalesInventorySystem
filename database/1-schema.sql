@@ -231,7 +231,7 @@ create table invoice (
    taxamount       number(19,4) default 0,
    finalamount     number(19,4) check ( finalamount >= 0 ),
    status          varchar2(20) not null check ( status in ( 'Chờ thanh toán',
-                                                    'Đã thanh toán' ) ),
+                                                    'Đã thanh toán', 'Thanh toán 1 phần' ) ),
    invoicedate     date default sysdate,
    constraint fk_invoice_customer foreign key ( customerid )
       references customer ( customerid ),

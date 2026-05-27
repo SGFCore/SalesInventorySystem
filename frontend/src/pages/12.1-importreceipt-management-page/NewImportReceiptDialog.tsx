@@ -393,13 +393,15 @@ export function NewImportReceiptDialog({ open, onOpenChange, onSave }: Props) {
             >
               Lưu bản nháp
             </Button>
-            <Button
-              className={btn.primary}
-              // onClick={() => handleSubmit(false)}
-              disabled={loading || items.length === 0}
-            >
-              {loading ? "Đang xử lý..." : "Hoàn thành nhập"}
-            </Button>
+            {
+              !(loading || items.length === 0) && <Button
+                className={btn.primary}
+                onClick={() => handleSubmit(false)}
+              >
+                {loading ? "Đang xử lý..." : "Hoàn thành"}
+              </Button>
+            }
+
           </div>
         </DialogFooter>
       </DialogContent>

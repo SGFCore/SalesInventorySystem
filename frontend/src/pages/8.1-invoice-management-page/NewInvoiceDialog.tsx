@@ -161,7 +161,7 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
         TotalAmount: totalAmount,
         TaxAmount: taxAmount,
         FinalAmount: finalAmount,
-        Status: status,
+        Status: status === "0" ? "Chờ thanh toán" : status === "1" ? "Đã thanh toán" : "Thanh toán 1 phần",
         InvoiceDate: new Date().toISOString(),
       });
 
@@ -173,7 +173,7 @@ export function NewInvoiceDialog({ open, onOpenChange, onSave }: NewProps) {
           return api.invoiceDetails.create({
             InvoiceID: newInvoice.InvoiceID,
             ProductID: item.productID,
-            ComboID: 0,
+            ComboID: null,
             Quantity: item.quantity,
             UnitPrice: price,
             DiscountAmount: 0,
