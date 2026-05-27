@@ -61,7 +61,7 @@ async function request<T>(
     clearTimeout(timeoutId);
   }
 
-  console.log("Response body: ", response.body);
+  // console.log("Response body: ", response.body);
 
   if (!response.ok) {
     const error = await response

@@ -227,6 +227,11 @@ export type Order = {
   exportreceiptId: number;
 }
 
+export type ExtendedOrder = Order & {
+  customer?: Customer;
+  invoice?: Invoice;
+};
+
 // orderreturn.dto.ts
 export type OrderReturn = {
   id: number;

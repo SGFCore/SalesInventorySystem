@@ -111,7 +111,7 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
             </div>
           </div>
 
-          <div className="grid gap-2">
+          {/* <div className="grid gap-2">
             <Label htmlFor="CustomerTypeID">Loại khách hàng (ID)</Label>
             <Input
               id="CustomerTypeID"
@@ -121,7 +121,7 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
               className={dialog.input}
               disabled={loading}
             />
-          </div>
+          </div> */}
 
           <div className="grid gap-2">
             <Label htmlFor="CompanyName">Tên công ty</Label>

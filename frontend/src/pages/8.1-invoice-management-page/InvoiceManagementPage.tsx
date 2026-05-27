@@ -81,7 +81,7 @@ export default function InvoiceManagementPage() {
     try {
       await api.invoices.update(invoice.InvoiceID, {
         ...invoice,
-        Status: "1", // Đã thanh toán
+        Status: "Đã thanh toán", // Đã thanh toán
       });
       toast.success(`Đã xác nhận thanh toán cho Hóa đơn #${invoice.InvoiceID}`);
       loadInvoices();
@@ -102,19 +102,19 @@ export default function InvoiceManagementPage() {
 
   const renderStatus = (status: string) => {
     switch (status) {
-      case "0":
+      case "Chờ thanh toán":
         return (
           <Badge variant="outline" className={cn(badge.base, badge.pending)}>
             Chờ thanh toán
           </Badge>
         );
-      case "1":
+      case "Đã thanh toán":
         return (
           <Badge variant="outline" className={cn(badge.base, badge.success)}>
             Đã thanh toán
           </Badge>
         );
-      case "2":
+      case "Thanh toán 1 phần":
         return (
           <Badge variant="outline" className={cn(badge.base, badge.info)}>
             Thanh toán 1 phần
@@ -216,19 +216,18 @@ export default function InvoiceManagementPage() {
                         >
                           Xem chi tiết
                         </Button>
-                        {invoice.Status !== "1" && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className={cn(
-                              btn.actionPrimary,
-                              "w-32 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100",
-                            )}
-                            onClick={() => handleConfirmPayment(invoice)}
-                          >
-                            XN. thanh toán
-                          </Button>
-                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={cn(
+                            btn.actionPrimary,
+                            "w-32 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100",
+                          )}
+                          disabled={invoice.Status === "Đã thanh toán"}
+                          onClick={() => handleConfirmPayment(invoice)}
+                        >
+                          XN. thanh toán
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>

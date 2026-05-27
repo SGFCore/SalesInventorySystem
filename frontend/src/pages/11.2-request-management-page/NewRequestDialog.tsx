@@ -92,7 +92,7 @@ export function NewRequestDialog({ open, onOpenChange, onSave }: Props) {
         EmployeeID: empId,
         CreatedDate: new Date().toISOString(),
         Status: "0", // "0": Chờ duyệt
-        ApproverID: 0,
+        ApproverID: null,
         RejectReason: "",
       });
 

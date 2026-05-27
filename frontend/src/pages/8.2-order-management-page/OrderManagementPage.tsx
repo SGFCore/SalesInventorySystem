@@ -1,36 +1,35 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, MoreHorizontal, Loader2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import type { Order, Customer } from "@/lib/types";
-import { DetailOrderDialog } from "@/pages/8.2-order-management-page/DetailOrderDialog";
-import { NewOrderDialog } from "@/pages/8.2-order-management-page/NewOrderDialog";
-import { EditOrderDialog } from "@/pages/8.2-order-management-page/EditOrderDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChangeProductDialog } from "@/pages/8.2-order-management-page/ChangeProductDialog";
-import { ReturnProductDialog } from "@/pages/8.2-order-management-page/ReturnProductDialog";
-import { page, btn, entity, input } from "@/pages/page-classes";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { api } from "@/lib/api";
+import type { ExtendedOrder } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { ChangeProductDialog } from "@/pages/8.2-order-management-page/ChangeProductDialog";
+import { DetailOrderDialog } from "@/pages/8.2-order-management-page/DetailOrderDialog";
+import { EditOrderDialog } from "@/pages/8.2-order-management-page/EditOrderDialog";
+import { NewOrderDialog } from "@/pages/8.2-order-management-page/NewOrderDialog";
+import { ReturnProductDialog } from "@/pages/8.2-order-management-page/ReturnProductDialog";
+import { btn, entity, input, page } from "@/pages/page-classes";
+import { ChevronLeft, ChevronRight, Loader2, MoreHorizontal } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 20;
 
-export default function OrderManagementPage({ saleChannelCode }: { saleChannelCode?: number }) {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
+export default function OrderManagementPage({ saleChannelCode }: { saleChannelCode: number }) {
+  const [orders, setOrders] = useState<ExtendedOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
   // Dialog states
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<ExtendedOrder | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isNewOpen, setIsNewOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -48,22 +47,60 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
         api.customers.list(),
         api.invoices.list(),
       ]);
-      setCustomers(customerData);
 
-      let filteredOrders = orderData || [];
-      if (saleChannelCode !== undefined && saleChannelCode !== 0) { // Treat 0 as no filter
-        filteredOrders = filteredOrders.filter(order => {
-          const invoice = invoiceData.find(inv => inv.InvoiceID == order.invoiceId);
-          return invoice && invoice.SaleChannelCode == saleChannelCode;
-        });
+      const customerMap = new Map(
+        customerData.map(cust => [cust.id, cust])
+      );
+
+      const invoiceMap = new Map(
+        invoiceData.map(inv => [Number(inv.InvoiceID), inv])
+      );
+
+      let extendedOrders: ExtendedOrder[] = [];
+
+      if (saleChannelCode === 1) {
+        extendedOrders = orderData.reduce<ExtendedOrder[]>((acc, order) => {
+          const invoice = invoiceMap.get(Number(order.invoiceId));
+          const customer = customerMap.get(Number(order.customerId));
+
+          if (invoice && invoice.SaleChannelCode === saleChannelCode) {
+            acc.push({
+              ...order,
+              invoice,
+              customer,
+            });
+          }
+          return acc;
+        }, []);
+      } else if (saleChannelCode === 0) {
+        // Đối với đơn hàng tại quầy (SaleChannelCode = 0), hệ thống chỉ có Invoice chứ không có Order
+        // Do đó chúng ta sẽ map trực tiếp từ invoiceData thành cấu trúc của ExtendedOrder để hiển thị lên bảng
+        extendedOrders = invoiceData.reduce<ExtendedOrder[]>((acc, inv) => {
+          if (inv.SaleChannelCode === saleChannelCode) {
+            const customer = customerMap.get(Number(inv.CustomerID));
+            acc.push({
+              id: inv.InvoiceID,
+              customerId: inv.CustomerID,
+              employeeId: inv.EmployeeID,
+              invoiceId: inv.InvoiceID,
+              shipcode: "",
+              shipcompanyId: 0,
+              totalamount: inv.TotalAmount,
+              orderstatus: 3, // Mặc định là Hoàn thành/Giao thành công cho đơn offline
+              shippingstatus: 0,
+              shipmentnote: "",
+              shippingfee: 0,
+              exportreceiptId: 0,
+              invoice: inv,
+              customer,
+            });
+          }
+          return acc;
+        }, []);
       }
 
-      if (!filteredOrders || filteredOrders.length === 0) {
-        setOrders([]);
-      } else {
-        // Sort newest first
-        setOrders(filteredOrders);
-      }
+      setOrders(extendedOrders);
+
     } catch (e: any) {
       toast.error(e.message || "Lỗi tải danh sách đơn hàng");
       setOrders([]);
@@ -80,16 +117,16 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
     setCurrentPage(1);
   }, [search]);
 
-  const getCustomerName = (customerId: number) => {
-    const cust = customers.find((c) => c.id === customerId);
-    return cust ? `${cust.firstname} ${cust.lastname}` : `Khách hàng #${customerId}`;
+  const getCustomerName = (order: ExtendedOrder) => {
+    const cust = order.customer;
+    return cust ? `${cust.firstname} ${cust.lastname}` : `Khách hàng #${order.customerId}`;
   };
 
   const filteredOrders = orders.filter((ord) => {
     if (!ord) return false;
     const safeSearch = (search || "").trim().toLowerCase();
     const idStr = ord.id != null ? String(ord.id) : "";
-    const nameStr = getCustomerName(ord.customerId).toLowerCase();
+    const nameStr = getCustomerName(ord).toLowerCase();
     return idStr.includes(safeSearch) || nameStr.includes(safeSearch);
   });
 
@@ -107,7 +144,7 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
   }, [currentPage]);
 
   const handleAction = async (
-    order: Order,
+    order: ExtendedOrder,
     action:
       | "detail"
       | "edit"
@@ -295,7 +332,7 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
                       <div className="flex flex-col items-start">
                         <span className={entity.id}>#{order.id}</span>
                         <span className="text-xs font-semibold text-slate-500 mt-0.5">
-                          {getCustomerName(order.customerId)}
+                          {getCustomerName(order)}
                         </span>
                       </div>
                     </TableCell>
