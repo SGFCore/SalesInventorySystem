@@ -560,35 +560,35 @@ end;
 /
 
 -- TRIGGER TẠO HÓA ĐƠN TỰ ĐỘNG KHI THÊM ĐƠN HÀNG MỚI 
-create or replace trigger trg_create_invoice_for_order before
-   insert on orders
-   for each row
-   when ( new.invoiceid is null
-      and new.shipcode is null
-      and new.shipcompanyid is null )
-declare
-   v_new_invoice_id number;
-begin
-    -- Chèn hóa đơn mới với SaleChannelCode = 0 (tại quầy)
-   insert into invoice (
-      customerid,
-      employeeid,
-      salechannelcode,
-      totalamount,
-      taxamount,
-      finalamount,
-      status,
-      invoicedate
-   ) values ( :new.customerid,
-              :new.employeeid,
-              0,                         -- Hóa đơn tại quầy
-              :new.totalamount,
-              0,                         -- TaxAmount
-              :new.totalamount,          -- FinalAmount (bằng TotalAmount vì chưa có thuế)
-              'Đã thanh toán',          -- Trạng thái mặc định
-              sysdate ) returning invoiceid into v_new_invoice_id;   -- Lấy ID của hóa đơn vừa tạo
+-- create or replace trigger trg_create_invoice_for_order before
+--    insert on orders
+--    for each row
+--    when ( new.invoiceid is null
+--       and new.shipcode is null
+--       and new.shipcompanyid is null )
+-- declare
+--    v_new_invoice_id number;
+-- begin
+--     -- Chèn hóa đơn mới với SaleChannelCode = 0 (tại quầy)
+--    insert into invoice (
+--       customerid,
+--       employeeid,
+--       salechannelcode,
+--       totalamount,
+--       taxamount,
+--       finalamount,
+--       status,
+--       invoicedate
+--    ) values ( :new.customerid,
+--               :new.employeeid,
+--               0,                         -- Hóa đơn tại quầy
+--               :new.totalamount,
+--               0,                         -- TaxAmount
+--               :new.totalamount,          -- FinalAmount (bằng TotalAmount vì chưa có thuế)
+--               'Đã thanh toán',          -- Trạng thái mặc định
+--               sysdate ) returning invoiceid into v_new_invoice_id;   -- Lấy ID của hóa đơn vừa tạo
 
-    -- Gán InvoiceID cho đơn hàng hiện tại
-   :new.invoiceid := v_new_invoice_id;
-end;
-/
+--     -- Gán InvoiceID cho đơn hàng hiện tại
+--    :new.invoiceid := v_new_invoice_id;
+-- end;
+-- /

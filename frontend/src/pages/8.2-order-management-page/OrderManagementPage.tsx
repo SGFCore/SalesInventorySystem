@@ -73,9 +73,21 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
           return acc;
         }, []);
       } else if (saleChannelCode === 0) {
-        // Đối với đơn hàng tại quầy (SaleChannelCode = 0), hệ thống chỉ có Invoice chứ không có Order
-        // Do đó chúng ta sẽ map trực tiếp từ invoiceData thành cấu trúc của ExtendedOrder để hiển thị lên bảng
-        extendedOrders = invoiceData.reduce<ExtendedOrder[]>((acc, inv) => {
+        // Lấy các đơn hàng không có invoiceid từ orderData (có orderid thực sự)
+        const ordersWithoutInvoice = orderData
+          .filter((order) => !order.invoiceId || order.invoiceId === 0)
+          .map((order) => {
+            const customer = customerMap.get(Number(order.customerId));
+            return {
+              ...order,
+              customer,
+              invoice: undefined,
+            } as ExtendedOrder;
+          })
+          .sort((a, b) => b.id - a.id); // Sắp xếp giảm dần
+
+        // Lấy các đơn hàng từ invoiceData (không có orderid thực sự)
+        const mappedInvoices = invoiceData.reduce<ExtendedOrder[]>((acc, inv) => {
           if (inv.SaleChannelCode === saleChannelCode) {
             const customer = customerMap.get(Number(inv.CustomerID));
             acc.push({
@@ -97,6 +109,9 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
           }
           return acc;
         }, []);
+
+        // Ghép mảng: đơn hàng có orderid lên trước, đơn hàng từ invoice xuống sau
+        extendedOrders = [...ordersWithoutInvoice, ...mappedInvoices];
       }
 
       setOrders(extendedOrders);
@@ -323,14 +338,16 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
           <>
             <Table>
               <TableBody>
-                {paginatedOrders.map((order) => (
+                {paginatedOrders.map((order, index) => (
                   <TableRow
-                    key={order.id}
+                    key={`${order.id}-${order.invoiceId || 'no-inv'}-${index}`}
                     className="hover:bg-slate-50 border-b border-slate-200"
                   >
                     <TableCell>
                       <div className="flex flex-col items-start">
-                        <span className={entity.id}>#{order.id}</span>
+                        {!(saleChannelCode === 0 && order.invoice) && (
+                          <span className={entity.id}>#{order.id}</span>
+                        )}
                         <span className="text-xs font-semibold text-slate-500 mt-0.5">
                           {getCustomerName(order)}
                         </span>
