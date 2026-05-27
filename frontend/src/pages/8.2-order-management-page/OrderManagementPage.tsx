@@ -231,7 +231,7 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
         className: "text-yellow-600 border-yellow-200 bg-yellow-50",
       },
       3: {
-        text: "Giao thành công",
+        text: saleChannelCode === 0 ? "Đã thanh toán" : "Giao thành công",
         className: "text-green-600 border-green-200 bg-green-50",
       },
       4: { text: "Đã hủy", className: "text-red-600 border-red-200 bg-red-50" },
