@@ -32,7 +32,7 @@ export const sidebarData: SidebarItem[] = [
   {
     directionTo: "/combo-management",
     label: "Quản lý combo",
-    availableRole: [1],
+    availableRole: [1, 3],
   },
   {
     directionTo: "/multichannel-order-management",

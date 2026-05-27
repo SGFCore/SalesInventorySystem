@@ -5,98 +5,6 @@ alter session set current_schema = sgf_admin;
 -- TRIGGER
 -- =============================================
 
--- C0: CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG PHÙ HỢP VỚI TRẠNG THÁI VẬN CHUYỂN
-create or replace trigger trg_order_status_by_shipping before
-   insert or update of shippingstatus on orders
-   for each row
-begin
-   if :new.shippingstatus = 0 then
-      :new.orderstatus := 0;   -- Chờ xác nhận
-   elsif :new.shippingstatus in ( 1,
-                                  4 ) then
-      :new.orderstatus := 1;   -- Đã xác nhận (đang chuẩn bị hàng)
-   elsif :new.shippingstatus = 2 then
-      :new.orderstatus := 2;   -- Đang giao
-   elsif :new.shippingstatus = 3 then
-      :new.orderstatus := 4;   -- Đã hủy (khách từ chối giao)
-   end if;
-end;
-/
--- C0: TRIGGER CẬP NHẬT LOẠI KHÁCH HÀNG THEO CHI TIÊU CỦA KHÁCH
-create or replace trigger trg_customer_type_upgrade before
-   update of totalaccumulatedspent on customer
-   for each row
-declare
-   v_new_type number;
-begin
-    -- Tìm loại khách hàng cao nhất mà SpendingLimit <= tổng chi tiêu mới
-   begin
-      select customertypeid
-        into v_new_type
-        from (
-         select customertypeid
-           from customertype
-          where spendinglimit <= :new.totalaccumulatedspent
-          order by spendinglimit desc
-      )
-       where rownum = 1;
-   exception
-      when no_data_found then
-            -- Không tìm thấy (trường hợp hiếm) → gán loại thấp nhất (Bronze)
-         select min(customertypeid)
-           into v_new_type
-           from customertype;
-   end;
-
-   :new.customertypeid := v_new_type;
-end;
-/
-
--- C0: UPDATE GIÁ CỦA COMBO KHI THÊM 1 COMBO VỚI GIÁ COMBO = 0.9 (TỔNG GIÁ SẢN PHẨM)
-create or replace trigger trg_update_combo_price for
-   insert or update or delete on combodetail
-compound trigger
-   type t_comboids is
-      table of number;
-   v_comboids t_comboids := t_comboids();
-   after each row is begin
-      if inserting then
-         v_comboids.extend;
-         v_comboids(v_comboids.count) := :new.comboid;
-      elsif updating then
-         v_comboids.extend;
-         v_comboids(v_comboids.count) := :new.comboid;
-      elsif deleting then
-         v_comboids.extend;
-         v_comboids(v_comboids.count) := :old.comboid;
-      end if;
-   end after each row;
-   after statement is
-      v_total_price number(
-         19,
-         4
-      );
-   begin
-      v_comboids := v_comboids multiset union distinct v_comboids;
-      for i in 1..v_comboids.count loop
-         select nvl(
-            sum(p.productprice * cd.quantity),
-            0
-         )
-           into v_total_price
-           from combodetail cd
-           join product p
-         on cd.productid = p.productid
-          where cd.comboid = v_comboids(i);
-
-         update combo
-            set
-            comboprice = v_total_price * 0.9
-          where comboid = v_comboids(i);
-      end loop;
-   end after statement;
-end trg_update_combo_price;
-/
 
 -- C11: Số lượng đặt hàng không vượt quá tồn kho khả dụng
 create or replace trigger trg_check_order_quantity before
@@ -160,7 +68,7 @@ end;
 /
 
 
--- C13: Tự động cập nhật tồn kho khả dụng khi thêm/sửa/xóa chi tiết đơn hàng
+-- C12: Tự động cập nhật tồn kho khả dụng khi thêm/sửa/xóa chi tiết đơn hàng
 create or replace trigger trg_update_inventory_orderdetail after
    insert or update of quantity,productid or delete on orderdetail
    for each row
@@ -236,7 +144,7 @@ begin
 end;
 /
 
--- C15: Tự động cập nhật tồn kho khi hoàn trả hàng được nhập lại kho
+-- C13: Tự động cập nhật tồn kho khi hoàn trả hàng được nhập lại kho
 create or replace trigger trg_update_inventory_return after
    update of actiontaken on returndetail
    for each row
@@ -261,30 +169,8 @@ begin
 end;
 /
 
--- C18: Sản phẩm trong Combo phải ở trạng thái đang kinh doanh
-create or replace trigger trg_check_combo_product_status before
-   insert or update of productid on combodetail
-   for each row
-declare
-   v_status number;
-begin
-   select productstatus
-     into v_status
-     from product
-    where productid = :new.productid;
 
-   if v_status != 1 then
-      raise_application_error(
-         -20011,
-         'Sản phẩm ID='
-         || :new.productid
-         || ' đã ngừng kinh doanh, không thể thêm vào combo.'
-      );
-   end if;
-end;
-/
-
--- C24: Hóa đơn phải có tối thiểu 1 sản phẩm hoặc 1 combo
+-- C14: Hóa đơn phải có tối thiểu 1 sản phẩm hoặc 1 combo
 create or replace trigger trg_check_order_has_items before
    update of orderstatus on orders
    for each row
@@ -309,25 +195,32 @@ begin
 end;
 /
 
--- C25: Tồn kho khả dụng không thể lớn hơn tồn kho thực tế
-create or replace trigger trg_check_available_stock before
-   insert or update of availablestock,realstock on detailinventory
+
+-- C15: Sản phẩm trong Combo phải ở trạng thái đang kinh doanh
+create or replace trigger trg_check_combo_product_status before
+   insert or update of productid on combodetail
    for each row
+declare
+   v_status number;
 begin
-   if :new.availablestock > :new.realstock then
+   select productstatus
+     into v_status
+     from product
+    where productid = :new.productid;
+
+   if v_status != 1 then
       raise_application_error(
-         -20015,
-         'Tồn kho khả dụng ('
-         || :new.availablestock
-         || ') không thể lớn hơn tồn kho thực tế ('
-         || :new.realstock
-         || ').'
+         -20011,
+         'Sản phẩm ID='
+         || :new.productid
+         || ' đã ngừng kinh doanh, không thể thêm vào combo.'
       );
    end if;
 end;
 /
 
--- C27: Tự động tạo cảnh báo khi tồn kho khả dụng ≤ ngưỡng tối thiểu
+
+-- C16: Tự động tạo cảnh báo khi tồn kho khả dụng ≤ ngưỡng tối thiểu
 create or replace trigger trg_alert_reorder_point after
    update of availablestock on detailinventory
    for each row
@@ -368,7 +261,7 @@ begin
 end;
 /
 
--- C28: Tự động hoàn trả tồn kho khả dụng khi đơn hàng bị hủy
+-- C18: Tự động hoàn trả tồn kho khả dụng khi đơn hàng bị hủy
 create or replace trigger trg_restore_stock_on_cancel after
    update of orderstatus on orders
    for each row
@@ -419,7 +312,85 @@ end;
 /
 
 
--- C31: CẬP NHẬT TỔNG CHI TIÊU CỦA KHÁCH HÀNG
+-- C21: Tự động phân hạng khách hàng theo tổng chi tiêu
+create or replace trigger trg_customer_type_upgrade before
+   update of totalaccumulatedspent on customer
+   for each row
+declare
+   v_new_type number;
+begin
+    -- Tìm loại khách hàng cao nhất mà SpendingLimit <= tổng chi tiêu mới
+   begin
+      select customertypeid
+        into v_new_type
+        from (
+         select customertypeid
+           from customertype
+          where spendinglimit <= :new.totalaccumulatedspent
+          order by spendinglimit desc
+      )
+       where rownum = 1;
+   exception
+      when no_data_found then
+            -- Không tìm thấy (trường hợp hiếm) → gán loại thấp nhất (Bronze)
+         select min(customertypeid)
+           into v_new_type
+           from customertype;
+   end;
+
+   :new.customertypeid := v_new_type;
+end;
+/
+
+
+-- C22: UPDATE GIÁ CỦA COMBO KHI THÊM 1 COMBO VỚI GIÁ COMBO = 0.9 (TỔNG GIÁ SẢN PHẨM)
+create or replace trigger trg_update_combo_price for
+   insert or update or delete on combodetail
+compound trigger
+   type t_comboids is
+      table of number;
+   v_comboids t_comboids := t_comboids();
+   after each row is begin
+      if inserting then
+         v_comboids.extend;
+         v_comboids(v_comboids.count) := :new.comboid;
+      elsif updating then
+         v_comboids.extend;
+         v_comboids(v_comboids.count) := :new.comboid;
+      elsif deleting then
+         v_comboids.extend;
+         v_comboids(v_comboids.count) := :old.comboid;
+      end if;
+   end after each row;
+   after statement is
+      v_total_price number(
+         19,
+         4
+      );
+   begin
+      v_comboids := v_comboids multiset union distinct v_comboids;
+      for i in 1..v_comboids.count loop
+         select nvl(
+            sum(p.productprice * cd.quantity),
+            0
+         )
+           into v_total_price
+           from combodetail cd
+           join product p
+         on cd.productid = p.productid
+          where cd.comboid = v_comboids(i);
+
+         update combo
+            set
+            comboprice = v_total_price * 0.9
+          where comboid = v_comboids(i);
+      end loop;
+   end after statement;
+end trg_update_combo_price;
+/
+
+
+-- C23: CẬP NHẬT TỔNG CHI TIÊU CỦA KHÁCH HÀNG
 create or replace trigger trg_update_customer_spending for
    insert or update of status,finalamount on invoice
 compound trigger
@@ -487,7 +458,7 @@ compound trigger
 end trg_update_customer_spending;
 /
 
--- C33: KIỂM TRA MÃ KHUYẾN MÃI PHÙ HỢP VỚI LOẠI KHÁCH HÀNG
+-- C24: KIỂM TRA MÃ KHUYẾN MÃI PHÙ HỢP VỚI LOẠI KHÁCH HÀNG
 create or replace trigger trg_check_discount_customer_type before
    insert or update on listdiscount
    for each row
@@ -547,5 +518,77 @@ begin
       );
    end if;
 
+end;
+/
+
+
+-- C25: Tồn kho khả dụng không thể lớn hơn tồn kho thực tế
+create or replace trigger trg_check_available_stock before
+   insert or update of availablestock,realstock on detailinventory
+   for each row
+begin
+   if :new.availablestock > :new.realstock then
+      raise_application_error(
+         -20015,
+         'Tồn kho khả dụng ('
+         || :new.availablestock
+         || ') không thể lớn hơn tồn kho thực tế ('
+         || :new.realstock
+         || ').'
+      );
+   end if;
+end;
+/
+
+
+-- C26: CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG PHÙ HỢP VỚI TRẠNG THÁI VẬN CHUYỂN
+create or replace trigger trg_order_status_by_shipping before
+   insert or update of shippingstatus on orders
+   for each row
+begin
+   if :new.shippingstatus = 0 then
+      :new.orderstatus := 0;   -- Chờ xác nhận
+   elsif :new.shippingstatus in ( 1,
+                                  4 ) then
+      :new.orderstatus := 1;   -- Đã xác nhận (đang chuẩn bị hàng)
+   elsif :new.shippingstatus = 2 then
+      :new.orderstatus := 2;   -- Đang giao
+   elsif :new.shippingstatus = 3 then
+      :new.orderstatus := 4;   -- Đã hủy (khách từ chối giao)
+   end if;
+end;
+/
+
+-- TRIGGER TẠO HÓA ĐƠN TỰ ĐỘNG KHI THÊM ĐƠN HÀNG MỚI 
+create or replace trigger trg_create_invoice_for_order before
+   insert on orders
+   for each row
+   when ( new.invoiceid is null
+      and new.shipcode is null
+      and new.shipcompanyid is null )
+declare
+   v_new_invoice_id number;
+begin
+    -- Chèn hóa đơn mới với SaleChannelCode = 0 (tại quầy)
+   insert into invoice (
+      customerid,
+      employeeid,
+      salechannelcode,
+      totalamount,
+      taxamount,
+      finalamount,
+      status,
+      invoicedate
+   ) values ( :new.customerid,
+              :new.employeeid,
+              0,                         -- Hóa đơn tại quầy
+              :new.totalamount,
+              0,                         -- TaxAmount
+              :new.totalamount,          -- FinalAmount (bằng TotalAmount vì chưa có thuế)
+              'Đã thanh toán',          -- Trạng thái mặc định
+              sysdate ) returning invoiceid into v_new_invoice_id;   -- Lấy ID của hóa đơn vừa tạo
+
+    -- Gán InvoiceID cho đơn hàng hiện tại
+   :new.invoiceid := v_new_invoice_id;
 end;
 /
