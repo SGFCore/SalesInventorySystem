@@ -69,62 +69,57 @@ end;
 
 
 --C12: Tự động cập nhật tồn kho khả dụng khi thêm/sửa/xóa chi tiết đơn hàng
-create or replace trigger trg_update_inventory_orderdetail after
-   insert or update of quantity,productid or delete on orderdetail
+create or replace trigger trg_update_inventory_invoicedetail after
+   insert or update of quantity,productid or delete on invoicedetail
    for each row
 declare
    v_warehouse_id number;
-   v_has_shipping number;
+   v_sale_channel number;
    v_old_qty      number := 0;
    v_new_qty      number := 0;
-   v_order_id     number;
+   v_invoice_id   number;
    v_product_id   number;
 begin
-    -- Xác định OrderID và ProductID
+   -- 1. Xác định InvoiceID và ProductID
    if inserting then
-      v_order_id := :new.orderid;
+      v_invoice_id := :new.invoiceid;
       v_product_id := :new.productid;
       v_new_qty := :new.quantity;
    elsif updating then
-      v_order_id := :new.orderid;
+      v_invoice_id := :new.invoiceid;
       v_product_id := :new.productid;
       v_old_qty := :old.quantity;
       v_new_qty := :new.quantity;
    elsif deleting then
-      v_order_id := :old.orderid;
+      v_invoice_id := :old.invoiceid;
       v_product_id := :old.productid;
       v_old_qty := :old.quantity;
    end if;
 
-    -- Xác định loại đơn hàng (online hay tại quầy)
+   -- 2. Lấy kênh bán hàng từ Invoice
    begin
-      select case
-                when o.shipcode is not null
-                    or o.shipcompanyid is not null then
-                   1
-                else
-                   0
-             end
-        into v_has_shipping
-        from orders o
-       where o.orderid = v_order_id;
+      select salechannelcode
+        into v_sale_channel
+        from invoice
+       where invoiceid = v_invoice_id;
    exception
       when no_data_found then
          raise_application_error(
-            -20005,
-            'Đơn hàng không tồn tại.'
+            -20010,
+            'Hóa đơn không tồn tại.'
          );
    end;
 
+   -- 3. Xác định kho: 0 = tại quầy (kho trực tiếp 2), 1 = trực tuyến (kho gốc 1)
    v_warehouse_id :=
       case
-         when v_has_shipping = 1 then
-            1
-         else
+         when v_sale_channel = 0 then
             2
+         else
+            1
       end;
 
-    -- Cập nhật AvailableStock
+   -- 4. Cập nhật AvailableStock
    update detailinventory
       set
       availablestock = availablestock - ( v_new_qty - v_old_qty )
@@ -133,8 +128,8 @@ begin
 
    if sql%rowcount = 0 then
       raise_application_error(
-         -20006,
-         'Không tìm thấy bản ghi tồn kho để cập nhật cho sản phẩm ID='
+         -20011,
+         'Không tìm thấy bản ghi tồn kho cho sản phẩm ID='
          || v_product_id
          || ' tại kho ID='
          || v_warehouse_id
@@ -560,36 +555,36 @@ begin
 end;
 /
 
--- TRIGGER TẠO HÓA ĐƠN TỰ ĐỘNG KHI THÊM ĐƠN HÀNG MỚI 
--- create or replace trigger trg_create_invoice_for_order before
---    insert on orders
---    for each row
---    when ( new.invoiceid is null
---       and new.shipcode is null
---       and new.shipcompanyid is null )
--- declare
---    v_new_invoice_id number;
--- begin
---     -- Chèn hóa đơn mới với SaleChannelCode = 0 (tại quầy)
---    insert into invoice (
---       customerid,
---       employeeid,
---       salechannelcode,
---       totalamount,
---       taxamount,
---       finalamount,
---       status,
---       invoicedate
---    ) values ( :new.customerid,
---               :new.employeeid,
---               0,                         -- Hóa đơn tại quầy
---               :new.totalamount,
---               0,                         -- TaxAmount
---               :new.totalamount,          -- FinalAmount (bằng TotalAmount vì chưa có thuế)
---               'Đã thanh toán',          -- Trạng thái mặc định
---               sysdate ) returning invoiceid into v_new_invoice_id;   -- Lấy ID của hóa đơn vừa tạo
+-- TRIGGER TẠO HÓA ĐƠN TỰ ĐỘNG KHI THÊM ĐƠN HÀNG VỚI INVOICEID = NULL
+create or replace trigger trg_create_invoice_for_order before
+   insert on orders
+   for each row
+   when ( new.invoiceid is null
+      and new.shipcode is null
+      and new.shipcompanyid is null )
+declare
+   v_new_invoice_id number;
+begin
+    -- Chèn hóa đơn mới với SaleChannelCode = 0 (tại quầy)
+   insert into invoice (
+      customerid,
+      employeeid,
+      salechannelcode,
+      totalamount,
+      taxamount,
+      finalamount,
+      status,
+      invoicedate
+   ) values ( :new.customerid,
+              :new.employeeid,
+              0,                         -- Hóa đơn tại quầy
+              :new.totalamount,
+              0,                         -- TaxAmount
+              :new.totalamount,          -- FinalAmount (bằng TotalAmount vì chưa có thuế)
+              'Đã thanh toán',          -- Trạng thái mặc định
+              sysdate ) returning invoiceid into v_new_invoice_id;   -- Lấy ID của hóa đơn vừa tạo
 
---     -- Gán InvoiceID cho đơn hàng hiện tại
---    :new.invoiceid := v_new_invoice_id;
--- end;
--- /
+    -- Gán InvoiceID cho đơn hàng hiện tại
+   :new.invoiceid := v_new_invoice_id;
+end;
+/
