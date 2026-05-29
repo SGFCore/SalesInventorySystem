@@ -66,4 +66,36 @@ public class OrderController {
         orderService.delete(id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/completed")
+    public ResponseEntity<List<OrderDTO>> getCompletedOrders() {
+        return ResponseEntity.ok(orderService.getCompletedOrders());
+    }
+
+    /**
+     * Lấy danh sách đơn hàng đã đóng gói (RoleID = 2)
+     */
+    @GetMapping("/shipping-ready")
+    public ResponseEntity<List<OrderDTO>> getShippingReadyOrders() {
+        return ResponseEntity.ok(orderService.getShippingReadyOrders());
+    }
+
+    /**
+     * Đẩy đơn vận chuyển (Assign shipping company and code)
+     */
+    @PostMapping("/{id}/assign-ship")
+    public ResponseEntity<OrderDTO> assignShipping(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Long> payload) {
+        Long shipCompanyId = payload.get("shipcompanyid");
+        return ResponseEntity.ok(orderService.assignShipping(id, shipCompanyId));
+    }
+
+    /**
+     * Hủy giao vận (Cancel order)
+     */
+    @PostMapping("/{id}/cancel-ship")
+    public ResponseEntity<OrderDTO> cancelShipping(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.cancelShipping(id));
+    }
 }

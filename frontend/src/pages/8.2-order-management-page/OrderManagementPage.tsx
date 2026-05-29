@@ -15,7 +15,6 @@ import { ChangeProductDialog } from "@/pages/8.2-order-management-page/ChangePro
 import { DetailOrderDialog } from "@/pages/8.2-order-management-page/DetailOrderDialog";
 import { EditOrderDialog } from "@/pages/8.2-order-management-page/EditOrderDialog";
 import { NewOrderDialog } from "@/pages/8.2-order-management-page/NewOrderDialog";
-import { ReturnProductDialog } from "@/pages/8.2-order-management-page/ReturnProductDialog";
 import { btn, entity, input, page } from "@/pages/page-classes";
 import { ChevronLeft, ChevronRight, Loader2, MoreHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -417,24 +416,6 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
                           >
                             Cập nhật
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            disabled={
-                              order.orderstatus === 4 || order.shippingstatus >= 2
-                            }
-                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
-                            onClick={() => handleAction(order, "change")}
-                          >
-                            Đổi hàng
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            disabled={
-                              order.orderstatus === 4 || order.shippingstatus >= 2
-                            }
-                            className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
-                            onClick={() => handleAction(order, "return")}
-                          >
-                            Trả hàng
-                          </DropdownMenuItem>
                           {saleChannelCode !== 0 && (
                             <DropdownMenuItem
                               disabled={
@@ -564,22 +545,6 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
           order={selectedOrder}
           onSave={loadOrders}
           saleChannelCode={saleChannelCode}
-        />
-      )}
-      {selectedOrder && (
-        <ChangeProductDialog
-          open={isChangeOpen}
-          onOpenChange={setIsChangeOpen}
-          order={selectedOrder}
-          onSave={loadOrders}
-        />
-      )}
-      {selectedOrder && (
-        <ReturnProductDialog
-          open={isReturnOpen}
-          onOpenChange={setIsReturnOpen}
-          order={selectedOrder}
-          onSave={loadOrders}
         />
       )}
     </div>

@@ -26,6 +26,9 @@ import ProductManagementGroup from "@/pages/grouped/ProductManagementGroup";
 import MultiChannelOrderManagement from "@/pages/grouped/MultiChannelOrderManagement";
 import PolicyManagementGroup from "@/pages/grouped/PolicyManagementGroup";
 import CirculatingSlipsManagement from "@/pages/grouped/CirculatingSlipsManagement";
+import ReportManagementGroup from "@/pages/grouped/ReportManagementGroup";
+import ShippingManagementGroup from "@/pages/grouped/ShippingManagementGroup";
+import AccountingManagementGroup from "@/pages/grouped/AccountingManagementGroup";
 
 function App() {
   return (
@@ -133,6 +136,30 @@ function App() {
                 element={
                   <PrivateRoute>
                     <CirculatingSlipsManagement />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/report-management"
+                element={
+                  <PrivateRoute>
+                    <ReportManagementGroup />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/shipping-management"
+                element={
+                  <PrivateRoute>
+                    <ShippingManagementGroup />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/accounting-management"
+                element={
+                  <PrivateRoute>
+                    <AccountingManagementGroup />
                   </PrivateRoute>
                 }
               />

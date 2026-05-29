@@ -98,6 +98,51 @@ public class OrderService {
         orderRepository.deleteById(id);
     }
 
+    public List<OrderDTO> getShippingReadyOrders() {
+        // shippingstatus = 4 (Packed), 2 (In Transit); salechannelid = 1 (Online)
+        return orderRepository.findAll()
+                .stream()
+                .filter(o -> (o.getShippingstatus() != null && (o.getShippingstatus() == 4 || o.getShippingstatus() == 2)) 
+                          && (o.getInvoiceid() != null && o.getInvoiceid().getSalechannelcode() == 1))
+                .map(OrderDTO::fromEntity)
+                .toList();
+    }
+
+    public List<OrderDTO> getCompletedOrders() {
+        return orderRepository.findAll()
+                .stream()
+                .filter(o -> o.getOrderstatus() != null && o.getOrderstatus() == 3)
+                .map(OrderDTO::fromEntity)
+                .toList();
+    }
+
+    public OrderDTO assignShipping(Long orderId, Long shipCompanyId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        Shipcompany company = shipcompanyRepository.findById(shipCompanyId)
+                .orElseThrow(() -> new RuntimeException("Shipcompany not found"));
+
+        order.setShipcompanyid(company);
+        order.setShippingstatus(2L); // 2 = In Transit / Sent to Shipping
+        
+        // Generate random ship code
+        String randomCode = "SGF" + System.currentTimeMillis() % 1000000 + (int)(Math.random() * 100);
+        order.setShipcode(randomCode);
+
+        return OrderDTO.fromEntity(orderRepository.save(order));
+    }
+
+    public OrderDTO cancelShipping(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        
+        // Trigger C18 will handle the inventory restoration on OrderStatus = 4
+        order.setOrderstatus(4L); // 4 = Cancelled
+        order.setShippingstatus(3L); // 3 = Returned/Refused (or suitable status)
+        
+        return OrderDTO.fromEntity(orderRepository.save(order));
+    }
+
     private Order convertToEntity(OrderDTO dto) {
         Order entity = new Order();
         if (dto.getCustomerId() != null) {

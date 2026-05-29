@@ -185,11 +185,64 @@ export const apiClient = {
       response = await fetch(toApiUrl(endpoint), {
         method: "GET",
         headers: {
+          "Client-Type": safeHeaders["X-Client-Type"] || "CUSTOMER",
+          ...safeHeaders,
+        },
+        credentials: "include",
+        signal: controller.signal,
+      });
+    } catch (err: any) {
+      if (err.name === "AbortError") {
+        throw new Error(`Download timed out at ${API_BASE}. Please try again.`);
+      }
+      throw new Error(
+        `Cannot connect to API at ${API_BASE}. Make sure backend is running.`,
+      );
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    if (!response.ok) {
+      const error = await response
+        .json()
+        .catch(() => ({ message: response.statusText }));
+      throw new Error(error.message || `HTTP ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+  },
+
+  downloadPost: async <T = any>(
+    endpoint: string,
+    body: T,
+    filename = "file.pdf",
+    headers?: Record<string, string>,
+  ) => {
+    const safeHeaders = headers || {};
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+    let response: Response;
+    try {
+      response = await fetch(toApiUrl(endpoint), {
+        method: "POST",
+        headers: {
           "Content-Type": "application/json",
           "Client-Type": safeHeaders["X-Client-Type"] || "CUSTOMER",
           ...safeHeaders,
         },
         credentials: "include",
+        body: JSON.stringify(body),
         signal: controller.signal,
       });
     } catch (err: any) {

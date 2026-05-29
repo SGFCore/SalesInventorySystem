@@ -10,7 +10,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -44,7 +44,7 @@ public class Payment {
 
     @ColumnDefault("current_timestamp")
     @Column(name = "PAYMENTDATE")
-    private Instant paymentdate;
+    private LocalDateTime paymentdate;
 
 
 }

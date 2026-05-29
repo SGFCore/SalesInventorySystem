@@ -66,4 +66,18 @@ public class PaymentController {
         paymentService.delete(id);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Ghi nhận thanh toán và cập nhật hóa đơn
+     * POST /payments/record
+     */
+    @PostMapping("/record")
+    public ResponseEntity<?> recordPayment(@RequestBody java.util.Map<String, Object> payload) {
+        try {
+            paymentService.recordPayment(payload);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
+        }
+    }
 }

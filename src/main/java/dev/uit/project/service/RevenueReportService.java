@@ -7,13 +7,17 @@ import dev.uit.project.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional
 public class RevenueReportService {
 
     @Autowired
@@ -21,6 +25,21 @@ public class RevenueReportService {
 
     @Autowired
     private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private dev.uit.project.repository.InvoiceRepository invoiceRepository;
+
+    @Autowired
+    private RevenueReportPdfService revenueReportPdfService;
+
+    public ByteArrayOutputStream generateRevenuePdf(LocalDate start, LocalDate endDate) throws com.itextpdf.text.DocumentException {
+        List<dev.uit.project.entity.Invoice> invoices = invoiceRepository.findByInvoicedateBetween(start, endDate);
+        return revenueReportPdfService.generateTransactionPdf(invoices, start, endDate);
+    }
+
+    public List<dev.uit.project.entity.Invoice> getRevenueTransactions(LocalDate start, LocalDate end) {
+        return invoiceRepository.findByInvoicedateBetween(start, end);
+    }
 
     // ==================== PUBLIC METHODS ====================
 

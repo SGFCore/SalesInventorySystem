@@ -40,7 +40,7 @@ docker volume rm sgf-data
 **Chạy container**:
 
 ```sh
-docker run --name sgf-db --network sgf-network -p 1521:1521 -e ORACLE_PASSWORD=Admin123 -v sgf-data:/opt/oracle/oradata -v "D:\UNI DOCS\SalesInventorySystem\database:/docker-entrypoint-initdb.d" --health-cmd="healthcheck.sh" gvenzl/oracle-free:23-slim
+docker run --name sgf-db --network sgf-network -p 1521:1521 -e ORACLE_PASSWORD=Admin123 -v sgf-data:/opt/oracle/oradata -v "C:\Users\24521\Downloads\SalesInventorySystem\database:/docker-entrypoint-initdb.d" --health-cmd="healthcheck.sh" gvenzl/oracle-free:23-slim
 ```
 
 f.write("ALTER SESSION SET CONTAINER = FREEPDB1;\nALTER SESSION SET CURRENT_SCHEMA = sgf_admin;\n")
@@ -73,7 +73,7 @@ docker build -t sgf-backend .
 **Run container**:
 
 ```sh
-docker run -it --name sgf-backend --network sgf-network -p 8080:8080 -v "D:\UNI DOCS\SalesInventorySystem":/app sgf-backend
+docker run -it --name sgf-backend --network sgf-network -p 8080:8080 sgf-backend
 ```
 
 Vào terminal:

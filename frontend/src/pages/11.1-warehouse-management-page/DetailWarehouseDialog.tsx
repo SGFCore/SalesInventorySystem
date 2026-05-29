@@ -39,7 +39,12 @@ export function DetailWarehouseDialog({
             api.detailInventories.list(),
             api.products.list(),
           ]);
-          setInventories(invList.filter((inv) => inv.WarehouseID === warehouse.WareHouseID));
+          // Chỉ lấy những tồn kho thuộc kho này VÀ sản phẩm đó phải tồn tại trong danh mục sản phẩm
+          const filteredInv = invList.filter((inv) => 
+            inv.WarehouseID === warehouse.WareHouseID && 
+            prodList.some((p) => p.ProductID === inv.ProductID)
+          );
+          setInventories(filteredInv);
           setProducts(prodList);
         } catch (e) {
           console.error("Lỗi tải thông tin tồn kho:", e);
@@ -160,10 +165,13 @@ export function DetailWarehouseDialog({
                           {getProductName(item.ProductID)} (Mã: #{item.ProductID})
                         </TableCell>
                         <TableCell className="py-2.5 text-center text-slate-500 font-medium">
-                          Vị trí: <span className="font-semibold text-slate-800">{item.StorageLocation || "Khu A"}</span>
+                          Vị trí: <span className="font-semibold text-slate-800">{item.StorageLocation || "Chưa xếp kệ"}</span>
                         </TableCell>
-                        <TableCell className="py-2.5 text-right font-semibold text-blue-600">
-                          Tồn thực: <span className="font-bold text-slate-900">{item.CurrentQuantity}</span>
+                        <TableCell className="py-2.5 text-right font-semibold text-slate-500">
+                          Tồn khả dụng: <span className="font-bold text-green-600">{item.AvailableStock}</span>
+                        </TableCell>
+                        <TableCell className="py-2.5 text-right font-semibold text-slate-500">
+                          Tồn thực: <span className="font-bold text-blue-600">{item.RealStock}</span>
                         </TableCell>
                       </TableRow>
                     ))}

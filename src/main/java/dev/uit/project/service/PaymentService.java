@@ -92,4 +92,44 @@ public class PaymentService {
         entity.setPaymentdate(dto.getPaymentDate());
         return entity;
     }
+
+    public void recordPayment(java.util.Map<String, Object> payload) {
+        Long invoiceId = Long.valueOf(payload.get("invoiceId").toString());
+        Long paymentMethodId = Long.valueOf(payload.get("paymentMethodId").toString());
+        java.math.BigDecimal amountPaid = new java.math.BigDecimal(payload.get("amountPaid").toString());
+        String referenceCode = payload.get("referenceCode") != null ? payload.get("referenceCode").toString() : null;
+        java.time.LocalDateTime paymentDate = payload.get("paymentDate") != null ? 
+            java.time.LocalDate.parse(payload.get("paymentDate").toString()).atStartOfDay() : 
+            java.time.LocalDateTime.now();
+
+        if (amountPaid.compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Số tiền thanh toán phải lớn hơn 0");
+        }
+
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn"));
+        Paymentmethod pm = paymentMethodRepository.findById(paymentMethodId)
+                .orElseThrow(() -> new RuntimeException("Phương thức thanh toán không hợp lệ"));
+
+        Payment payment = new Payment();
+        payment.setInvoiceid(invoice);
+        payment.setPaymentmethodid(pm);
+        payment.setAmountpaid(amountPaid);
+        payment.setReferencecode(referenceCode);
+        payment.setPaymentdate(paymentDate);
+        paymentRepository.save(payment);
+
+        // Tính tổng đã thanh toán
+        java.math.BigDecimal totalPaid = paymentRepository.findAll().stream()
+                .filter(p -> p.getInvoiceid().getId().equals(invoiceId))
+                .map(Payment::getAmountpaid)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
+        if (invoice.getFinalamount() != null && totalPaid.compareTo(invoice.getFinalamount()) >= 0) {
+            invoice.setStatus("Đã thanh toán");
+        } else {
+            invoice.setStatus("Thanh toán một phần");
+        }
+        invoiceRepository.save(invoice);
+    }
 }

@@ -1,7 +1,8 @@
 import { GroupedPageLayout, type TabConfig } from "@/components/GroupedPageLayout";
 import InvoiceManagementPage from "@/pages/8.1-invoice-management-page/InvoiceManagementPage";
 import OrderManagementPage from "@/pages/8.2-order-management-page/OrderManagementPage";
-import { ShoppingBag, Receipt } from "lucide-react";
+import ReturnExchangeManagementPage from "@/pages/9-orderreturn-management-page/ReturnExchangeManagementPage";
+import { ShoppingBag, Receipt, RefreshCcw } from "lucide-react";
 
 export default function MultiChannelOrderManagement() {
   const tabs: TabConfig[] = [
@@ -10,7 +11,7 @@ export default function MultiChannelOrderManagement() {
       label: "Đơn hàng tại quầy",
       icon: <ShoppingBag className="h-4 w-4" />,
       component: () => <OrderManagementPage saleChannelCode={0} />,
-      roles: [1, 2, 3],
+      roles: [1, 3],
     },
     {
       id: "orders-online",
@@ -20,11 +21,18 @@ export default function MultiChannelOrderManagement() {
       roles: [1, 2, 3],
     },
     {
+      id: "return-exchange",
+      label: "Xử lý đổi trả",
+      icon: <RefreshCcw className="h-4 w-4" />,
+      component: ReturnExchangeManagementPage,
+      roles: [1, 3], // Quản lý và nhân viên
+    },
+    {
       id: "invoices",
       label: "Hóa đơn",
       icon: <Receipt className="h-4 w-4" />,
       component: InvoiceManagementPage,
-      roles: [3, 4],
+      roles: [3],
     },
   ];
 

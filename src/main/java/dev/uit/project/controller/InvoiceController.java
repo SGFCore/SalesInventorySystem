@@ -66,4 +66,34 @@ public class InvoiceController {
         invoiceService.delete(id);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Generate PDF (VAT or normal) for an existing invoice
+     */
+    @PostMapping("/generate-pdf")
+    public ResponseEntity<byte[]> generatePdf(@RequestBody java.util.Map<String, Object> payload) {
+        try {
+            Long invoiceId = Long.valueOf(payload.get("invoiceId").toString());
+            boolean isVat = payload.containsKey("isVat") && Boolean.parseBoolean(payload.get("isVat").toString());
+            java.util.Map<String, String> vatInfo = isVat ? (java.util.Map<String, String>) payload.get("vatInfo") : null;
+            
+            java.io.ByteArrayOutputStream pdf = invoiceService.generateInvoicePdf(invoiceId, vatInfo);
+            
+            return ResponseEntity.ok()
+                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice_" + invoiceId + ".pdf")
+                    .body(pdf.toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Get pending invoices for payment
+     */
+    @GetMapping("/pending")
+    public ResponseEntity<List<InvoiceDTO>> getPendingInvoices() {
+        return ResponseEntity.ok(invoiceService.getPendingInvoices());
+    }
 }

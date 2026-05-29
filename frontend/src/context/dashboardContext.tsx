@@ -31,6 +31,10 @@ interface DashboardContextType {
   loading: boolean;
   metrics: DashboardMetrics;
   chartData: ChartPoint[];
+  invoices: any[];
+  detailInventories: any[];
+  warehouses: any[];
+  products: any[];
   getData: (start: Date, end: Date) => Promise<void>;
 }
 
@@ -47,6 +51,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     productsReturned: 0,
   });
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [detailInventories, setDetailInventories] = useState<any[]>([]);
+  const [warehouses, setWarehouses] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
 
   const getData = async (start: Date, end: Date) => {
     setLoading(true);
@@ -54,13 +62,21 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     setEndDate(end);
 
     try {
-      // Gọi song song cả 4 API để tải dữ liệu
-      const [invList, invDetailsList, returnList, returnDetailsList] = await Promise.all([
+      // Gọi song song các API để tải dữ liệu
+      const [invList, invDetailsList, returnList, returnDetailsList, diList, whList, pList] = await Promise.all([
         api.invoices.list(),
         api.invoiceDetails.list(),
         api.orderReturns.list(),
         api.returnDetails.list(),
+        api.detailInventories.list(),
+        api.warehouses.list(),
+        api.products.list(),
       ]);
+
+      setInvoices(invList);
+      setDetailInventories(diList);
+      setWarehouses(whList);
+      setProducts(pList);
 
       const startBoundary = startOfDay(start);
       const endBoundary = endOfDay(end);
@@ -188,6 +204,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         loading,
         metrics,
         chartData,
+        invoices,
+        detailInventories,
+        warehouses,
+        products,
         getData,
       }}
     >

@@ -37,12 +37,12 @@ export const sidebarData: SidebarItem[] = [
   {
     directionTo: "/multichannel-order-management",
     label: "Quản lý đơn hàng đa kênh",
-    availableRole: [1, 2, 3, 4],
+    availableRole: [1, 2, 3],
   },
   {
     directionTo: "/policy-management",
     label: "Quản lý chính sách",
-    availableRole: [1, 4],
+    availableRole: [1],
   },
   {
     directionTo: "/warehouse-management",
@@ -52,6 +52,21 @@ export const sidebarData: SidebarItem[] = [
   {
     directionTo: "/circulating-slips-management",
     label: "Quản lý các phiếu lưu hành",
+    availableRole: [1, 2, 3],
+  },
+  {
+    directionTo: "/report-management",
+    label: "Quản lý Báo cáo và Thống kê",
+    availableRole: [1],
+  },
+  {
+    directionTo: "/shipping-management",
+    label: "Quản lý giao vận",
     availableRole: [1, 2],
+  },
+  {
+    directionTo: "/accounting-management",
+    label: "Xử lý hóa đơn và thanh toán",
+    availableRole: [1, 4],
   },
 ];

@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/reports")
+@RequestMapping("/reports")
 public class ReportController {
     
     @Autowired
@@ -36,6 +37,56 @@ public class ReportController {
     @Autowired
     private WarehouseReportExcelService warehouseReportExcelService;
     
+    @GetMapping("/revenue/pdf")
+    public ResponseEntity<byte[]> getRevenueTransactionPdf(
+            @RequestParam String startDate,
+            @RequestParam String endDate) throws DocumentException {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+        ByteArrayOutputStream pdf = revenueReportService.generateRevenuePdf(start, end);
+        
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=revenue_report.pdf")
+                .body(pdf.toByteArray());
+    }
+
+    @GetMapping("/inventory/pdf")
+    public ResponseEntity<byte[]> getInventoryReportPdf(
+            @RequestParam(required = false) Long warehouseId,
+            @RequestParam(required = false) Long productId) throws DocumentException {
+        ByteArrayOutputStream pdf = warehouseReportService.generateInventoryPdf(warehouseId, productId);
+        
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=inventory_report.pdf")
+                .body(pdf.toByteArray());
+    }
+
+    @GetMapping("/revenue/transactions")
+    public ResponseEntity<List<dev.uit.project.dto.InvoiceDTO>> getRevenueTransactions(
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+        List<dev.uit.project.dto.InvoiceDTO> dtos = revenueReportService.getRevenueTransactions(start, end)
+                .stream()
+                .map(dev.uit.project.dto.InvoiceDTO::fromEntity)
+                .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/inventory")
+    public ResponseEntity<List<dev.uit.project.dto.DetailinventoryDTO>> getInventoryReport(
+            @RequestParam(required = false) Long warehouseId,
+            @RequestParam(required = false) Long productId) {
+        List<dev.uit.project.dto.DetailinventoryDTO> dtos = warehouseReportService.getInventoryReport(warehouseId, productId)
+                .stream()
+                .map(dev.uit.project.dto.DetailinventoryDTO::fromEntity)
+                .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
     @GetMapping("/revenue/daily")
     public ResponseEntity<RevenueReportDTO> getDailyRevenueReport(@RequestParam String date) {
         LocalDate localDate = LocalDate.parse(date);

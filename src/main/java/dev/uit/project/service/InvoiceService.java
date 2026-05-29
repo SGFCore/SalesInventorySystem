@@ -98,4 +98,25 @@ public class InvoiceService {
         entity.setInvoicedate(dto.getInvoicedate());
         return entity;
     }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private dev.uit.project.repository.InvoicedetailRepository invoiceDetailRepository;
+    @org.springframework.beans.factory.annotation.Autowired
+    private InvoicePdfService invoicePdfService;
+
+    public java.io.ByteArrayOutputStream generateInvoicePdf(Long invoiceId, java.util.Map<String, String> vatInfo) throws com.itextpdf.text.DocumentException {
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Invoice not found: " + invoiceId));
+        List<dev.uit.project.entity.Invoicedetail> details = invoiceDetailRepository.findAll().stream()
+                .filter(d -> d.getInvoiceid().getId().equals(invoiceId))
+                .toList();
+        return invoicePdfService.generateInvoicePdf(invoice, details, vatInfo);
+    }
+
+    public List<InvoiceDTO> getPendingInvoices() {
+        return invoiceRepository.findAll().stream()
+                .filter(i -> "Chờ thanh toán".equals(i.getStatus()) || "Thanh toán một phần".equals(i.getStatus()) || "Thanh toán 1 phần".equals(i.getStatus()))
+                .map(InvoiceDTO::fromEntity)
+                .toList();
+    }
 }

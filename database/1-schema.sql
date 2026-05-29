@@ -538,7 +538,7 @@ create table exportreceipt (
 );
 
 -- =============================================
--- 31. EXPORTRECEIPTDETAIL TABLE (references ExportReceipt, Product)
+-- 31. EXPORTRECEIPTDETAIL TABLE (references ExportReceip, Product)
 -- =============================================
 create table exportreceiptdetail (
    exportreceiptid number,

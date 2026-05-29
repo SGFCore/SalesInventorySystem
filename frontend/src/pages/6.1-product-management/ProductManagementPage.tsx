@@ -65,16 +65,16 @@ export default function ProductManagementPage() {
       warehouseData.forEach((wh: any) => {
         whMap[wh.WareHouseID] = wh.WarehouseType as number;
       });
-      setWarehouseMap(whMap);
+setWarehouseMap(whMap);
       inventoryData.forEach((inv: any) => {
         const pid = inv.ProductID as number;
         const wid = inv.WarehouseID as number;
         const wtype = whMap[wid];
-        // total quantity per product
-        qtyMap[pid] = (qtyMap[pid] || 0) + (inv.CurrentQuantity as number);
+        // total available quantity per product
+        qtyMap[pid] = (qtyMap[pid] || 0) + (inv.AvailableStock as number);
         // per warehouse type
         if (!byWarehouse[pid]) byWarehouse[pid] = {};
-        byWarehouse[pid][wtype] = (byWarehouse[pid][wtype] || 0) + (inv.CurrentQuantity as number);
+        byWarehouse[pid][wtype] = (byWarehouse[pid][wtype] || 0) + (inv.AvailableStock as number);
       });
       setTotalByWarehouse(byWarehouse);
       setTotalQuantities(qtyMap);
@@ -221,7 +221,8 @@ export default function ProductManagementPage() {
                           DM: {product.CategoryID} • Loại: {product.ProductTypeID}  • SL: {totalQuantities[product.ProductID]}
                         </span>
                         <span className={entity.cellMeta}>
-                          Kho gốc: {totalByWarehouse[product.ProductID]?.[1] ?? 0} • Kho VL: {totalByWarehouse[product.ProductID]?.[2] ?? 0} • Kho lỗi: {totalByWarehouse[product.ProductID]?.[3] ?? 0}
+                          Kho gốc: {totalByWarehouse[product.ProductID]?.[1] ?? 0} • 
+                          : {totalByWarehouse[product.ProductID]?.[2] ?? 0} • Kho lỗi: {totalByWarehouse[product.ProductID]?.[3] ?? 0}
                         </span>
                         <span className={cn(entity.price, 'mt-0.5')}>
                           {product.ProductPrice.toLocaleString("vi-VN")} đ

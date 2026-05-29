@@ -14,13 +14,6 @@ export default function PolicyManagementGroup() {
       roles: [1],
     },
     {
-      id: "returns",
-      label: "Hoàn tiền",
-      icon: <RefreshCw className="h-4 w-4" />,
-      component: OrderReturnManagementPage,
-      roles: [4],
-    },
-    {
       id: "policies",
       label: "Chính sách đổi trả",
       icon: <FileText className="h-4 w-4" />,

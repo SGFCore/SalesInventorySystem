@@ -2,7 +2,8 @@ import { GroupedPageLayout, type TabConfig } from "@/components/GroupedPageLayou
 import RequestManagementPage from "@/pages/11.2-request-management-page/RequestManagementPage";
 import ImportReceiptManagementPage from "@/pages/12.1-importreceipt-management-page/ImportReceiptManagementPage";
 import CountsheetManagementPage from "@/pages/15-countsheet-management-page/CountsheetManagementPage";
-import { FilePlus, FileInput, ClipboardCheck } from "lucide-react";
+import TransferTicketManagementPage from "@/pages/18-transfer-ticket-management/TransferTicketManagementPage";
+import { FilePlus, FileInput, ClipboardCheck, ArrowLeftRight } from "lucide-react";
 
 export default function CirculatingSlipsManagement() {
   const tabs: TabConfig[] = [
@@ -26,6 +27,13 @@ export default function CirculatingSlipsManagement() {
       icon: <ClipboardCheck className="h-4 w-4" />,
       component: CountsheetManagementPage,
       roles: [1, 2],
+    },
+    {
+      id: "transfer-tickets",
+      label: "Phiếu luân chuyển nội bộ",
+      icon: <ArrowLeftRight className="h-4 w-4" />,
+      component: TransferTicketManagementPage,
+      roles: [1, 2, 3],
     },
   ];
 

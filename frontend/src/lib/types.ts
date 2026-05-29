@@ -225,6 +225,7 @@ export type Order = {
   shipmentnote: string;
   shippingfee: number;
   exportreceiptId: number;
+  invoicedate?: string; // Add this line if missing
 }
 
 export type ExtendedOrder = Order & {

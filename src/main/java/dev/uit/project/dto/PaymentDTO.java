@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -30,7 +30,7 @@ public class PaymentDTO {
     private String referenceCode;
 
     @JsonProperty("PaymentDate")
-    private Instant paymentDate;
+    private LocalDateTime paymentDate;
 
     public static PaymentDTO fromEntity(Payment entity) {
         if (entity == null) return null;

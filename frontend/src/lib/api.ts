@@ -182,6 +182,9 @@ export const api = {
     update: (id: number, data: Invoice) =>
       apiClient.put<Invoice>(`/invoices/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/invoices/${id}`),
+    generatePdf: (invoiceId: number, isVat: boolean, vatInfo?: any) => 
+      apiClient.downloadPost("/invoices/generate-pdf", { invoiceId, isVat, vatInfo }, `invoice_${invoiceId}.pdf`),
+    getPending: () => apiClient.get<Invoice[]>("/invoices/pending"),
   },
 
   // 14. ORDER TABLE
@@ -445,5 +448,37 @@ export const api = {
     update: (id: number, data: Feedback) =>
       apiClient.put<Feedback>(`/feedbacks/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/feedbacks/${id}`),
+  },
+
+  reports: {
+    downloadRevenuePdf: (startDate: string, endDate: string) =>
+      apiClient.download(`/reports/revenue/pdf?startDate=${startDate}&endDate=${endDate}`, `revenue_report_${startDate}_${endDate}.pdf`),
+    downloadInventoryPdf: (warehouseId?: string, productId?: string) => {
+      let url = "/reports/inventory/pdf";
+      const params = [];
+      if (warehouseId && warehouseId !== "ALL") params.push(`warehouseId=${warehouseId}`);
+      if (productId && productId !== "ALL") params.push(`productId=${productId}`);
+      if (params.length > 0) url += "?" + params.join("&");
+      return apiClient.download(url, "inventory_report.pdf");
+    },
+  },
+
+  shipping: {
+    getShippingReadyOrders: () => apiClient.get<Order[]>("/orders/shipping-ready"),
+    assignShip: (orderId: number, shipcompanyid: number) =>
+      apiClient.post<Order>(`/orders/${orderId}/assign-ship`, { shipcompanyid }),
+    cancelShip: (orderId: number) =>
+      apiClient.post<Order>(`/orders/${orderId}/cancel-ship`, {}),
+  },
+
+  sales: {
+    searchOrders: (keyword: string) => apiClient.get<Order[]>(`/sales/orders/search?keyword=${encodeURIComponent(keyword)}`),
+    exchange: (data: { orderId: number, oldProductId: number, newProductId: number, quantity: number }) => 
+      apiClient.post("/sales/exchange", data),
+    return: (data: { orderId: number, reason: string, items: { productId: number, quantity: number, condition: string }[] }) => 
+      apiClient.post("/sales/return", data),
+    getTransferTickets: () => apiClient.get<Transferticket[]>("/sales/transfer-tickets"),
+    createTransferTicket: (data: any) => apiClient.post("/sales/transfer-tickets", data),
+    confirmTransferReceive: (id: number) => apiClient.put(`/sales/transfer-tickets/${id}/confirm-receive`, {}),
   },
 };
