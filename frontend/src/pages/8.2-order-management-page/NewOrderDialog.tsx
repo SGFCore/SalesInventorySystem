@@ -14,7 +14,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { btn, dialog } from "@/pages/page-classes";
 import { Trash2, Plus } from "lucide-react";
 import { api } from "@/lib/api";
-import type { Product, Shipcompany, Customer } from "@/lib/types";
+import type { Product, Shipcompany, Customer, Discount } from "@/lib/types";
 import { toast } from "sonner";
 import { useEmp } from "@/context/empContext";
 
@@ -38,23 +38,29 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
   const [products, setProducts] = useState<Product[]>([]);
   const [shipCompanies, setShipCompanies] = useState<Shipcompany[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [discounts, setDiscounts] = useState<Discount[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [selectedProducts, setSelectedProducts] = useState<
     { productID: number; quantity: number }[]
+  >([]);
+  const [selectedPromotions, setSelectedPromotions] = useState<
+    { promoID: number }[]
   >([]);
 
   useEffect(() => {
     if (open) {
       const loadOptions = async () => {
         try {
-          const [allProducts, allShip, allCustomers] = await Promise.all([
+          const [allProducts, allShip, allCustomers, allDiscounts] = await Promise.all([
             api.products.list(),
             api.shipCompanies.list(),
             api.customers.list(),
+            api.discounts.list(),
           ]);
           setProducts(allProducts);
           setShipCompanies(allShip);
           setCustomers(allCustomers);
+          setDiscounts(allDiscounts);
 
           if (allProducts.length > 0) {
             setSelectedProducts([
@@ -70,6 +76,7 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
           if (allCustomers.length > 0) {
             setSelectedCustomerId(allCustomers[0].id.toString());
           }
+          setSelectedPromotions([]);
         } catch (e) {
           console.error("Lỗi tải danh mục tạo đơn hàng:", e);
         }
@@ -89,6 +96,15 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
   const handleRemoveProduct = (index: number) => {
     if (selectedProducts.length === 1) return;
     setSelectedProducts((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddPromotion = () => {
+    if (discounts.length === 0) return;
+    setSelectedPromotions((prev) => [...prev, { promoID: discounts[0].id }]);
+  };
+
+  const handleRemovePromotion = (index: number) => {
+    setSelectedPromotions((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async () => {
@@ -114,6 +130,15 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
         }
       });
 
+      // Apply promotional discounts if any
+      let discountTotal = 0;
+      selectedPromotions.forEach((item) => {
+        const promo = discounts.find((d) => d.id === item.promoID);
+        if (promo) {
+          discountTotal += promo.value;
+        }
+      });
+
       // 1. Create Order
       const newOrder = await api.orders.create({
         customerId: Number(selectedCustomerId),
@@ -121,7 +146,7 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
         invoiceId: orderData.InvoiceID ? Number(orderData.InvoiceID) : null,
         shipcode: saleChannelCode !== 0 && shipCode.trim().length ? shipCode.trim() : null,
         shipcompanyId: saleChannelCode !== 0 && orderData.ShipCompanyID ? Number(orderData.ShipCompanyID) : null,
-        totalamount: totalAmount + (saleChannelCode !== 0 ? orderData.ShippingFee : 0),
+        totalamount: Math.max(0, totalAmount + (saleChannelCode !== 0 ? orderData.ShippingFee : 0) - discountTotal),
         orderstatus: 0, // 0: Chờ xác nhận, 1: Đang chuẩn bị, 2: Đang giao, 3: Đã giao, 4: Đã hủy
         shippingstatus: 0, // 0: Chưa giao, 1: Đang giao, 2: Đã giao thành công, 3: Trả về
         shipmentnote: saleChannelCode !== 0 && orderData.ShipmentNote.trim().length ? orderData.ShipmentNote.trim() : null,
@@ -145,6 +170,21 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
           });
         }),
       );
+
+      // 3. Link Promotions to Order
+      if (selectedPromotions.length > 0) {
+        await Promise.all(
+          selectedPromotions.map((item) => {
+            const promo = discounts.find((d) => d.id === item.promoID);
+            const val = promo ? promo.value : 0;
+            return api.listDiscounts.create({
+              orderId: newOrder.id,
+              discountId: item.promoID,
+              appliedvalue: val,
+            });
+          })
+        );
+      }
 
       toast.success("Tạo đơn hàng thành công!");
       onOpenChange(false);
@@ -330,6 +370,57 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
                 disabled={loading}
               >
                 <Plus className="h-4 w-4 mr-1" /> Thêm sản phẩm
+              </Button>
+            </div>
+          </div>
+
+          {/* Khuyến mãi */}
+          <div className="grid gap-3 border-t border-slate-100 pt-4">
+            <Label className="text-blue-600 font-bold uppercase text-xs tracking-wider">
+              Khuyến mãi áp dụng
+            </Label>
+            <div className="grid gap-2">
+              {selectedPromotions.map((item, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <NativeSelect
+                    value={item.promoID}
+                    onChange={(e) =>
+                      setSelectedPromotions((prev) =>
+                        prev.map((p, i) =>
+                          i === index
+                            ? { ...p, promoID: Number(e.target.value) }
+                            : p,
+                        ),
+                      )
+                    }
+                    className="border-slate-200 focus-visible:ring-blue-600 focus-visible:ring-offset-0 text-sm h-9 flex-1"
+                    disabled={loading}
+                  >
+                    {discounts.map((promo) => (
+                      <option key={promo.id} value={promo.id}>
+                        {promo.discountname} (-{promo.value.toLocaleString()} đ)
+                      </option>
+                    ))}
+                  </NativeSelect>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRemovePromotion(index)}
+                    className="text-red-500 border-slate-200 h-9 w-9 p-0 flex items-center justify-center"
+                    disabled={loading}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAddPromotion}
+                className="text-slate-600 border-dashed border-slate-300 mt-1 h-8 w-full text-xs"
+                disabled={loading || discounts.length === 0}
+              >
+                <Plus className="h-4 w-4 mr-1" /> Thêm mã khuyến mãi
               </Button>
             </div>
           </div>

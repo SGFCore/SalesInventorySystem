@@ -172,13 +172,79 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
       | "change"
       | "return"
       | "packeted"
-      | "cancelshipping",
+      | "cancelshipping"
+      | "confirm-invoice",
   ) => {
     setSelectedOrder(order);
     if (action === "detail") setIsDetailOpen(true);
     if (action === "edit") setIsEditOpen(true);
     if (action === "change") setIsChangeOpen(true);
     if (action === "return") setIsReturnOpen(true);
+
+    if (action === "confirm-invoice") {
+      try {
+        const details = await api.orderDetails.list();
+        const orderDetails = details.filter(d => d.OrderID === order.id);
+        
+        if (orderDetails.length === 0) {
+          toast.error("Đơn hàng không có chi tiết sản phẩm!");
+          return;
+        }
+
+        let subTotal = 0;
+        orderDetails.forEach(d => {
+          subTotal += d.UnitPrice * d.Quantity;
+        });
+
+        const taxAmount = Math.round(subTotal * 0.1);
+        // Lấy các khuyến mãi đã áp dụng cho đơn hàng
+        const allListDiscounts = await api.listDiscounts.list();
+        const appliedDiscounts = allListDiscounts.filter(ld => ld.orderId === order.id);
+        let discountAmount = 0;
+        appliedDiscounts.forEach(ad => discountAmount += ad.appliedvalue);
+
+        const finalAmount = Math.max(0, subTotal + taxAmount - discountAmount + (order.shippingfee || 0));
+
+        // 1. Create Invoice
+        const newInvoice = await api.invoices.create({
+          CustomerID: order.customerId,
+          EmployeeID: order.employeeId || 1,
+          SaleChannelCode: 1, // Online
+          TotalAmount: subTotal,
+          TaxAmount: taxAmount,
+          FinalAmount: finalAmount,
+          Status: "Chờ thanh toán",
+          InvoiceDate: new Date().toISOString(),
+        });
+
+        // 2. Create Invoice Details
+        await Promise.all(
+          orderDetails.map(od => 
+            api.invoiceDetails.create({
+              InvoiceID: newInvoice.InvoiceID,
+              ProductID: od.ProductID,
+              ComboID: od.ComboID,
+              Quantity: od.Quantity,
+              UnitPrice: od.UnitPrice,
+              DiscountAmount: od.DiscountAmount,
+              TotalAmount: od.TotalAmount
+            })
+          )
+        );
+
+        // 3. Update Order with InvoiceID
+        await api.orders.update(order.id, {
+          ...order,
+          invoiceId: newInvoice.InvoiceID,
+          orderstatus: 1 // Đã xác nhận
+        });
+
+        toast.success(`Đã tạo hóa đơn #${newInvoice.InvoiceID} cho đơn hàng #${order.id}`);
+        loadOrders();
+      } catch (e: any) {
+        toast.error(e.message || "Lỗi khi tạo hóa đơn");
+      }
+    }
 
     if (action === "cancel") {
       try {
@@ -401,6 +467,17 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
                           align="end"
                           className="bg-white border border-slate-200 min-w-[140px]"
                         >
+                          {saleChannelCode !== 0 && (
+                            <DropdownMenuItem
+                              disabled={
+                                order.orderstatus === 4 || !!order.invoiceId
+                              }
+                              className="text-blue-600 hover:bg-blue-50 cursor-pointer text-xs py-2 disabled:opacity-50 font-semibold"
+                              onClick={() => handleAction(order, "confirm-invoice")}
+                            >
+                              XN tạo hóa đơn
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
                             className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 font-medium"
                             onClick={() => handleAction(order, "detail")}

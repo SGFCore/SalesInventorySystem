@@ -3,39 +3,48 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Printer } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { Invoice } from "@/lib/types";
+import type { Invoice, Customer } from "@/lib/types";
 import { DetailInvoiceDialog } from "@/pages/8.1-invoice-management-page/DetailInvoiceDialog";
-import { NewInvoiceDialog } from "@/pages/8.1-invoice-management-page/NewInvoiceDialog";
 import { badge, btn, entity, input, page } from "@/pages/page-classes";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { useEmp } from "@/context/empContext";
+import { PrintInvoiceDialog } from "./PrintInvoiceDialog";
 
 const ITEMS_PER_PAGE = 20;
 
 export default function InvoiceManagementPage() {
+  const { hasRole } = useEmp();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isNewOpen, setIsNewOpen] = useState(false);
+  const [isPrintOpen, setIsPrintOpen] = useState(false);
 
   // State cho phân trang
   const [currentPage, setCurrentPage] = useState(1);
 
-  const loadInvoices = async () => {
+  const loadData = async () => {
     setLoading(true);
     try {
-      const data = await api.invoices.list();
-      if (!data || data.length === 0) {
+      const [invoiceData, customerData] = await Promise.all([
+        api.invoices.list(),
+        api.customers.list()
+      ]);
+      
+      setCustomers(customerData);
+
+      if (!invoiceData || invoiceData.length === 0) {
         toast.error("Không có dữ liệu hóa đơn");
         setInvoices([]);
       } else {
         // Sort newest first
         setInvoices(
-          data.sort(
+          invoiceData.sort(
             (a, b) =>
               new Date(b.InvoiceDate).getTime() -
               new Date(a.InvoiceDate).getTime(),
@@ -51,7 +60,7 @@ export default function InvoiceManagementPage() {
   };
 
   useEffect(() => {
-    loadInvoices();
+    loadData();
   }, []);
 
   // Reset về trang 1 khi tìm kiếm thay đổi
@@ -77,6 +86,11 @@ export default function InvoiceManagementPage() {
     setIsDetailOpen(true);
   };
 
+  const handlePrintClick = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setIsPrintOpen(true);
+  };
+
   const handleConfirmPayment = async (invoice: Invoice) => {
     try {
       await api.invoices.update(invoice.InvoiceID, {
@@ -84,7 +98,7 @@ export default function InvoiceManagementPage() {
         Status: "Đã thanh toán", // Đã thanh toán
       });
       toast.success(`Đã xác nhận thanh toán cho Hóa đơn #${invoice.InvoiceID}`);
-      loadInvoices();
+      loadData();
     } catch (e: any) {
       toast.error(e.message || "Lỗi xác nhận thanh toán");
     }
@@ -125,6 +139,8 @@ export default function InvoiceManagementPage() {
     }
   };
 
+  const isSalesRole = hasRole(3);
+
   return (
     <div className={page.shell}>
       <div ref={topRef} />
@@ -139,9 +155,6 @@ export default function InvoiceManagementPage() {
             className={input.search}
           />
         </div>
-        <Button className={btn.primary} onClick={() => setIsNewOpen(true)}>
-          Thêm hóa đơn
-        </Button>
       </div>
 
       {/* Invoice Table */}
@@ -216,17 +229,31 @@ export default function InvoiceManagementPage() {
                         >
                           Xem chi tiết
                         </Button>
+                        {!isSalesRole && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={cn(
+                              btn.actionPrimary,
+                              "w-32 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100",
+                            )}
+                            disabled={invoice.Status === "Đã thanh toán"}
+                            onClick={() => handleConfirmPayment(invoice)}
+                          >
+                            XN. thanh toán
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           size="sm"
                           className={cn(
                             btn.actionPrimary,
-                            "w-32 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100",
+                            "w-32 bg-green-50 text-green-600 border-green-200 hover:bg-green-100",
                           )}
-                          disabled={invoice.Status === "Đã thanh toán"}
-                          onClick={() => handleConfirmPayment(invoice)}
+                          onClick={() => handlePrintClick(invoice)}
                         >
-                          XN. thanh toán
+                          <Printer className="h-4 w-4 mr-2" />
+                          In hóa đơn
                         </Button>
                       </div>
                     </TableCell>
@@ -308,11 +335,14 @@ export default function InvoiceManagementPage() {
         invoice={selectedInvoice}
       />
 
-      <NewInvoiceDialog
-        open={isNewOpen}
-        onOpenChange={setIsNewOpen}
-        onSave={loadInvoices}
-      />
+      {selectedInvoice && (
+        <PrintInvoiceDialog
+          open={isPrintOpen}
+          onOpenChange={setIsPrintOpen}
+          invoice={selectedInvoice}
+          customer={customers.find(c => c.id === selectedInvoice.CustomerID)}
+        />
+      )}
     </div>
   );
 }

@@ -8,7 +8,7 @@ export default function MultiChannelOrderManagement() {
   const tabs: TabConfig[] = [
     {
       id: "orders-offline",
-      label: "Đơn hàng tại quầy",
+      label: "Hóa đơn tại quầy",
       icon: <ShoppingBag className="h-4 w-4" />,
       component: () => <OrderManagementPage saleChannelCode={0} />,
       roles: [1, 3],
