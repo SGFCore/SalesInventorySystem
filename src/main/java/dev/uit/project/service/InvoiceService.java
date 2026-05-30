@@ -102,14 +102,51 @@ public class InvoiceService {
     @org.springframework.beans.factory.annotation.Autowired
     private dev.uit.project.repository.InvoicedetailRepository invoiceDetailRepository;
     @org.springframework.beans.factory.annotation.Autowired
+    private dev.uit.project.repository.OrderRepository orderRepository;
+    @org.springframework.beans.factory.annotation.Autowired
+    private dev.uit.project.repository.OrderDetailRepository orderDetailRepository;
+    @org.springframework.beans.factory.annotation.Autowired
     private InvoicePdfService invoicePdfService;
 
-    public java.io.ByteArrayOutputStream generateInvoicePdf(Long invoiceId, java.util.Map<String, String> vatInfo) throws com.itextpdf.text.DocumentException {
+    public java.io.ByteArrayOutputStream generateInvoicePdf(Long invoiceId, java.util.Map<String, Object> vatInfo) throws com.itextpdf.text.DocumentException {
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new RuntimeException("Invoice not found: " + invoiceId));
-        List<dev.uit.project.entity.Invoicedetail> details = invoiceDetailRepository.findAll().stream()
-                .filter(d -> d.getInvoiceid().getId().equals(invoiceId))
-                .toList();
+        
+        if (vatInfo == null) {
+            vatInfo = new java.util.HashMap<>();
+        }
+
+        // 1. Try to find in INVOICEDETAIL
+        List<dev.uit.project.entity.Invoicedetail> details = invoiceDetailRepository.findByInvoiceid_Id(invoiceId);
+        
+        // 2. Fallback: If empty, try to find an Order linked to this invoice and get its ORDERDETAILs
+        List<dev.uit.project.entity.Order> linkedOrders = orderRepository.findByInvoiceid_Id(invoiceId);
+        if (details.isEmpty() && !linkedOrders.isEmpty()) {
+            dev.uit.project.entity.Order order = linkedOrders.get(0);
+            List<dev.uit.project.entity.Orderdetail> orderDetails = orderDetailRepository.findByOrderid_Id(order.getId());
+            
+            // Map Orderdetail to Invoicedetail (transiently for PDF generation)
+            details = orderDetails.stream().map(od -> {
+                dev.uit.project.entity.Invoicedetail id = new dev.uit.project.entity.Invoicedetail();
+                id.setInvoiceid(invoice);
+                id.setProductid(od.getProductid());
+                id.setComboid(od.getComboid());
+                id.setQuantity(od.getQuantity());
+                id.setUnitprice(od.getUnitprice());
+                id.setDiscountamount(od.getDiscountamount());
+                id.setTotalamount(od.getTotalamount());
+                return id;
+            }).toList();
+        }
+
+        // Add shipping fee from order if available
+        if (!linkedOrders.isEmpty()) {
+            dev.uit.project.entity.Order order = linkedOrders.get(0);
+            if (order.getShippingfee() != null) {
+                vatInfo.put("shippingFee", order.getShippingfee());
+            }
+        }
+        
         return invoicePdfService.generateInvoicePdf(invoice, details, vatInfo);
     }
 

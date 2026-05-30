@@ -30,6 +30,19 @@ public class ListdiscountDTO {
         cid.setOrderid(this.orderId);
         cid.setDiscountid(this.discountId);
         entity.setId(cid);
+
+        // Populate associations because of @MapsId
+        if (this.orderId != null) {
+            dev.uit.project.entity.Order o = new dev.uit.project.entity.Order();
+            o.setId(this.orderId);
+            entity.setOrderid(o);
+        }
+        if (this.discountId != null) {
+            dev.uit.project.entity.Discount d = new dev.uit.project.entity.Discount();
+            d.setId(this.discountId);
+            entity.setDiscountid(d);
+        }
+
         entity.setAppliedvalue(this.appliedvalue);
         return entity;
     }

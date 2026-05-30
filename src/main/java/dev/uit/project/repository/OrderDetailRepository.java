@@ -16,4 +16,6 @@ public interface OrderDetailRepository extends JpaRepository<Orderdetail, Long> 
         GROUP BY od.PRODUCTID, p.PRODUCTNAME
     """, nativeQuery = true)
     List<Object[]> sumByOrderIds(@Param("orderIds") List<Long> orderIds);
+
+    List<Orderdetail> findByOrderid_Id(Long orderId);
 }

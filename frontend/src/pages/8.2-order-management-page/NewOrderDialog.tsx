@@ -157,10 +157,10 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
       // 2. Create OrderDetails
       await Promise.all(
         selectedProducts.map((item, index) => {
-          const prod = products.find((p) => p.ProductID === item.productID);
-          const price = prod ? prod.ProductPrice : 0;
+          const prod = products.find((p) => (p as any).ProductID === item.productID || (p as any).id === item.productID);
+          const price = prod ? (prod as any).ProductPrice || (prod as any).productprice : 0;
           return api.orderDetails.create({
-            OrderID: newOrder.id,
+            OrderID: newOrder.id || (newOrder as any).OrderID,
             ProductID: item.productID,
             ComboID: null,
             Quantity: item.quantity,
@@ -175,10 +175,10 @@ export function NewOrderDialog({ open, onOpenChange, onSave, saleChannelCode }: 
       if (selectedPromotions.length > 0) {
         await Promise.all(
           selectedPromotions.map((item) => {
-            const promo = discounts.find((d) => d.id === item.promoID);
-            const val = promo ? promo.value : 0;
+            const promo = discounts.find((d) => (d as any).id === item.promoID || (d as any).id === item.promoID);
+            const val = promo ? (promo as any).value || (promo as any).discountvalue : 0;
             return api.listDiscounts.create({
-              orderId: newOrder.id,
+              orderId: newOrder.id || (newOrder as any).OrderID,
               discountId: item.promoID,
               appliedvalue: val,
             });

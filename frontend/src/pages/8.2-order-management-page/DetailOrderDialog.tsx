@@ -33,16 +33,51 @@ export function DetailOrderDialog({ open, onOpenChange, order, saleChannelCode }
       const loadDetails = async () => {
         setLoading(true);
         try {
-          const [allDetails, allProds, allCustomers] = await Promise.all([
+          // Tải song song tất cả các nguồn dữ liệu có thể chứa chi tiết sản phẩm
+          const [allOrderDetails, allInvDetails, allProds, allCustomers] = await Promise.all([
             api.orderDetails.list(),
+            api.invoiceDetails.list(),
             api.products.list(),
             api.customers.list(),
           ]);
-          const filtered = allDetails.filter((d) => d.OrderID === order.id);
-          setDetails(filtered);
+          
           setProducts(allProds);
           const cust = allCustomers.find((c) => c.id === order.customerId);
           setCustomer(cust || null);
+
+          const orderId = order.id;
+          const invoiceId = order.invoiceId || (order.invoice as any)?.InvoiceID;
+
+          // 1. Thử tìm trong OrderDetails (quy trình chuẩn cho Đơn hàng)
+          let filtered = allOrderDetails
+            .filter((d: any) => 
+              (d.OrderID || d.orderid) == orderId || 
+              (invoiceId && (d.OrderID || d.orderid) == invoiceId)
+            );
+
+          // 2. Nếu không có trong OrderDetails, thử tìm trong InvoiceDetails (quy trình cho Hóa đơn/Đơn tại quầy đã thanh toán)
+          if (filtered.length === 0 && (invoiceId || orderId)) {
+            const targetId = invoiceId || orderId;
+            const fromInvoice = allInvDetails.filter((d: any) => 
+              (d.InvoiceID || d.invoiceid) == targetId || 
+              (d.InvoiceID || d.invoiceid) == orderId
+            );
+
+            if (fromInvoice.length > 0) {
+              filtered = fromInvoice.map((id: any) => ({
+                OrderDetailID: id.InvoiceDetailID || id.id || id.invoicedetailid,
+                OrderID: orderId,
+                ProductID: id.ProductID || id.productid,
+                ComboID: id.ComboID || id.comboid,
+                Quantity: id.Quantity || id.quantity,
+                UnitPrice: id.UnitPrice || id.unitprice,
+                DiscountAmount: id.DiscountAmount || id.discountamount,
+                TotalAmount: id.TotalAmount || id.totalamount
+              } as OrderDetail));
+            }
+          }
+
+          setDetails(filtered);
         } catch (e) {
           console.error("Lỗi lấy chi tiết đơn hàng:", e);
         } finally {
@@ -55,9 +90,10 @@ export function DetailOrderDialog({ open, onOpenChange, order, saleChannelCode }
 
   if (!order) return null;
 
-  const getProductName = (prodId: number) => {
-    const prod = products.find((p) => p.ProductID === prodId);
-    return prod ? prod.ProductName : `Sản phẩm #${prodId}`;
+  const getProductName = (item: any) => {
+    const prodId = item.ProductID || item.productid;
+    const prod = products.find((p) => (p as any).ProductID == prodId || (p as any).id == prodId);
+    return prod ? (prod as any).ProductName || (prod as any).productname : `Sản phẩm #${prodId}`;
   };
 
   const renderValue = (val: any) =>
@@ -183,13 +219,13 @@ export function DetailOrderDialog({ open, onOpenChange, order, saleChannelCode }
                       details.map((item, idx) => (
                         <TableRow key={idx} className="border-b border-slate-100 bg-white">
                           <TableCell className="py-2 text-xs font-semibold text-slate-700">
-                            {getProductName(item.ProductID)} (Mã: #{item.ProductID})
+                            {getProductName(item)} (Mã: #{item.ProductID || (item as any).productid})
                           </TableCell>
                           <TableCell className="py-2 text-xs text-center text-slate-600">
-                            SL: <span className="font-bold">{item.Quantity}</span>
+                            SL: <span className="font-bold">{item.Quantity || (item as any).quantity}</span>
                           </TableCell>
                           <TableCell className="py-2 text-xs text-right text-slate-900 font-semibold">
-                            {(item.Quantity * item.UnitPrice).toLocaleString("vi-VN")} đ
+                            {((item.Quantity || (item as any).quantity) * (item.UnitPrice || (item as any).unitprice)).toLocaleString("vi-VN")} đ
                           </TableCell>
                         </TableRow>
                       ))
@@ -208,7 +244,7 @@ export function DetailOrderDialog({ open, onOpenChange, order, saleChannelCode }
               </div>
               <div className="flex justify-end pt-2 border-t border-slate-100 mt-2">
                 <span className="text-sm font-semibold text-slate-500 mr-4">
-                  Tổng cộng (đã gồm ship):
+                  Tổng cộng:
                 </span>
                 <span className="text-base font-bold text-blue-600">
                   {(order.totalamount || 0).toLocaleString("vi-VN")} đ

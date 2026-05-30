@@ -39,4 +39,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         AND EXTRACT(YEAR FROM i.INVOICEDATE) = :year
     """, nativeQuery = true)
     List<Object[]> findPaidOrdersByYear(@Param("year") int year);
+
+    List<Order> findByInvoiceid_Id(Long invoiceId);
 }

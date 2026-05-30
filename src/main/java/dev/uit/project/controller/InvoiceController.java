@@ -75,8 +75,8 @@ public class InvoiceController {
         try {
             Long invoiceId = Long.valueOf(payload.get("invoiceId").toString());
             boolean isVat = payload.containsKey("isVat") && Boolean.parseBoolean(payload.get("isVat").toString());
-            java.util.Map<String, String> vatInfo = isVat ? (java.util.Map<String, String>) payload.get("vatInfo") : null;
-            
+            java.util.Map<String, Object> vatInfo = isVat ? (java.util.Map<String, Object>) payload.get("vatInfo") : null;
+
             java.io.ByteArrayOutputStream pdf = invoiceService.generateInvoicePdf(invoiceId, vatInfo);
             
             return ResponseEntity.ok()

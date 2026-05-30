@@ -76,9 +76,14 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
         }, []);
         extendedOrders.sort((a, b) => b.id - a.id);
       } else if (saleChannelCode === 0) {
-        // Lấy các đơn hàng không có invoiceid từ orderData (có orderid thực sự)
+        // Tạo map để tìm đơn hàng gốc từ invoiceId
+        const invoiceToOrderMap = new Map(
+          orderData.filter(o => o.invoiceId && o.invoiceId !== 0).map(o => [Number(o.invoiceId), o])
+        );
+
+        // Lấy các đơn hàng không có invoiceid từ orderData (đơn tại quầy chưa thanh toán)
         const ordersWithoutInvoice = orderData
-          .filter((order) => (!order.invoiceId || order.invoiceId === 0) && !order.shipcompanyId)
+          .filter((order) => (!order.invoiceId || order.invoiceId === 0) && (order as any).salechannelcode === 0 && !order.shipcompanyId)
           .map((order) => {
             const customer = customerMap.get(Number(order.customerId));
             return {
@@ -88,32 +93,41 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
             } as ExtendedOrder;
           });
 
-        // Lấy các đơn hàng từ invoiceData (không có orderid thực sự)
+        // Lấy các đơn hàng từ invoiceData (đơn tại quầy đã thanh toán)
         const mappedInvoices = invoiceData.reduce<ExtendedOrder[]>((acc, inv) => {
           if (inv.SaleChannelCode === saleChannelCode) {
             const customer = customerMap.get(Number(inv.CustomerID));
+            const realOrder = invoiceToOrderMap.get(Number(inv.InvoiceID));
+
             acc.push({
-              id: inv.InvoiceID,
+              ...(realOrder || {}),
+              id: realOrder?.id || inv.InvoiceID,
               customerId: inv.CustomerID,
               employeeId: inv.EmployeeID,
               invoiceId: inv.InvoiceID,
-              shipcode: "",
-              shipcompanyId: 0,
+              shipcode: realOrder?.shipcode || "",
+              shipcompanyId: realOrder?.shipcompanyId || 0,
               totalamount: inv.TotalAmount,
-              orderstatus: 3, // Mặc định là Hoàn thành/Giao thành công cho đơn offline
-              shippingstatus: 0,
-              shipmentnote: "",
-              shippingfee: 0,
-              exportreceiptId: 0,
+              orderstatus: realOrder?.orderstatus || 3, // 3: Hoàn thành
+              shippingstatus: realOrder?.shippingstatus || 0,
+              shipmentnote: realOrder?.shipmentnote || "",
+              shippingfee: realOrder?.shippingfee || 0,
+              exportreceiptId: realOrder?.exportreceiptId || 0,
               invoice: inv,
               customer,
-            });
+            } as ExtendedOrder);
           }
           return acc;
         }, []);
 
-        // Ghép mảng và sắp xếp chung
-        extendedOrders = [...ordersWithoutInvoice, ...mappedInvoices];
+        // Ghép mảng và lọc trùng lặp nếu đơn hàng xuất hiện ở cả 2 nơi (trường hợp hiếm)
+        const combined = [...ordersWithoutInvoice];
+        mappedInvoices.forEach(mi => {
+          if (!combined.some(c => c.id === mi.id)) {
+            combined.push(mi);
+          }
+        });
+        extendedOrders = combined;
         extendedOrders.sort((a, b) => b.id - a.id);
       }
 
@@ -184,7 +198,7 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
     if (action === "confirm-invoice") {
       try {
         const details = await api.orderDetails.list();
-        const orderDetails = details.filter(d => d.OrderID === order.id);
+        const orderDetails = details.filter((d: any) => (d.OrderID || d.orderid) == order.id);
         
         if (orderDetails.length === 0) {
           toast.error("Đơn hàng không có chi tiết sản phẩm!");
@@ -192,16 +206,16 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
         }
 
         let subTotal = 0;
-        orderDetails.forEach(d => {
-          subTotal += d.UnitPrice * d.Quantity;
+        orderDetails.forEach((d: any) => {
+          subTotal += (d.UnitPrice || d.unitprice || 0) * (d.Quantity || d.quantity || 0);
         });
 
         const taxAmount = Math.round(subTotal * 0.1);
         // Lấy các khuyến mãi đã áp dụng cho đơn hàng
         const allListDiscounts = await api.listDiscounts.list();
-        const appliedDiscounts = allListDiscounts.filter(ld => ld.orderId === order.id);
+        const appliedDiscounts = allListDiscounts.filter((ld: any) => (ld.orderId || ld.orderID || ld.OrderID) == order.id);
         let discountAmount = 0;
-        appliedDiscounts.forEach(ad => discountAmount += ad.appliedvalue);
+        appliedDiscounts.forEach((ad: any) => discountAmount += (ad.appliedvalue || 0));
 
         const finalAmount = Math.max(0, subTotal + taxAmount - discountAmount + (order.shippingfee || 0));
 
@@ -219,15 +233,15 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
 
         // 2. Create Invoice Details
         await Promise.all(
-          orderDetails.map(od => 
+          orderDetails.map((od: any) => 
             api.invoiceDetails.create({
-              InvoiceID: newInvoice.InvoiceID,
-              ProductID: od.ProductID,
-              ComboID: od.ComboID,
-              Quantity: od.Quantity,
-              UnitPrice: od.UnitPrice,
-              DiscountAmount: od.DiscountAmount,
-              TotalAmount: od.TotalAmount
+              InvoiceID: newInvoice.InvoiceID || (newInvoice as any).id,
+              ProductID: od.ProductID || od.productid,
+              ComboID: od.ComboID || od.comboid,
+              Quantity: od.Quantity || od.quantity,
+              UnitPrice: od.UnitPrice || od.unitprice,
+              DiscountAmount: od.DiscountAmount || od.discountamount,
+              TotalAmount: od.TotalAmount || od.totalamount
             })
           )
         );

@@ -136,15 +136,18 @@ export function PrintInvoiceDialog({ open, onOpenChange, invoice, customer }: Pr
               </div>
               <div className="grid gap-2">
                 <Label className="text-xs text-slate-600 font-medium">
-                  Chiết khấu hóa đơn (đ)
+                  Chiết khấu hóa đơn
                 </Label>
                 <Input
                   type="number"
-                  placeholder="0"
+                  placeholder="Nhập số tiền hoặc % (VD: 10 cho 10%)"
                   value={vatInfo.discount}
                   onChange={(e) => setVatInfo({ ...vatInfo, discount: Number(e.target.value) })}
                   className="border-slate-200 h-9 text-sm focus-visible:ring-blue-600"
                 />
+                <p className="text-[10px] text-slate-400 italic">
+                  * Nếu nhập ≤ 100 hệ thống sẽ tính theo %, &gt; 100 tính theo số tiền.
+                </p>
               </div>
             </div>
           )}

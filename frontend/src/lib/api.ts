@@ -238,6 +238,7 @@ export const api = {
     update: (id: number, data: Payment) =>
       apiClient.put<Payment>(`/payments/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/payments/${id}`),
+    record: (data: any) => apiClient.post("/payments/record", data),
   },
 
   // 19. RETURNPOLICY TABLE
