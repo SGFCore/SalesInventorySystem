@@ -474,9 +474,9 @@ export const api = {
 
   sales: {
     searchOrders: (keyword: string) => apiClient.get<Order[]>(`/sales/orders/search?keyword=${encodeURIComponent(keyword)}`),
-    exchange: (data: { orderId: number, oldProductId: number, newProductId: number, quantity: number }) => 
+    exchange: (data: { orderId: number, oldProductId: number, newProductId: number, quantity: number, employeeId: number }) => 
       apiClient.post("/sales/exchange", data),
-    return: (data: { orderId: number, reason: string, items: { productId: number, quantity: number, condition: string }[] }) => 
+    return: (data: { orderId: number, reason: string, employeeId: number, items: { productId: number, quantity: number, condition: string, qcStatus: string, targetWarehouseId: number, actionTaken: string }[] }) => 
       apiClient.post("/sales/return", data),
     getTransferTickets: () => apiClient.get<Transferticket[]>("/sales/transfer-tickets"),
     createTransferTicket: (data: any) => apiClient.post("/sales/transfer-tickets", data),

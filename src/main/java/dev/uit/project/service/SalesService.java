@@ -38,85 +38,83 @@ public class SalesService {
                 .collect(Collectors.toList());
     }
 
-    public void processExchange(Long orderId, Long oldProductId, Long newProductId, Integer quantity) {
+    public void processExchange(Long orderId, Long oldProductId, Long newProductId, Integer quantity, Long employeeId) {
+        if (!oldProductId.equals(newProductId)) {
+            throw new RuntimeException("Chế độ đổi hàng hiện tại chỉ áp dụng 1 đổi 1 cùng mã SKU");
+        }
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
         
-        Product oldProduct = productRepository.findById(oldProductId)
-                .orElseThrow(() -> new RuntimeException("Sản phẩm cũ không tồn tại"));
-        Product newProduct = productRepository.findById(newProductId)
-                .orElseThrow(() -> new RuntimeException("Sản phẩm mới không tồn tại"));
+        Product product = productRepository.findById(oldProductId)
+                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
 
-        DetailinventoryId newInvId = new DetailinventoryId();
-        newInvId.setWarehouseid(2L); // Kho cửa hàng
-        newInvId.setProductid(newProductId);
+        Employee emp = employeeRepository.findById(employeeId).orElse(null);
 
-        Detailinventory newInv = detailinventoryRepository.findById(newInvId)
+        Long warehouseId = 2L; 
+
+        DetailinventoryId invId = new DetailinventoryId();
+        invId.setWarehouseid(warehouseId);
+        invId.setProductid(oldProductId);
+
+        Detailinventory inv = detailinventoryRepository.findById(invId)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm đổi chưa được cấu hình tại kho cửa hàng"));
 
-        if (newInv.getAvailablestock() < quantity) {
+        if (inv.getAvailablestock() < quantity) {
             throw new RuntimeException("Không đủ số lượng tồn kho khả dụng để đổi");
         }
 
         // Tạo order return
         Orderreturn orderReturn = new Orderreturn();
         orderReturn.setOrderid(order);
+        orderReturn.setEmployeeid(emp);
         orderReturn.setReturndate(LocalDate.now());
-        orderReturn.setReason("Đổi hàng");
-        orderReturn.setStatus("Chờ xử lý");
-        orderReturn.setTotalrefund(BigDecimal.ZERO); // Tính bù trừ ngoài luồng, hoặc tính lại nếu cần.
+        orderReturn.setReason("Đổi hàng 1-1");
+        orderReturn.setStatus("Hoàn tất");
+        orderReturn.setTotalrefund(BigDecimal.ZERO);
+        orderReturn.setReturnrefcode("EXCH-" + orderId + "-" + (int)(Math.random() * 1000));
         Orderreturn savedReturn = orderReturnRepository.save(orderReturn);
 
-        // Chi tiết trả (SP cũ)
+        // Chi tiết trả (SP cũ nhập lại)
         Returndetail detail = new Returndetail();
         ReturndetailId detailId = new ReturndetailId();
         detailId.setReturnid(savedReturn.getId());
         detailId.setProductid(oldProductId);
         detail.setId(detailId);
         detail.setReturnid(savedReturn);
-        detail.setProductid(oldProduct);
+        detail.setProductid(product);
         detail.setQuantity(Long.valueOf(quantity));
-        
-        Warehouse targetWh = warehouseRepository.findById(2L).orElse(null);
-        detail.setTargetwarehouseid(targetWh);
-        detail.setActiontaken("Đã đổi");
         detail.setQcStatus("Đạt chuẩn");
+        detail.setTargetwarehouseid(warehouseRepository.findById(warehouseId).orElse(null));
+        detail.setActiontaken("Đã đổi 1-1");
         returnDetailRepository.save(detail);
 
-        // Update inventory for new product (subtract available and real stock)
-        newInv.setAvailablestock(newInv.getAvailablestock() - quantity);
-        newInv.setRealstock(newInv.getRealstock() - quantity);
-        detailinventoryRepository.save(newInv);
-
-        // Update inventory for old product (add available and real stock)
-        DetailinventoryId oldInvId = new DetailinventoryId();
-        oldInvId.setWarehouseid(2L);
-        oldInvId.setProductid(oldProductId);
-        Detailinventory oldInv = detailinventoryRepository.findById(oldInvId).orElse(null);
-        if (oldInv != null) {
-            oldInv.setAvailablestock(oldInv.getAvailablestock() + quantity);
-            oldInv.setRealstock(oldInv.getRealstock() + quantity);
-            detailinventoryRepository.save(oldInv);
-        }
+        System.out.println("AUDIT LOG: NV " + (emp != null ? emp.getFullname() : "Unknown") + " xử lý ĐỔI HÀNG cho ĐH #" + orderId);
     }
 
-    public void processReturn(Long orderId, String reason, List<Map<String, Object>> items) {
+    public void processReturn(Long orderId, String reason, Long employeeId, List<Map<String, Object>> items) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
+        Employee emp = employeeRepository.findById(employeeId).orElse(null);
         BigDecimal totalRefund = BigDecimal.ZERO;
 
         Orderreturn orderReturn = new Orderreturn();
         orderReturn.setOrderid(order);
+        orderReturn.setEmployeeid(emp);
         orderReturn.setReturndate(LocalDate.now());
         orderReturn.setReason(reason);
-        orderReturn.setStatus("Chờ duyệt hoàn tiền");
+        orderReturn.setStatus("Chờ xử lý"); // Yêu cầu hoàn tiền khách hàng
+        orderReturn.setReturnrefcode("REF-" + orderId + "-" + (int)(Math.random() * 1000));
         Orderreturn savedReturn = orderReturnRepository.save(orderReturn);
 
         for (Map<String, Object> item : items) {
             Long productId = Long.valueOf(item.get("productId").toString());
             Integer quantity = Integer.valueOf(item.get("quantity").toString());
-            String condition = item.get("condition").toString();
+            
+            String qcStatus = item.get("qcStatus") != null ? item.get("qcStatus").toString() : "Đạt chuẩn";
+            Long targetWarehouseId = item.get("targetWarehouseId") != null ? Long.valueOf(item.get("targetWarehouseId").toString()) : 2L;
+            String actionTaken = item.get("actionTaken") != null ? item.get("actionTaken").toString() : "Nhập lại kho";
 
             Product p = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("SP không tồn tại"));
             
@@ -128,16 +126,15 @@ public class SalesService {
             detail.setReturnid(savedReturn);
             detail.setProductid(p);
             detail.setQuantity(Long.valueOf(quantity));
-            // Removed detail.setCondition(condition) because it does not exist in Returndetail
+            detail.setQcStatus(qcStatus);
+            detail.setTargetwarehouseid(warehouseRepository.findById(targetWarehouseId).orElse(null));
+            detail.setActiontaken(actionTaken);
+            returnDetailRepository.save(detail);
 
-            if (condition.equals("Còn mới")) {
-                Warehouse targetWh = warehouseRepository.findById(2L).orElse(null);
-                detail.setTargetwarehouseid(targetWh); // Kho quầy
-                detail.setQcStatus("Đạt chuẩn");
-                detail.setActiontaken("Nhập lại kho");
-
+            // Cập nhật tồn kho
+            if ("Nhập lại kho".equals(actionTaken)) {
                 DetailinventoryId invId = new DetailinventoryId();
-                invId.setWarehouseid(2L);
+                invId.setWarehouseid(targetWarehouseId);
                 invId.setProductid(productId);
                 Detailinventory inv = detailinventoryRepository.findById(invId).orElse(null);
                 if (inv != null) {
@@ -145,23 +142,16 @@ public class SalesService {
                     inv.setRealstock(inv.getRealstock() + quantity);
                     detailinventoryRepository.save(inv);
                 }
-            } else {
-                Warehouse targetWh = warehouseRepository.findById(3L).orElse(null);
-                detail.setTargetwarehouseid(targetWh); // Kho lỗi
-                detail.setQcStatus("Lỗi");
-                detail.setActiontaken("Nhập kho lỗi");
-
+            } else if ("Hủy hàng".equals(actionTaken) || "Chờ sửa chữa".equals(actionTaken)) {
                 DetailinventoryId invId = new DetailinventoryId();
-                invId.setWarehouseid(3L);
+                invId.setWarehouseid(targetWarehouseId);
                 invId.setProductid(productId);
                 Detailinventory inv = detailinventoryRepository.findById(invId).orElse(null);
                 if (inv != null) {
                     inv.setRealstock(inv.getRealstock() + quantity);
-                    // Lỗi thì không cộng available
                     detailinventoryRepository.save(inv);
                 }
             }
-            returnDetailRepository.save(detail);
 
             BigDecimal price = p.getProductprice() != null ? new BigDecimal(p.getProductprice()) : BigDecimal.ZERO;
             totalRefund = totalRefund.add(price.multiply(new BigDecimal(quantity)));
@@ -169,6 +159,8 @@ public class SalesService {
 
         savedReturn.setTotalrefund(totalRefund);
         orderReturnRepository.save(savedReturn);
+        
+        System.out.println("AUDIT LOG: NV " + (emp != null ? emp.getFullname() : "Unknown") + " xử lý TRẢ HÀNG cho ĐH #" + orderId + ". Hoàn tiền: " + totalRefund);
     }
 
     @Autowired

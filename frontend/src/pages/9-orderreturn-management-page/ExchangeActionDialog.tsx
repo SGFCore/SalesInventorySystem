@@ -17,6 +17,8 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import type { OrderDetail, Product } from "@/lib/types";
 
+import { useEmp } from "@/context/empContext";
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -26,42 +28,19 @@ interface Props {
 }
 
 export function ExchangeActionDialog({ open, onOpenChange, detail, orderId, onSuccess }: Props) {
+  const { emp } = useEmp();
   const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [newProductId, setNewProductId] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [priceDiff, setPriceDiff] = useState(0);
 
   useEffect(() => {
     if (open) {
-      loadProducts();
-      setNewProductId("");
       setQuantity(1);
-      setPriceDiff(0);
     }
   }, [open]);
 
-  useEffect(() => {
-    if (newProductId && products.length > 0) {
-      const oldPrice = detail.UnitPrice || 0;
-      const newProd = products.find(p => p.ProductID === Number(newProductId));
-      const newPrice = newProd ? newProd.ProductPrice : 0;
-      setPriceDiff((newPrice - oldPrice) * quantity);
-    }
-  }, [newProductId, quantity, detail.UnitPrice, products]);
-
-  const loadProducts = async () => {
-    try {
-      const data = await api.products.list();
-      setProducts(data.filter(p => p.ProductStatus === 1)); // Chỉ hiển thị SP đang kinh doanh
-    } catch (e) {
-      toast.error("Không thể tải danh sách sản phẩm");
-    }
-  };
-
   const handleSubmit = async () => {
-    if (!newProductId) {
-      toast.error("Vui lòng chọn sản phẩm mới để đổi");
+    if (!emp) {
+      toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
       return;
     }
     setLoading(true);
@@ -69,10 +48,11 @@ export function ExchangeActionDialog({ open, onOpenChange, detail, orderId, onSu
       await api.sales.exchange({
         orderId,
         oldProductId: detail.ProductID,
-        newProductId: Number(newProductId),
-        quantity
+        newProductId: detail.ProductID, // 1 đổi 1 cùng mã SKU
+        quantity,
+        employeeId: emp.EmployeeID
       });
-      toast.success("Xử lý đổi hàng thành công");
+      toast.success("Xử lý đổi hàng thành công (1 đổi 1)");
       onSuccess();
       onOpenChange(false);
     } catch (e: any) {
@@ -87,63 +67,48 @@ export function ExchangeActionDialog({ open, onOpenChange, detail, orderId, onSu
       <DialogContent className={cn("sm:max-w-[450px] transition-none", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-blue-600">
-            Xử lý đổi hàng
+            Xử lý đổi hàng (1 đổi 1)
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
-          <div className="bg-slate-50 p-3 rounded-md border border-slate-200">
-            <Label className="text-xs font-semibold text-slate-500">Sản phẩm khách trả</Label>
-            <p className="font-bold text-slate-900 mt-1">Mã SP: #{detail.ProductID}</p>
-            <p className="text-xs text-slate-500 mt-1">Đơn giá: {(detail.UnitPrice || 0).toLocaleString("vi-VN")} đ</p>
+        <div className="grid gap-4 py-4 text-sm font-medium">
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-2">
+            <div className="flex justify-between">
+              <span className="text-slate-500">Sản phẩm đổi trả:</span>
+              <span className="text-slate-900 font-bold">Mã SP #{detail.ProductID}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Đơn giá:</span>
+              <span className="text-slate-900">{(detail.UnitPrice || 0).toLocaleString("vi-VN")} đ</span>
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t border-slate-200">
+              <span className="text-blue-600 font-bold italic">Hình thức: 1 đổi 1 cùng mã SKU</span>
+            </div>
           </div>
           
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2">
-              <Label className="text-xs font-semibold text-slate-500">Chọn sản phẩm mới <span className="text-red-500">*</span></Label>
-              <NativeSelect
-                value={newProductId}
-                onChange={(e) => setNewProductId(e.target.value)}
-                className="mt-1"
-              >
-                <option value="" disabled>-- Tìm hoặc chọn SP --</option>
-                {products.map(p => (
-                  <option key={p.ProductID} value={p.ProductID}>
-                    #{p.ProductID} - {p.ProductName} ({(p.ProductPrice || 0).toLocaleString("vi-VN")} đ)
-                  </option>
-                ))}
-              </NativeSelect>
-            </div>
-            <div>
-              <Label className="text-xs font-semibold text-slate-500">Số lượng</Label>
-              <Input 
-                type="number" 
-                min={1} 
-                max={detail.Quantity} 
-                value={quantity} 
-                onChange={e => setQuantity(Number(e.target.value))}
-                className={cn(input.base, "mt-1")}
-              />
-            </div>
+          <div className="grid gap-2">
+            <Label className="text-xs font-semibold text-slate-500">Số lượng đổi <span className="text-red-500">*</span></Label>
+            <Input 
+              type="number" 
+              min={1} 
+              max={detail.Quantity} 
+              value={quantity} 
+              onChange={e => setQuantity(Number(e.target.value))}
+              className={cn(input.base, "h-10")}
+            />
+            <p className="text-[10px] text-slate-400 italic">Tối đa cho phép: {detail.Quantity} sản phẩm</p>
           </div>
 
-          <div className="border-t border-slate-100 pt-3 mt-1 flex justify-between items-center">
-            <Label className="text-sm font-semibold text-slate-700">Chênh lệch tài chính:</Label>
-            <div className="text-right">
-              {priceDiff > 0 ? (
-                <span className="font-bold text-red-600">Khách cần bù: {priceDiff.toLocaleString("vi-VN")} đ</span>
-              ) : priceDiff < 0 ? (
-                <span className="font-bold text-green-600">Hoàn lại khách: {Math.abs(priceDiff).toLocaleString("vi-VN")} đ</span>
-              ) : (
-                <span className="font-bold text-slate-500">Đổi ngang giá (0 đ)</span>
-              )}
-            </div>
+          <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
+            <p className="text-xs text-blue-700 leading-relaxed">
+              <strong>Lưu ý:</strong> Chế độ đổi hàng 1-to-1 không phát sinh giao dịch tài chính. Hệ thống sẽ tự động trừ kho sản phẩm mới và nhập kho sản phẩm cũ.
+            </p>
           </div>
         </div>
 
         <DialogFooter className="mt-2">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading} className={btn.secondary}>Hủy</Button>
-          <Button onClick={handleSubmit} disabled={loading || !newProductId} className={btn.primary}>
+          <Button onClick={handleSubmit} disabled={loading} className={btn.primary}>
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Xác nhận đổi hàng"}
           </Button>
         </DialogFooter>

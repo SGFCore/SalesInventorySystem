@@ -51,6 +51,10 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
       toast.error("Họ và tên không được để trống!");
       return;
     }
+    if (!formData.phone.trim()) {
+      toast.error("Số điện thoại không được để trống!");
+      return;
+    }
     if (!formData.password.trim()) {
       toast.error("Mật khẩu không được để trống!");
       return;
@@ -103,7 +107,9 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
 
         <div className={dialog.body}>
           <div className="grid gap-2">
-            <Label htmlFor="fullname">Họ và tên</Label>
+            <Label htmlFor="fullname">
+              Họ và tên <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="fullname"
               name="fullname"
@@ -127,7 +133,9 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="phone">Số điện thoại</Label>
+            <Label htmlFor="phone">
+              Số điện thoại <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="phone"
               name="phone"
@@ -139,7 +147,9 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="password">Mật khẩu</Label>
+            <Label htmlFor="password">
+              Mật khẩu <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="password"
               name="password"
@@ -156,7 +166,7 @@ export function NewEmpDialog({ open, onOpenChange, onSave }: Props) {
               Phân quyền <span className="text-red-500">*</span>
             </Label>
             <div className="grid grid-cols-2 gap-3 rounded-md border border-slate-200 bg-slate-50/50 p-3">
-              {ROLES.map((role) => (
+              {ROLES.filter((role) => role.RoleID !== 1).map((role) => (
                 <div key={role.RoleID} className="flex items-center space-x-2">
                   <Checkbox
                     id={`role-${role.RoleID}`}

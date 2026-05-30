@@ -10,24 +10,37 @@ import { ChevronLeft, ChevronRight, Loader2, CheckCircle, Eye } from "lucide-rea
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { NewTransferTicketDialog } from "./NewTransferTicketDialog";
-import type { Transferticket, Transferticketdetail } from "@/lib/types";
+import { DetailTransferTicketDialog } from "./DetailTransferTicketDialog";
+import type { Transferticket, Warehouse, Employee } from "@/lib/types";
 
 const ITEMS_PER_PAGE = 20;
 
 export default function TransferTicketManagementPage() {
   const { user } = useAuth();
   const [tickets, setTickets] = useState<Transferticket[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isNewOpen, setIsNewOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<Transferticket | null>(null);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const data = await api.sales.getTransferTickets();
+      const [ticketData, whData, empData] = await Promise.all([
+        api.sales.getTransferTickets(),
+        api.warehouses.list(),
+        api.employees.list(),
+      ]);
+      
+      setWarehouses(whData);
+      setEmployees(empData);
+
       // Role 3 chỉ thấy phiếu do mình tạo
-      const filtered = user?.RoleID === 3 ? data.filter(t => t.EmployeeID === user.EmployeeID) : data;
+      const filtered = user?.RoleID === 3 ? ticketData.filter(t => t.EmployeeID === user.EmployeeID) : ticketData;
       filtered.sort((a, b) => b.TransferID - a.TransferID);
       setTickets(filtered);
     } catch (e: any) {
@@ -51,6 +64,9 @@ export default function TransferTicketManagementPage() {
       toast.error(e.message || "Lỗi khi xác nhận nhận hàng");
     }
   };
+
+  const getWhName = (id: number) => warehouses.find(w => w.WareHouseID === id)?.WareHouseName || `Kho #${id}`;
+  const getEmpName = (id: number) => employees.find(e => e.EmployeeID === id)?.Fullname || `NV #${id}`;
 
   const renderStatus = (status: string) => {
     const config: Record<string, { className: string }> = {
@@ -81,6 +97,11 @@ export default function TransferTicketManagementPage() {
   useEffect(() => {
     topRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [currentPage]);
+
+  const openDetail = (ticket: Transferticket) => {
+    setSelectedTicket(ticket);
+    setIsDetailOpen(true);
+  };
 
   return (
     <div className={page.shell}>
@@ -117,6 +138,7 @@ export default function TransferTicketManagementPage() {
               <TableRow>
                 <TableHead>Mã phiếu</TableHead>
                 <TableHead>Ngày tạo</TableHead>
+                <TableHead>Người phụ trách</TableHead>
                 <TableHead>Từ kho &gt; Đến kho</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead className="text-right">Hành động</TableHead>
@@ -127,21 +149,32 @@ export default function TransferTicketManagementPage() {
                 <TableRow key={t.TransferID} className="hover:bg-slate-50">
                   <TableCell className="font-bold text-slate-800">#{t.TransferID}</TableCell>
                   <TableCell className="text-sm text-slate-600">{t.CreatedDate ? new Date(t.CreatedDate).toLocaleDateString("vi-VN") : "N/A"}</TableCell>
+                  <TableCell className="text-sm font-medium text-slate-700">{getEmpName(t.EmployeeID)}</TableCell>
                   <TableCell className="text-sm">
-                    <span className="font-semibold text-slate-700">Kho #{t.SourceWarehouseID}</span> &rarr; <span className="font-semibold text-blue-600">Kho #{t.DestinationWarehouseID}</span>
+                    <span className="font-semibold text-slate-700">{getWhName(t.SourceWHID)}</span> &rarr; <span className="font-semibold text-blue-600">{getWhName(t.DestWHID)}</span>
                   </TableCell>
                   <TableCell>{renderStatus(t.Status)}</TableCell>
                   <TableCell className="text-right">
-                    {t.Status === 'Đang luân chuyển' && user?.RoleID !== 2 && (
+                    <div className="flex justify-end gap-2">
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="text-green-600 border-green-200 hover:bg-green-50 text-[10px] h-7"
-                        onClick={() => handleConfirmReceive(t.TransferID)}
+                        className="text-blue-600 border-blue-200 hover:bg-blue-50 text-[10px] h-7"
+                        onClick={() => openDetail(t)}
                       >
-                        <CheckCircle className="w-3 h-3 mr-1" /> Nhận hàng
+                        <Eye className="w-3 h-3 mr-1" /> Chi tiết
                       </Button>
-                    )}
+                      {t.Status === 'Đang luân chuyển' && user?.RoleID !== 2 && (
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-green-600 border-green-200 hover:bg-green-50 text-[10px] h-7"
+                          onClick={() => handleConfirmReceive(t.TransferID)}
+                        >
+                          <CheckCircle className="w-3 h-3 mr-1" /> Nhận hàng
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -154,6 +187,14 @@ export default function TransferTicketManagementPage() {
         open={isNewOpen}
         onOpenChange={setIsNewOpen}
         onSave={loadData}
+      />
+
+      <DetailTransferTicketDialog
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
+        ticket={selectedTicket}
+        sourceName={selectedTicket ? getWhName(selectedTicket.SourceWHID) : ""}
+        destName={selectedTicket ? getWhName(selectedTicket.DestWHID) : ""}
       />
     </div>
   );

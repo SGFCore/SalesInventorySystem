@@ -11,28 +11,28 @@ export default function MultiChannelOrderManagement() {
       label: "Hóa đơn tại quầy",
       icon: <ShoppingBag className="h-4 w-4" />,
       component: () => <OrderManagementPage saleChannelCode={0} />,
-      roles: [1, 3],
+      roles: [1, 3, 4],
     },
     {
       id: "orders-online",
       label: "Đơn hàng trực tuyến",
       icon: <ShoppingBag className="h-4 w-4" />,
       component: () => <OrderManagementPage saleChannelCode={1} />,
-      roles: [1, 2, 3],
+      roles: [1, 2, 3, 4],
     },
     {
       id: "return-exchange",
       label: "Xử lý đổi trả",
       icon: <RefreshCcw className="h-4 w-4" />,
       component: ReturnExchangeManagementPage,
-      roles: [1, 3], // Quản lý và nhân viên
+      roles: [1, 3, 4], // Quản lý, nhân viên và kế toán
     },
     {
       id: "invoices",
       label: "Hóa đơn",
       icon: <Receipt className="h-4 w-4" />,
       component: InvoiceManagementPage,
-      roles: [3],
+      roles: [1, 3, 4],
     },
   ];
 

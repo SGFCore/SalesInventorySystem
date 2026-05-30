@@ -115,7 +115,7 @@ export function EditRoleDialog({ open, onOpenChange, emp, onSave }: Props) {
               Quyền <span className="text-red-500">*</span>
             </Label>
             <div className="grid grid-cols-2 gap-4 border p-3 rounded-md border-slate-100">
-              {ROLES.map((role) => (
+              {ROLES.filter((role) => role.RoleID !== 1).map((role) => (
                 <div key={role.RoleID} className="flex items-center space-x-2">
                   <Checkbox
                     id={`role-${role.RoleID}`}

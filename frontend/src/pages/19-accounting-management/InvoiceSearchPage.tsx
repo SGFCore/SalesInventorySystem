@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Loader2, Printer, Eye } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Invoice } from "@/lib/types";
 import { DetailInvoiceDialog } from "@/pages/8.1-invoice-management-page/DetailInvoiceDialog";
+import { PrintInvoiceDialog } from "./PrintInvoiceDialog";
 import { badge, btn, entity, input, page } from "@/pages/page-classes";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ export default function InvoiceSearchPage() {
   const [search, setSearch] = useState("");
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isPrintOpen, setIsPrintOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const loadInvoices = async () => {
@@ -60,15 +62,9 @@ export default function InvoiceSearchPage() {
     setIsDetailOpen(true);
   };
 
-  const handlePrint = async (invoice: Invoice) => {
-    toast.info("Đang khởi tạo tệp PDF...");
-    try {
-      await api.invoices.generatePdf(invoice.InvoiceID, false);
-      toast.success("Tải báo cáo thành công!");
-    } catch (e: any) {
-      console.error("PDF Download Error:", e);
-      toast.error(`Lỗi khi in hóa đơn: ${e.message}`);
-    }
+  const handlePrintClick = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setIsPrintOpen(true);
   };
 
   const topRef = useRef<HTMLDivElement>(null);
@@ -153,7 +149,7 @@ export default function InvoiceSearchPage() {
                         <Button variant="outline" size="sm" className={cn(btn.actionSecondary, "w-28")} onClick={() => handleDetailClick(invoice)}>
                           <Eye className="w-4 h-4 mr-1.5" /> Chi tiết
                         </Button>
-                        <Button variant="outline" size="sm" className={cn(btn.actionPrimary, "w-28")} onClick={() => handlePrint(invoice)}>
+                        <Button variant="outline" size="sm" className={cn(btn.actionPrimary, "w-28")} onClick={() => handlePrintClick(invoice)}>
                           <Printer className="w-4 h-4 mr-1.5" /> In hóa đơn
                         </Button>
                       </div>
@@ -192,6 +188,12 @@ export default function InvoiceSearchPage() {
       <DetailInvoiceDialog
         open={isDetailOpen}
         onOpenChange={setIsDetailOpen}
+        invoice={selectedInvoice}
+      />
+
+      <PrintInvoiceDialog
+        open={isPrintOpen}
+        onOpenChange={setIsPrintOpen}
         invoice={selectedInvoice}
       />
     </div>

@@ -26,6 +26,8 @@ export default function ProductManagementPage() {
   const { hasRole } = useEmp();
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [productTypes, setProductTypes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -46,11 +48,17 @@ export default function ProductManagementPage() {
     setLoading(true);
     setInventoryLoading(true);
     try {
-      const [productData, inventoryData, warehouseData] = await Promise.all([
+      const [productData, inventoryData, warehouseData, categoryData, typeData] = await Promise.all([
         api.products.list(),
         api.detailInventories.list(),
         api.warehouses.list(),
+        api.categories.list(),
+        api.productTypes.list(),
       ]);
+      
+      setCategories(categoryData || []);
+      setProductTypes(typeData || []);
+
       if (!productData || productData.length === 0) {
         toast.error("Không có dữ liệu");
         setProducts([]);
@@ -218,11 +226,13 @@ setWarehouseMap(whMap);
                         )}
                       >
                         <span className={entity.cellMeta}>
-                          DM: {product.CategoryID} • Loại: {product.ProductTypeID}  • SL: {totalQuantities[product.ProductID]}
+                          DM: {categories.find(c => c.id === product.CategoryID)?.categoryname || product.CategoryID} • 
+                          Loại: {productTypes.find(t => t.id === product.ProductTypeID)?.producttypename || product.ProductTypeID} • 
+                          SL: {totalQuantities[product.ProductID]}
                         </span>
                         <span className={entity.cellMeta}>
                           Kho gốc: {totalByWarehouse[product.ProductID]?.[1] ?? 0} • 
-                          : {totalByWarehouse[product.ProductID]?.[2] ?? 0} • Kho lỗi: {totalByWarehouse[product.ProductID]?.[3] ?? 0}
+                          Kho trưng bày: {totalByWarehouse[product.ProductID]?.[2] ?? 0} • Kho lỗi: {totalByWarehouse[product.ProductID]?.[3] ?? 0}
                         </span>
                         <span className={cn(entity.price, 'mt-0.5')}>
                           {product.ProductPrice.toLocaleString("vi-VN")} đ
@@ -315,6 +325,8 @@ setWarehouseMap(whMap);
         product={selectedProduct}
         loading={inventoryLoading}
         totalQuantity={selectedProduct ? totalQuantities[selectedProduct.ProductID] ?? null : null}
+        categories={categories}
+        productTypes={productTypes}
       />
 
       <EditProductDialog

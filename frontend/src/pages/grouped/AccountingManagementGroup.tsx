@@ -1,25 +1,17 @@
 import { GroupedPageLayout, type TabConfig } from "@/components/GroupedPageLayout";
-import CreateInvoicePage from "@/pages/19-accounting-management/CreateInvoicePage";
 import InvoiceSearchPage from "@/pages/19-accounting-management/InvoiceSearchPage";
 import PaymentRecordingPage from "@/pages/19-accounting-management/PaymentRecordingPage";
 import OrderReturnManagementPage from "@/pages/9-orderreturn-management-page/OrderReturnManagementPage";
-import { FilePlus, Search, CreditCard, RefreshCw } from "lucide-react";
+import { Search, CreditCard, RefreshCw } from "lucide-react";
 
 export default function AccountingManagementGroup() {
   const tabs: TabConfig[] = [
-    {
-      id: "create-invoice",
-      label: "Lập hóa đơn",
-      icon: <FilePlus className="h-4 w-4" />,
-      component: CreateInvoicePage,
-      roles: [1, 4],
-    },
     {
       id: "search-invoice",
       label: "Tra cứu hóa đơn",
       icon: <Search className="h-4 w-4" />,
       component: InvoiceSearchPage,
-      roles: [1, 4],
+      roles: [1, 3, 4],
     },
     {
       id: "record-payment",

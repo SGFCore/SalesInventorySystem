@@ -22,8 +22,9 @@ export function EditEmpDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { emp } = useEmp();
+  const { emp, hasRole } = useEmp();
   const [loading, setLoading] = useState(false);
+  const isManager = hasRole(1);
 
   const [formData, setFormData] = useState({
     email: emp?.Email || "",
@@ -39,18 +40,27 @@ export function EditEmpDialog({
 
   const handleSubmit = async () => {
     if (!emp) return;
-    if (!formData.oldPassword) {
+    
+    // Chỉ yêu cầu mật khẩu nếu là Quản lý muốn đổi mật khẩu hoặc xác nhận
+    if (isManager && !formData.oldPassword) {
       toast.error("Vui lòng nhập mật khẩu hiện tại để xác nhận!");
       return;
     }
+
     setLoading(true);
     try {
-      await api.employees.update(emp.EmployeeID, {
+      const updateData: any = {
         ...emp,
         Email: formData.email,
         Phone: formData.phone,
-        password: formData.newPassword || emp.password,
-      });
+      };
+
+      // Chỉ gửi password mới nếu là Quản lý và có nhập mật khẩu mới
+      if (isManager && formData.newPassword) {
+        updateData.password = formData.newPassword;
+      }
+
+      await api.employees.update(emp.EmployeeID, updateData);
       toast.success("Cập nhật hồ sơ thành công!");
       onOpenChange(false);
     } catch (error: any) {
@@ -94,35 +104,39 @@ export function EditEmpDialog({
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="newPassword" className={dialog.label}>
-              Mật khẩu mới
-            </Label>
-            <Input
-              id="newPassword"
-              name="newPassword"
-              type="password"
-              placeholder="Để trống nếu không đổi"
-              value={formData.newPassword}
-              onChange={handleChange}
-              className={dialog.input}
-            />
-          </div>
+          {isManager && (
+            <>
+              <div className="grid gap-2">
+                <Label htmlFor="newPassword" className={dialog.label}>
+                  Mật khẩu mới
+                </Label>
+                <Input
+                  id="newPassword"
+                  name="newPassword"
+                  type="password"
+                  placeholder="Để trống nếu không đổi"
+                  value={formData.newPassword}
+                  onChange={handleChange}
+                  className={dialog.input}
+                />
+              </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="oldPassword" className={dialog.label}>
-              Mật khẩu hiện tại
-            </Label>
-            <Input
-              id="oldPassword"
-              name="oldPassword"
-              type="password"
-              placeholder="Nhập mật khẩu để xác nhận"
-              value={formData.oldPassword}
-              onChange={handleChange}
-              className={dialog.input}
-            />
-          </div>
+              <div className="grid gap-2">
+                <Label htmlFor="oldPassword" className={dialog.label}>
+                  Mật khẩu hiện tại
+                </Label>
+                <Input
+                  id="oldPassword"
+                  name="oldPassword"
+                  type="password"
+                  placeholder="Nhập mật khẩu để xác nhận"
+                  value={formData.oldPassword}
+                  onChange={handleChange}
+                  className={dialog.input}
+                />
+              </div>
+            </>
+          )}
         </div>
 
         <DialogFooter>

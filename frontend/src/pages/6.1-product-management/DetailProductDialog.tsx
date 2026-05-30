@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
-import type { Product } from "@/lib/types";
+import type { Product, Category, Producttype } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { dialog } from "@/pages/page-classes";
 import { Loader2 } from "lucide-react";
@@ -15,6 +15,8 @@ interface DetailProps {
   product: Product | null;
   loading: boolean;
   totalQuantity: number | null;
+  categories: Category[];
+  productTypes: Producttype[];
 }
 
 export function DetailProductDialog({
@@ -23,10 +25,15 @@ export function DetailProductDialog({
   product,
   loading,
   totalQuantity,
+  categories,
+  productTypes,
 }: DetailProps) {
   // loading and totalQuantity are now provided via props
 
   if (!product) return null;
+
+  const categoryName = categories.find(c => c.id === product.CategoryID)?.categoryname || product.CategoryID;
+  const productTypeName = productTypes.find(t => t.id === product.ProductTypeID)?.producttypename || product.ProductTypeID;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -53,16 +60,16 @@ export function DetailProductDialog({
           </div>
 
           <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
-            <Label className="text-slate-500">Danh mục (ID)</Label>
+            <Label className="text-slate-500">Danh mục</Label>
             <span className="col-span-2 text-slate-900">
-              {product.CategoryID}
+              {categoryName}
             </span>
           </div>
 
           <div className="grid grid-cols-3 gap-2 items-start border-b border-slate-100 pb-2">
-            <Label className="text-slate-500">Loại sản phẩm (ID)</Label>
+            <Label className="text-slate-500">Loại sản phẩm</Label>
             <span className="col-span-2 text-slate-900">
-              {product.ProductTypeID}
+              {productTypeName}
             </span>
           </div>
 

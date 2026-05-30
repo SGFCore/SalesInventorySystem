@@ -36,13 +36,30 @@ export default function EmpManagementPage() {
   const loadEmps = async () => {
     setLoading(true);
     try {
-      const data = await api.employees.list();
-      if (!data || data.length === 0) {
+      const [empData, roleData] = await Promise.all([
+        api.employees.list(),
+        api.employeeRoles.list(),
+      ]);
+
+      if (!empData || empData.length === 0) {
         toast.error("Không có dữ liệu");
         setEmps([]);
         return;
       }
-      setEmps(data);
+
+      // Lọc bỏ những nhân viên có quyền Quản lý (RoleID = 1)
+      // Phạm Văn Quản Lý có RoleID là 1 nên sẽ bị loại bỏ khỏi danh sách này
+      const managerIds = new Set(
+        roleData
+          .filter((r: any) => r.roleId === 1)
+          .map((r: any) => r.employeeId)
+      );
+
+      const nonManagerEmps = empData.filter(
+        (emp) => !managerIds.has(emp.EmployeeID)
+      );
+
+      setEmps(nonManagerEmps);
     } catch (error: any) {
       toast.error(error.message || "Không thể tải danh sách nhân viên");
     } finally {
@@ -59,9 +76,10 @@ export default function EmpManagementPage() {
     setCurrentPage(1);
   }, [search]);
 
-  // Lọc dữ liệu theo search
+  // Lọc dữ liệu theo search (tên hoặc số điện thoại)
   const filteredEmps = emps.filter((e) =>
-    e.Fullname.toLowerCase().includes(search.toLowerCase()),
+    e.Fullname.toLowerCase().includes(search.toLowerCase()) ||
+    (e.Phone && e.Phone.includes(search))
   );
 
   // Tính toán phân trang
@@ -114,7 +132,7 @@ export default function EmpManagementPage() {
       <div className={page.header}>
         <div className={page.searchWrap}>
           <Input
-            placeholder="Tìm kiếm theo tên..."
+            placeholder="Tìm kiếm theo tên hoặc SĐT..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={input.search}
@@ -145,13 +163,14 @@ export default function EmpManagementPage() {
           <>
             <Table>
               <TableBody>
-                {paginatedEmps.map((emp) => (
+                {paginatedEmps.map((emp, index) => (
                   <TableRow key={emp.EmployeeID} className={page.tableRow}>
                     {/* General info */}
                     <TableCell>
                       <div className="flex flex-col items-start">
                         <div className={entity.rowMeta}>
-                          <span className={entity.id}>{emp.EmployeeID}</span>
+                          {/* Hiển thị số thứ tự (STT) thay vì EmployeeID gốc của DB */}
+                          <span className={entity.id}>{startIndex + index + 1}</span>
                           <span className={entity.separator}>·</span>
                           <span
                             className={cn(

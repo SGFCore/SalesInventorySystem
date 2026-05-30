@@ -14,6 +14,7 @@ import { btn, dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { useEmp } from "@/context/empContext";
 
 interface EditProps {
   open: boolean;
@@ -28,6 +29,8 @@ export function EditEmpDialog({
   employee,
   onSave,
 }: EditProps) {
+  const { hasRole } = useEmp();
+  const isManager = hasRole(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullname: "",
@@ -118,19 +121,21 @@ export function EditEmpDialog({
               disabled={loading}
             />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Mật khẩu</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Để trống nếu giữ nguyên"
-              value={formData.password}
-              onChange={handleChange}
-              className={dialog.input}
-              disabled={loading}
-            />
-          </div>
+          {isManager && (
+            <div className="grid gap-2">
+              <Label htmlFor="password">Mật khẩu</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Để trống nếu giữ nguyên"
+                value={formData.password}
+                onChange={handleChange}
+                className={dialog.input}
+                disabled={loading}
+              />
+            </div>
+          )}
         </div>
 
         <DialogFooter>
