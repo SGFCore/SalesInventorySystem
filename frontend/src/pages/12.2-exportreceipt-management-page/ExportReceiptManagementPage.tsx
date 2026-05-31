@@ -3,9 +3,10 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import type { ExtendedOrder, Shipcompany } from "@/lib/types";
+import type { ExtendedOrder, Shipcompany, Exportreceipt } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { NewExportReceiptDialog } from "@/pages/12.2-exportreceipt-management-page/NewExportReceiptDialog";
+import { DetailExportReceiptDialog } from "@/pages/12.2-exportreceipt-management-page/DetailExportReceiptDialog";
 import { page, input, btn, entity } from "@/pages/page-classes";
 import { FileOutput, Loader2, Search, Truck, AlertTriangle, History } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
@@ -26,6 +27,11 @@ export default function ExportReceiptManagementPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedOrderForDetail, setSelectedOrderForDetail] = useState<any>(null);
   const [showHistory, setShowHistory] = useState(false);
+
+  const [historyReceipts, setHistoryReceipts] = useState<Exportreceipt[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [selectedReceiptForDetail, setSelectedReceiptForDetail] = useState<Exportreceipt | null>(null);
+  const [isReceiptDetailOpen, setIsReceiptDetailOpen] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -60,6 +66,22 @@ export default function ExportReceiptManagementPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (showHistory) {
+      setLoadingHistory(true);
+      api.exportReceipts.list()
+        .then(data => {
+          setHistoryReceipts(data.sort((a, b) => b.id - a.id));
+        })
+        .catch(err => {
+          toast.error("Lỗi tải lịch sử phiếu xuất kho");
+        })
+        .finally(() => {
+          setLoadingHistory(false);
+        });
+    }
+  }, [showHistory]);
 
   const filteredOrders = useMemo(() => {
     const safeSearch = search.trim().toLowerCase();
@@ -124,10 +146,71 @@ export default function ExportReceiptManagementPage() {
                Quay lại danh sách chờ
             </Button>
          </div>
-         {/* History table would go here - simplified for now to keep focus on requirements */}
-         <div className="bg-white p-20 text-center rounded-xl border border-dashed border-slate-200">
-            <p className="text-slate-400 italic">Dữ liệu lịch sử đang được tối ưu hóa...</p>
+         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+           <Table>
+             <TableHeader className="bg-slate-50">
+               <TableRow>
+                 <TableHead className="w-[100px]">Mã phiếu</TableHead>
+                 <TableHead>Ngày tạo</TableHead>
+                 <TableHead>Người tạo (Mã NV)</TableHead>
+                 <TableHead>Kho xuất</TableHead>
+                 <TableHead>Lý do</TableHead>
+                 <TableHead>Trạng thái</TableHead>
+                 <TableHead className="text-center">Thao tác</TableHead>
+               </TableRow>
+             </TableHeader>
+             <TableBody>
+               {loadingHistory ? (
+                 <TableRow>
+                   <TableCell colSpan={7} className="text-center py-10">
+                     <Loader2 className="h-6 w-6 animate-spin mx-auto text-blue-600 mb-2" />
+                     <p className="text-sm text-slate-500">Đang tải lịch sử...</p>
+                   </TableCell>
+                 </TableRow>
+               ) : historyReceipts.length === 0 ? (
+                 <TableRow>
+                   <TableCell colSpan={7} className="text-center py-10 text-slate-500">
+                     Không có dữ liệu lịch sử phiếu xuất kho.
+                   </TableCell>
+                 </TableRow>
+               ) : (
+                 historyReceipts.map((receipt) => (
+                   <TableRow key={receipt.id}>
+                     <TableCell className="font-bold text-slate-700">#{receipt.id}</TableCell>
+                     <TableCell>{new Date(receipt.createddate).toLocaleDateString("vi-VN")}</TableCell>
+                     <TableCell>NV{receipt.employeeId}</TableCell>
+                     <TableCell>Kho {receipt.warehouseId}</TableCell>
+                     <TableCell className="max-w-[200px] truncate text-slate-500">{receipt.reason}</TableCell>
+                     <TableCell>
+                       <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                         {receipt.status}
+                       </Badge>
+                     </TableCell>
+                     <TableCell className="text-center">
+                       <Button 
+                         variant="ghost" 
+                         size="sm" 
+                         className="h-8 text-xs font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                         onClick={() => {
+                           setSelectedReceiptForDetail(receipt);
+                           setIsReceiptDetailOpen(true);
+                         }}
+                       >
+                         Xem chi tiết
+                       </Button>
+                     </TableCell>
+                   </TableRow>
+                 ))
+               )}
+             </TableBody>
+           </Table>
          </div>
+
+         <DetailExportReceiptDialog
+            open={isReceiptDetailOpen}
+            onOpenChange={setIsReceiptDetailOpen}
+            exportReceipt={selectedReceiptForDetail}
+         />
       </div>
     );
   }
