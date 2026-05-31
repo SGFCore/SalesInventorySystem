@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import dev.uit.project.config.AuditAction;
 import dev.uit.project.dto.OrderDTO;
 import dev.uit.project.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class OrderController {
      * POST /orders
      */
     @PostMapping
+    @AuditAction(actionType = "CREATE", target = "Đơn hàng")
     public ResponseEntity<OrderDTO> create(@RequestBody OrderDTO orderDTO) {
         return ResponseEntity.ok(orderService.create(orderDTO));
     }
@@ -53,6 +55,7 @@ public class OrderController {
      * PUT /orders/{id}
      */
     @PutMapping("/{id}")
+    @AuditAction(actionType = "UPDATE", target = "Đơn hàng")
     public ResponseEntity<OrderDTO> update(@PathVariable Long id, @RequestBody OrderDTO orderDTO) {
         return ResponseEntity.ok(orderService.update(id, orderDTO));
     }
@@ -62,6 +65,7 @@ public class OrderController {
      * DELETE /orders/{id}
      */
     @DeleteMapping("/{id}")
+    @AuditAction(actionType = "DELETE", target = "Đơn hàng")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         orderService.delete(id);
         return ResponseEntity.ok().build();

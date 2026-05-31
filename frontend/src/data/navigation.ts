@@ -60,11 +60,6 @@ export const sidebarData: SidebarItem[] = [
     availableRole: [1, 2],
   },
   {
-    directionTo: "/report-management",
-    label: "Quản lý Báo cáo và Thống kê",
-    availableRole: [1],
-  },
-  {
     directionTo: "/shipping-management",
     label: "Quản lý giao vận",
     availableRole: [1, 2, 3],
@@ -73,5 +68,10 @@ export const sidebarData: SidebarItem[] = [
     directionTo: "/accounting-management",
     label: "Xử lý hóa đơn và thanh toán",
     availableRole: [1, 4],
+  },
+  {
+    directionTo: "/report-management",
+    label: "Quản lý Báo cáo và Thống kê",
+    availableRole: [1],
   },
 ];

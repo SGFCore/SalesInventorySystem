@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import dev.uit.project.config.AuditAction;
 import dev.uit.project.dto.InvoiceDTO;
 import dev.uit.project.service.InvoiceService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class InvoiceController {
      * POST /invoices
      */
     @PostMapping
+    @AuditAction(actionType = "CREATE", target = "Hóa đơn")
     public ResponseEntity<InvoiceDTO> create(@RequestBody InvoiceDTO invoiceDTO) {
         return ResponseEntity.ok(invoiceService.create(invoiceDTO));
     }
@@ -53,6 +55,7 @@ public class InvoiceController {
      * PUT /invoices/{id}
      */
     @PutMapping("/{id}")
+    @AuditAction(actionType = "UPDATE", target = "Hóa đơn")
     public ResponseEntity<InvoiceDTO> update(@PathVariable Long id, @RequestBody InvoiceDTO invoiceDTO) {
         return ResponseEntity.ok(invoiceService.update(id, invoiceDTO));
     }
@@ -62,6 +65,7 @@ public class InvoiceController {
      * DELETE /invoices/{id}
      */
     @DeleteMapping("/{id}")
+    @AuditAction(actionType = "DELETE", target = "Hóa đơn")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         invoiceService.delete(id);
         return ResponseEntity.ok().build();

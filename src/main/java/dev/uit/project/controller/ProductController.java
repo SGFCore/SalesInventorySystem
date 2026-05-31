@@ -1,5 +1,6 @@
 package dev.uit.project.controller;
 
+import dev.uit.project.config.AuditAction;
 import dev.uit.project.dto.ProductDTO;
 import dev.uit.project.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class ProductController {
      * POST /products
      */
     @PostMapping
+    @AuditAction(actionType = "CREATE", target = "Sản phẩm")
     public ResponseEntity<ProductDTO> create(@RequestBody ProductDTO productDTO) {
         return ResponseEntity.ok(productService.create(productDTO));
     }
@@ -47,6 +49,7 @@ public class ProductController {
      * PUT /products/{id}
      */
     @PutMapping("/{id}")
+    @AuditAction(actionType = "UPDATE", target = "Sản phẩm")
     public ResponseEntity<ProductDTO> update(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
         return ResponseEntity.ok(productService.update(id, productDTO));
     }
@@ -56,6 +59,7 @@ public class ProductController {
      * DELETE /products/{id}
      */
     @DeleteMapping("/{id}")
+    @AuditAction(actionType = "DELETE", target = "Sản phẩm")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.ok().build();
