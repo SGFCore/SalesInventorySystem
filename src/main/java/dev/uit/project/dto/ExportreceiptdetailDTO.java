@@ -25,10 +25,23 @@ public class ExportreceiptdetailDTO {
     public Exportreceiptdetail toEntity() {
         Exportreceiptdetail entity = new Exportreceiptdetail();
         dev.uit.project.entity.ExportreceiptdetailId cid = new dev.uit.project.entity.ExportreceiptdetailId();
-        // Leave exportreceiptid in ID null for @MapsId to handle during cascade
+        cid.setExportreceiptid(this.exportreceiptId);
         cid.setProductid(this.productId);
         entity.setId(cid);
         entity.setQuantity(this.quantity);
+        
+        if (this.exportreceiptId != null) {
+            dev.uit.project.entity.Exportreceipt receipt = new dev.uit.project.entity.Exportreceipt();
+            receipt.setId(this.exportreceiptId);
+            entity.setExportreceiptid(receipt);
+        }
+        
+        if (this.productId != null) {
+            dev.uit.project.entity.Product product = new dev.uit.project.entity.Product();
+            product.setId(this.productId);
+            entity.setProductid(product);
+        }
+        
         return entity;
     }
 }

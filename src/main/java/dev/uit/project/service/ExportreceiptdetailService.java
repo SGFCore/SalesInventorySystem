@@ -40,6 +40,11 @@ public class ExportreceiptdetailService {
             return null;
         }
         Exportreceiptdetail entity = dto.toEntity();
+        
+        if (!id.equals(entity.getId())) {
+            exportreceiptdetailRepository.deleteById(id);
+        }
+        
         Exportreceiptdetail saved = exportreceiptdetailRepository.save(entity);
         return ExportreceiptdetailDTO.fromEntity(saved);
     }
