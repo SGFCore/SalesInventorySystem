@@ -39,7 +39,7 @@ export function DetailExportReceiptDialog({ open, onOpenChange, exportReceipt }:
         api.exportReceiptDetails.list(),
         api.products.list(),
       ]);
-      setDetails(detailData.filter((d) => d.ExportReceiptID === exportReceipt?.id));
+      setDetails(detailData.filter((d: any) => (d.ExportReceiptID || d.exportreceiptId) === exportReceipt?.id));
       setProducts(productData);
     } catch (error) {
       console.error("Lỗi tải chi tiết phiếu xuất:", error);
@@ -134,18 +134,20 @@ export function DetailExportReceiptDialog({ open, onOpenChange, exportReceipt }:
                     </TableCell>
                   </TableRow>
                 ) : (
-                  details.map((item, idx) => {
-                    const product = products.find(p => p.ProductID === item.ProductID);
+                  details.map((item: any, idx) => {
+                    const pId = item.ProductID || item.productId;
+                    const qty = item.Quantity || item.quantity;
+                    const product = products.find(p => p.ProductID === pId);
                     return (
                       <TableRow key={idx} className="hover:bg-slate-50">
                         <TableCell className="py-3">
                           <div className="flex flex-col">
                             <span className="text-sm font-bold text-slate-700">{product?.ProductName || "N/A"}</span>
-                            <span className="text-[10px] text-slate-400 font-medium">Mã SP: #{item.ProductID}</span>
+                            <span className="text-[10px] text-slate-400 font-medium">Mã SP: #{pId}</span>
                           </div>
                         </TableCell>
                         <TableCell className="py-3 text-center font-bold text-blue-600">
-                          {item.Quantity}
+                          {qty}
                         </TableCell>
                       </TableRow>
                     );
