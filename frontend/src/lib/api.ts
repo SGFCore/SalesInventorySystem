@@ -451,6 +451,14 @@ export const api = {
     delete: (id: number) => apiClient.delete<void>(`/feedbacks/${id}`),
   },
 
+  uploads: {
+    uploadImage: (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      return apiClient.upload<{ url: string }>("/uploads", formData);
+    },
+  },
+
   reports: {
     downloadRevenuePdf: (startDate: string, endDate: string) =>
       apiClient.download(`/reports/revenue/pdf?startDate=${startDate}&endDate=${endDate}`, `revenue_report_${startDate}_${endDate}.pdf`),

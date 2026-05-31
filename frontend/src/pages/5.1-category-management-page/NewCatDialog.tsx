@@ -63,7 +63,9 @@ export function NewCatDialog({ open, onOpenChange, onSave }: Props) {
 
         <div className={dialog.body}>
           <div className="grid gap-2">
-            <Label htmlFor="newCategoryName">Tên danh mục</Label>
+            <Label htmlFor="newCategoryName">
+              Tên danh mục <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="newCategoryName"
               name="CategoryName"

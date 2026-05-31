@@ -9,7 +9,7 @@ export default function ShippingManagementGroup() {
       label: "Điều phối giao vận",
       icon: <Truck className="h-4 w-4" />,
       component: ShippingManagementPage,
-      roles: [1, 2],
+      roles: [1, 2, 3],
     }
   ];
 

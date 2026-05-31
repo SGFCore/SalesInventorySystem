@@ -41,9 +41,11 @@ export function NewComboDialog({ open, onOpenChange, onSave }: NewProps) {
       const loadProducts = async () => {
         try {
           const list = await api.products.list();
-          setProductList(list);
-          if (list.length > 0) {
-            setSelectedProducts([{ productID: list[0].ProductID, quantity: 1 }]);
+          // Chỉ lấy sản phẩm đang kinh doanh
+          const activeList = list.filter(p => p.ProductStatus === 1);
+          setProductList(activeList);
+          if (activeList.length > 0) {
+            setSelectedProducts([{ productID: activeList[0].ProductID, quantity: 1 }]);
           }
         } catch (e) {
           console.error("Lỗi tải danh sách sản phẩm:", e);

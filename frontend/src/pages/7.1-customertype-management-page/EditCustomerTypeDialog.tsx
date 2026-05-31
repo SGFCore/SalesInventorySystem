@@ -40,8 +40,8 @@ export function EditCustomerTypeDialog({
 
   const handleSubmit = async () => {
     if (!customerType) return;
-    if (!form.customertypename?.trim()) {
-      toast.error("Vui lòng nhập tên nhóm khách hàng!");
+    if (!form.customertypename?.trim() || form.discount === undefined || !form.detail?.trim()) {
+      toast.error("Vui lòng nhập đầy đủ các trường bắt buộc (Tên, Chiết khấu, Mô tả)!");
       return;
     }
     setLoading(true);
@@ -75,7 +75,7 @@ export function EditCustomerTypeDialog({
         <div className="grid gap-3 py-4">
           {/* Tên nhóm khách hàng */}
           <div className="grid gap-1">
-            <Label htmlFor="edit-typeName">Tên nhóm khách hàng</Label>
+            <Label htmlFor="edit-typeName">Tên nhóm khách hàng <span className="text-red-500">*</span></Label>
             <Input
               id="edit-typeName"
               value={form.customertypename || ""}
@@ -91,7 +91,7 @@ export function EditCustomerTypeDialog({
           <div className="grid grid-cols-2 gap-4">
             {/* Chiết khấu - Đã được mở khóa cho phép sửa đổi */}
             <div className="grid gap-1">
-              <Label htmlFor="edit-discount">Chiết khấu (%)</Label>
+              <Label htmlFor="edit-discount">Chiết khấu (%) <span className="text-red-500">*</span></Label>
               <Input
                 id="edit-discount"
                 type="number"
@@ -122,7 +122,7 @@ export function EditCustomerTypeDialog({
 
           {/* Mô tả quyền lợi chi tiết */}
           <div className="grid gap-1">
-            <Label htmlFor="edit-detail">Mô tả quyền lợi</Label>
+            <Label htmlFor="edit-detail">Mô tả quyền lợi <span className="text-red-500">*</span></Label>
             <Input
               id="edit-detail"
               value={form.detail || ""}

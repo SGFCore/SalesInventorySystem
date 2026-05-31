@@ -14,17 +14,17 @@ export default function ProductManagementGroup() {
       roles: [1, 2, 3, 4],
     },
     {
-      id: "categories",
-      label: "Danh mục sản phẩm",
-      icon: <FolderTree className="h-4 w-4" />,
-      component: CatManagementPage,
-      roles: [1],
-    },
-    {
       id: "product-types",
       label: "Loại sản phẩm",
       icon: <Layers className="h-4 w-4" />,
       component: ProductTypeManagementPage,
+      roles: [1],
+    },
+    {
+      id: "categories",
+      label: "Danh mục sản phẩm",
+      icon: <FolderTree className="h-4 w-4" />,
+      component: CatManagementPage,
       roles: [1],
     },
   ];

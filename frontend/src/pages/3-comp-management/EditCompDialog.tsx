@@ -53,7 +53,7 @@ export function EditCompDialog({ open, onOpenChange, comp, onSave }: EditProps) 
 
   const handleSubmit = async () => {
     if (!comp) return;
-    if (!formData.shipCompanyName || !formData.phone || !formData.email) {
+    if (!formData.shipCompanyName || !formData.phone || !formData.supportedRegion) {
       toast.error("Vui lòng điền đầy đủ các thông tin bắt buộc!");
       return;
     }
@@ -91,7 +91,7 @@ export function EditCompDialog({ open, onOpenChange, comp, onSave }: EditProps) 
         <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="edit-shipCompanyName">
-              Tên công ty <span className="text-red-500">*</span>
+              Tên đối tác vận chuyển <span className="text-red-500">*</span>
             </Label>
             <Input
               id="edit-shipCompanyName"
@@ -104,7 +104,9 @@ export function EditCompDialog({ open, onOpenChange, comp, onSave }: EditProps) 
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="edit-supportedRegion">Khu vực hỗ trợ</Label>
+            <Label htmlFor="edit-supportedRegion">
+              Khu vực hỗ trợ <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="edit-supportedRegion"
               name="supportedRegion"
@@ -116,9 +118,7 @@ export function EditCompDialog({ open, onOpenChange, comp, onSave }: EditProps) 
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="edit-email">
-              Email <span className="text-red-500">*</span>
-            </Label>
+            <Label htmlFor="edit-email">Email</Label>
             <Input
               id="edit-email"
               name="email"

@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -25,8 +25,8 @@ public class FeedbackDTO {
     @JsonProperty("FeedbackComment")
     private String feedbackcomment;
 
-    @JsonProperty("FeedBackDate") // NOTE: FE types.ts uses FeedBackDate with uppercase B
-    private Instant feedbackdate;
+    @JsonProperty("FeedbackDate") 
+    private LocalDateTime feedbackdate;
 
     @JsonProperty("AttachmentURL")
     private String attachmenturl;

@@ -7,9 +7,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import type { Customer } from "@/lib/types";
+import type { Customer, Customertype } from "@/lib/types";
 import { btn, dialog } from "@/pages/page-classes";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import { api } from "@/lib/api";
 
 interface Props {
   open: boolean;
@@ -18,10 +20,29 @@ interface Props {
 }
 
 export function DetailCustomerDialog({ open, onOpenChange, customer }: Props) {
+  const [customerTypes, setCustomerTypes] = useState<Customertype[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      loadCustomerTypes();
+    }
+  }, [open]);
+
+  const loadCustomerTypes = async () => {
+    try {
+      const data = await api.customerTypes.list();
+      setCustomerTypes(data);
+    } catch (e) {
+      console.error("Lỗi tải danh sách loại khách hàng", e);
+    }
+  };
+
   if (!customer) return null;
 
   const renderValue = (val: any) =>
     val || <span className="text-slate-400">(Không có)</span>;
+
+  const typeName = customerTypes.find(t => t.id === customer.customertypeId)?.customertypename || customer.customertypeId;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -38,8 +59,8 @@ export function DetailCustomerDialog({ open, onOpenChange, customer }: Props) {
               <p className="font-medium">{customer.id}</p>
             </div>
             <div>
-              <Label className="text-slate-500 text-xs">Loại khách hàng</Label>
-              <p className="font-medium">{customer.customertypeId}</p>
+              <Label className="text-slate-500 text-xs">Nhóm khách hàng</Label>
+              <p className="font-medium text-blue-600">{typeName}</p>
             </div>
           </div>
           <div>

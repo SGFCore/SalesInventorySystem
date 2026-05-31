@@ -39,8 +39,8 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
   };
 
   const handleSubmit = async () => {
-    if (!formData.FirstName || !formData.LastName) {
-      toast.error("Vui lòng điền họ và tên!");
+    if (!formData.FirstName || !formData.LastName || !formData.Phone) {
+      toast.error("Vui lòng điền đầy đủ thông tin bắt buộc (Họ, Tên, SĐT)!");
       return;
     }
     setLoading(true);
@@ -51,7 +51,7 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
         lastname: formData.LastName,
         companyname: formData.CompanyName.trim().length ? formData.CompanyName.trim() : null,
         phone: formData.Phone,
-        email: formData.Email.trim().length ? formData.Address.trim() : null,
+        email: formData.Email.trim().length ? formData.Email.trim() : null,
         address: formData.Address.trim().length ? formData.Address.trim() : null,
         createddate: new Date().toISOString(),
         totalaccumulatedspent: 0,
@@ -88,7 +88,9 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
         <div className={dialog.body}>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="FirstName">Họ</Label>
+              <Label htmlFor="FirstName">
+                Họ <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="FirstName"
                 name="FirstName"
@@ -99,7 +101,9 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="LastName">Tên</Label>
+              <Label htmlFor="LastName">
+                Tên <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="LastName"
                 name="LastName"
@@ -111,20 +115,8 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
             </div>
           </div>
 
-          {/* <div className="grid gap-2">
-            <Label htmlFor="CustomerTypeID">Loại khách hàng (ID)</Label>
-            <Input
-              id="CustomerTypeID"
-              name="CustomerTypeID"
-              value={formData.CustomerTypeID}
-              onChange={handleChange}
-              className={dialog.input}
-              disabled={loading}
-            />
-          </div> */}
-
           <div className="grid gap-2">
-            <Label htmlFor="CompanyName">Tên công ty</Label>
+            <Label htmlFor="CompanyName">Tên công ty (Khách hàng doanh nghiệp - B2B)</Label>
             <Input
               id="CompanyName"
               name="CompanyName"
@@ -136,7 +128,9 @@ export function NewCustomerDialog({ open, onOpenChange, onSave }: Props) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="Phone">Số điện thoại</Label>
+            <Label htmlFor="Phone">
+              Số điện thoại <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="Phone"
               name="Phone"

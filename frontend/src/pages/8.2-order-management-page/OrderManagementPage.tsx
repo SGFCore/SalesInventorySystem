@@ -15,6 +15,7 @@ import { ChangeProductDialog } from "@/pages/8.2-order-management-page/ChangePro
 import { DetailOrderDialog } from "@/pages/8.2-order-management-page/DetailOrderDialog";
 import { EditOrderDialog } from "@/pages/8.2-order-management-page/EditOrderDialog";
 import { NewOrderDialog } from "@/pages/8.2-order-management-page/NewOrderDialog";
+import { CancelReasonDialog } from "@/pages/grouped/CancelReasonDialog";
 import { btn, entity, input, page } from "@/pages/page-classes";
 import { ChevronLeft, ChevronRight, Loader2, MoreHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -34,6 +35,7 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isChangeOpen, setIsChangeOpen] = useState(false);
   const [isReturnOpen, setIsReturnOpen] = useState(false);
+  const [isCancelOpen, setIsCancelOpen] = useState(false);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -194,6 +196,7 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
     if (action === "edit") setIsEditOpen(true);
     if (action === "change") setIsChangeOpen(true);
     if (action === "return") setIsReturnOpen(true);
+    if (action === "cancel") setIsCancelOpen(true);
 
     if (action === "confirm-invoice") {
       try {
@@ -260,19 +263,6 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
       }
     }
 
-    if (action === "cancel") {
-      try {
-        await api.orders.update(order.id, {
-          ...order,
-          orderstatus: 4, // Đã hủy
-        });
-        toast.success(`Đã hủy đơn hàng #${order.id}`);
-        loadOrders();
-      } catch (e: any) {
-        toast.error(e.message || "Lỗi khi hủy đơn hàng");
-      }
-    }
-
     if (action === "ship") {
       try {
         await api.orders.update(order.id, {
@@ -312,6 +302,44 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
       } catch (e: any) {
         toast.error(e.message || "Lỗi cập nhật trạng thái đóng gói");
       }
+    }
+  };
+
+  const handleConfirmCancel = async (reason: string) => {
+    if (!selectedOrder) return;
+    const order = selectedOrder;
+
+    try {
+      // 1. Update Order Status
+      await api.orders.update(order.id, {
+        ...order,
+        orderstatus: 4, // Đã hủy
+        shipmentnote: (order.shipmentnote || "") + " | Lý do hủy đơn: " + reason
+      });
+
+      // 2. Revert Stock
+      const details = await api.orderDetails.list();
+      const items = details.filter((d: any) => (d.OrderID || d.orderid) == order.id);
+      const allInventories = await api.detailInventories.list();
+      
+      // Online use Warehouse 1
+      const warehouseId = 1; 
+
+      for (const item of items) {
+        const pId = item.ProductID || (item as any).productid;
+        const inv = allInventories.find(i => i.WarehouseID === warehouseId && i.ProductID === pId);
+        if (inv) {
+          await api.detailInventories.update(warehouseId, {
+            ...inv,
+            AvailableStock: inv.AvailableStock + (item.Quantity || item.quantity)
+          });
+        }
+      }
+
+      toast.success(`Đã hủy đơn hàng #${order.id} thành công và hoàn tồn kho khả dụng.`);
+      loadOrders();
+    } catch (e: any) {
+      toast.error(e.message || "Lỗi khi hủy đơn hàng");
     }
   };
 
@@ -508,36 +536,7 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
                             Cập nhật
                           </DropdownMenuItem>
                           {saleChannelCode !== 0 && (
-                            <DropdownMenuItem
-                              disabled={
-                                order.orderstatus === 4 || order.shippingstatus >= 2
-                              }
-                              className="text-slate-700 hover:bg-slate-100 cursor-pointer text-xs py-2 disabled:opacity-50 font-medium"
-                              onClick={() => handleAction(order, "ship")}
-                            >
-                              Giao vận
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            disabled={
-                              order.orderstatus === 4 || order.shippingstatus >= 2
-                            }
-                            className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-semibold disabled:opacity-50"
-                            onClick={() => handleAction(order, "cancel")}
-                          >
-                            Hủy đơn hàng
-                          </DropdownMenuItem>
-                          {saleChannelCode !== 0 && (
                             <>
-                              <DropdownMenuItem
-                                disabled={
-                                  order.orderstatus === 4 || order.shippingstatus >= 2
-                                }
-                                className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 font-semibold disabled:opacity-50"
-                                onClick={() => handleAction(order, "cancelshipping")}
-                              >
-                                Hủy giao vận
-                              </DropdownMenuItem>
                               <DropdownMenuItem
                                 disabled={
                                   order.orderstatus === 4 || order.shippingstatus >= 2
@@ -546,6 +545,15 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
                                 onClick={() => handleAction(order, "packeted")}
                               >
                                 Đóng gói xong
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                disabled={
+                                  order.orderstatus === 4 || order.shippingstatus >= 2
+                                }
+                                className="text-red-600 hover:bg-red-50 cursor-pointer text-xs py-2 disabled:opacity-50 font-semibold"
+                                onClick={() => handleAction(order, "cancel")}
+                              >
+                                Hủy đơn hàng
                               </DropdownMenuItem>
                             </>
                           )}
@@ -638,6 +646,11 @@ export default function OrderManagementPage({ saleChannelCode }: { saleChannelCo
           saleChannelCode={saleChannelCode}
         />
       )}
+      <CancelReasonDialog
+        open={isCancelOpen}
+        onOpenChange={setIsCancelOpen}
+        onConfirm={handleConfirmCancel}
+      />
     </div>
   );
 }

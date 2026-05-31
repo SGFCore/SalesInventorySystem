@@ -74,7 +74,9 @@ export function EditCatDialog({ open, onOpenChange, cat, onSave }: EditProps) {
 
         <div className={dialog.body}>
           <div className="grid gap-2">
-            <Label htmlFor="CategoryName">Tên danh mục</Label>
+            <Label htmlFor="CategoryName">
+              Tên danh mục <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="CategoryName"
               name="CategoryName"

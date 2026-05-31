@@ -37,8 +37,8 @@ export function EditCustomerDialog({
 
   const handleSubmit = async () => {
     if (!customer) return;
-    if (!form.firstname || !form.lastname) {
-      toast.error("Họ và tên không được trống!");
+    if (!form.firstname || !form.lastname || !form.phone) {
+      toast.error("Họ, Tên và Số điện thoại không được trống!");
       return;
     }
     setLoading(true);
@@ -66,7 +66,7 @@ export function EditCustomerDialog({
         <div className="grid gap-3 py-4">
           <div className="grid grid-cols-2 gap-2">
             <div className="grid gap-1">
-              <Label>Họ</Label>
+              <Label>Họ <span className="text-red-500">*</span></Label>
               <Input
                 value={form.firstname || ""}
                 onChange={(e) =>
@@ -77,7 +77,7 @@ export function EditCustomerDialog({
               />
             </div>
             <div className="grid gap-1">
-              <Label>Tên</Label>
+              <Label>Tên <span className="text-red-500">*</span></Label>
               <Input
                 value={form.lastname || ""}
                 onChange={(e) => setForm({ ...form, lastname: e.target.value })}
@@ -87,7 +87,7 @@ export function EditCustomerDialog({
             </div>
           </div>
           <div className="grid gap-1">
-            <Label>Công ty</Label>
+            <Label>Tên công ty (Khách hàng doanh nghiệp - B2B)</Label>
             <Input
               value={form.companyname || ""}
               onChange={(e) =>
@@ -97,7 +97,7 @@ export function EditCustomerDialog({
             />
           </div>
           <div className="grid gap-1">
-            <Label>Số điện thoại</Label>
+            <Label>Số điện thoại <span className="text-red-500">*</span></Label>
             <Input
               value={form.phone || ""}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}

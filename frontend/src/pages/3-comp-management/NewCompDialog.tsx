@@ -37,7 +37,7 @@ export function NewCompDialog({ open, onOpenChange, onSave }: NewProps) {
   };
 
   const handleSubmit = async () => {
-    if (!formData.shipCompanyName || !formData.phone || !formData.email) {
+    if (!formData.shipCompanyName || !formData.phone || !formData.supportedRegion) {
       toast.error("Vui lòng nhập đầy đủ các thông tin bắt buộc!");
       return;
     }
@@ -83,7 +83,7 @@ export function NewCompDialog({ open, onOpenChange, onSave }: NewProps) {
         <div className={dialog.body}>
           <div className="grid gap-2">
             <Label htmlFor="new-shipCompanyName">
-              Tên công ty <span className="text-red-500">*</span>
+              Tên đối tác vận chuyển <span className="text-red-500">*</span>
             </Label>
             <Input
               id="new-shipCompanyName"
@@ -97,7 +97,9 @@ export function NewCompDialog({ open, onOpenChange, onSave }: NewProps) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="new-supportedRegion">Khu vực hỗ trợ</Label>
+            <Label htmlFor="new-supportedRegion">
+              Khu vực hỗ trợ <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="new-supportedRegion"
               name="supportedRegion"
@@ -110,9 +112,7 @@ export function NewCompDialog({ open, onOpenChange, onSave }: NewProps) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="new-email">
-              Email <span className="text-red-500">*</span>
-            </Label>
+            <Label htmlFor="new-email">Email</Label>
             <Input
               id="new-email"
               name="email"

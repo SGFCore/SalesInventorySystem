@@ -80,7 +80,9 @@ export function NewProductTypeDialog({ open, onOpenChange, onSave }: Props) {
 
         <div className={dialog.body}>
           <div className="grid gap-2">
-            <Label htmlFor="newProductTypeName">Tên loại sản phẩm</Label>
+            <Label htmlFor="newProductTypeName">
+              Tên loại sản phẩm <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="newProductTypeName"
               name="ProductTypeName"
@@ -92,7 +94,9 @@ export function NewProductTypeDialog({ open, onOpenChange, onSave }: Props) {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="CategoryId">Danh mục</Label>
+            <Label htmlFor="CategoryId">
+              Danh mục <span className="text-red-500">*</span>
+            </Label>
             <select
               id="CategoryId"
               name="CategoryId"
@@ -105,7 +109,7 @@ export function NewProductTypeDialog({ open, onOpenChange, onSave }: Props) {
               disabled={loading}
             >
               <option value={0} disabled>
-                Chọn danh mục...
+                -- Chọn danh mục --
               </option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>

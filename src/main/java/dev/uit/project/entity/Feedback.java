@@ -9,7 +9,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -38,8 +38,8 @@ public class Feedback {
     private String feedbackcomment;
 
     @ColumnDefault("current_timestamp")
-    @Column(name = "FEEDBACKDATE")
-    private Instant feedbackdate;
+    @Column(name = "FEEDBACKDATE", columnDefinition = "TIMESTAMP")
+    private LocalDateTime feedbackdate;
 
     @Size(max = 4000)
     @Column(name = "ATTACHMENTURL", length = 4000)

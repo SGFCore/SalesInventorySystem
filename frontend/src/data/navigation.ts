@@ -62,7 +62,7 @@ export const sidebarData: SidebarItem[] = [
   {
     directionTo: "/shipping-management",
     label: "Quản lý giao vận",
-    availableRole: [1, 2],
+    availableRole: [1, 2, 3],
   },
   {
     directionTo: "/accounting-management",

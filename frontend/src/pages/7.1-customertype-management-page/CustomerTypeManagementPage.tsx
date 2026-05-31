@@ -88,9 +88,6 @@ export default function CustomerTypeManagementPage() {
           onChange={(e) => setSearch(e.target.value)}
           className={input.search}
         />
-        <Button className={btn.primary} onClick={() => setIsNewOpen(true)}>
-          Thêm nhóm khách hàng mới
-        </Button>
       </div>
 
       <div className="border border-slate-200 overflow-hidden">

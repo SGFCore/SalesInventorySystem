@@ -4,10 +4,11 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { EditProductTypeDialog } from "@/pages/5.2-producttype-management-page/EditProductTypeDialog";
 import { NewProductTypeDialog } from "@/pages/5.2-producttype-management-page/NewProductTypeDialog";
+import { DetailProductTypeDialog } from "@/pages/5.2-producttype-management-page/DetailProductTypeDialog";
 import { page, input, btn, entity } from "@/pages/page-classes";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Eye, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { Producttype } from "@/lib/types";
+import type { Producttype, Product } from "@/lib/types";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -15,6 +16,7 @@ const ITEMS_PER_PAGE = 10;
 
 export default function ProductTypeManagementPage() {
   const [productTypes, setProductTypes] = useState<Producttype[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedProductType, setSelectedProductType] =
@@ -23,23 +25,23 @@ export default function ProductTypeManagementPage() {
   // Dialog states
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isNewOpen, setIsNewOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const topRef = useRef<HTMLDivElement>(null);
 
-  const loadProductTypes = async () => {
+  const loadData = async () => {
     setLoading(true);
     try {
-      const data = await api.productTypes.list();
-      if (!data || data.length === 0) {
-        toast.error("Không có dữ liệu");
-        setProductTypes([]);
-      } else {
-        setProductTypes(data);
-      }
+      const [typeData, productData] = await Promise.all([
+        api.productTypes.list(),
+        api.products.list()
+      ]);
+      setProductTypes(typeData || []);
+      setProducts(productData || []);
     } catch (error: any) {
-      toast.error(error.message || "Lỗi lấy dữ liệu loại sản phẩm");
+      toast.error(error.message || "Lỗi lấy dữ liệu");
       setProductTypes([]);
     } finally {
       setLoading(false);
@@ -47,7 +49,7 @@ export default function ProductTypeManagementPage() {
   };
 
   useEffect(() => {
-    loadProductTypes();
+    loadData();
   }, []);
 
   // Reset về trang 1 khi tìm kiếm
@@ -74,13 +76,18 @@ export default function ProductTypeManagementPage() {
 
   const openAction = async (
     productType: Producttype,
-    type: "edit" | "delete",
+    type: "edit" | "delete" | "detail",
   ) => {
-    if (type === "edit") {
-      setSelectedProductType(productType);
-      setIsEditOpen(true);
-    }
+    setSelectedProductType(productType);
+    if (type === "detail") setIsDetailOpen(true);
+    if (type === "edit") setIsEditOpen(true);
     if (type === "delete") {
+      const hasProducts = products.some(p => p.ProductTypeID === productType.id);
+      if (hasProducts) {
+        toast.error("Không thể xóa loại sản phẩm đang có sản phẩm bên trong!");
+        return;
+      }
+
       if (
         window.confirm(
           `Bạn có chắc chắn muốn xóa loại sản phẩm "${productType.producttypename}"?`,
@@ -89,12 +96,16 @@ export default function ProductTypeManagementPage() {
         try {
           await api.productTypes.delete(productType.id);
           toast.success("Xóa loại sản phẩm thành công!");
-          loadProductTypes();
+          loadData();
         } catch (error: any) {
           toast.error("Xóa loại sản phẩm thất bại: " + error.message);
         }
       }
     }
+  };
+
+  const getProductCount = (typeId: number) => {
+    return products.filter(p => p.ProductTypeID === typeId).length;
   };
 
   return (
@@ -118,7 +129,7 @@ export default function ProductTypeManagementPage() {
           <div className="flex justify-center items-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
             <span className="ml-2 text-slate-500 font-medium">
-              Đang tải dữ liệu loại sản phẩm...
+              Đang tải dữ liệu...
             </span>
           </div>
         ) : paginatedProductTypes.length === 0 ? (
@@ -129,36 +140,57 @@ export default function ProductTypeManagementPage() {
           <>
             <Table>
               <TableBody>
-                {paginatedProductTypes.map((pt) => (
-                  <TableRow key={pt.id} className={page.tableRow}>
-                    <TableCell className={cn("w-20", entity.id)}>
-                      {pt.id}
-                    </TableCell>
-                    <TableCell className={cn("text-left", entity.name)}>
-                      {pt.producttypename}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2 justify-end">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className={btn.actionPrimary}
-                          onClick={() => openAction(pt, "edit")}
-                        >
-                          Cập nhật
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className={btn.actionDestructive}
-                          onClick={() => openAction(pt, "delete")}
-                        >
-                          Xóa
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {paginatedProductTypes.map((pt) => {
+                  const pCount = getProductCount(pt.id);
+                  return (
+                    <TableRow key={pt.id} className={page.tableRow}>
+                      <TableCell className={cn("w-20", entity.id)}>
+                        {pt.id}
+                      </TableCell>
+                      <TableCell className={cn("text-left", entity.name)}>
+                        <div className="flex flex-col">
+                          <span>{pt.producttypename}</span>
+                          <span className="text-[10px] text-slate-400 font-medium uppercase mt-0.5 tracking-tight">
+                            Số lượng sản phẩm: {pCount}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={cn(btn.actionSecondary, "w-28")}
+                            onClick={() => openAction(pt, "detail")}
+                          >
+                            <Eye className="w-4 h-4 mr-1.5" /> Xem chi tiết
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={cn(btn.actionPrimary, "w-28")}
+                            onClick={() => openAction(pt, "edit")}
+                          >
+                            Cập nhật
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={cn(
+                              btn.actionDestructive, 
+                              "w-28",
+                              pCount > 0 && "opacity-30 cursor-not-allowed grayscale pointer-events-none"
+                            )}
+                            disabled={pCount > 0}
+                            onClick={() => openAction(pt, "delete")}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1.5" /> Xóa
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
 
@@ -228,16 +260,22 @@ export default function ProductTypeManagementPage() {
       </div>
 
       {/* Dialogs */}
+      <DetailProductTypeDialog
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
+        productType={selectedProductType}
+        products={products}
+      />
       <EditProductTypeDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         productType={selectedProductType}
-        onSave={loadProductTypes}
+        onSave={loadData}
       />
       <NewProductTypeDialog
         open={isNewOpen}
         onOpenChange={setIsNewOpen}
-        onSave={loadProductTypes}
+        onSave={loadData}
       />
     </div>
   );

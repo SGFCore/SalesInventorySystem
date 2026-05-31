@@ -79,6 +79,14 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
       toast.error("Vui lòng chọn danh mục!");
       return;
     }
+    if (!formData.productTypeId) {
+      toast.error("Vui lòng chọn loại sản phẩm!");
+      return;
+    }
+    if (formData.productPrice <= 0) {
+      toast.error("Giá bán phải lớn hơn 0!");
+      return;
+    }
     setLoading(true);
     try {
       await api.products.create({
@@ -135,7 +143,9 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="new-productPrice">Giá bán (đ)</Label>
+            <Label htmlFor="new-productPrice">
+              Giá bán (đ) <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="new-productPrice"
               name="productPrice"
@@ -159,6 +169,7 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
               className={cn(dialog.input, "bg-white border text-sm rounded-md p-2 h-10")}
               disabled={loading}
             >
+              <option value={0} disabled>-- Chọn danh mục --</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.categoryname}
@@ -168,7 +179,9 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="new-productTypeId">Loại sản phẩm</Label>
+            <Label htmlFor="new-productTypeId">
+              Loại sản phẩm <span className="text-red-500">*</span>
+            </Label>
             <select
               id="new-productTypeId"
               name="productTypeId"
@@ -177,6 +190,7 @@ export function NewProductDialog({ open, onOpenChange, onSave }: NewProps) {
               className={cn(dialog.input, "bg-white border text-sm rounded-md p-2 h-10")}
               disabled={loading}
             >
+              <option value={0} disabled>-- Chọn loại sản phẩm --</option>
               {productTypes.map((pt) => (
                 <option key={pt.id} value={pt.id}>
                   {pt.producttypename}

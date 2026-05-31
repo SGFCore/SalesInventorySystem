@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import type { Category } from "@/lib/types";
+import type { Category, Producttype } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { EditCatDialog } from "@/pages/5.1-category-management-page/EditCatDialog";
 import { NewCatDialog } from "@/pages/5.1-category-management-page/NewCatDialog";
+import { DetailCatDialog } from "@/pages/5.1-category-management-page/DetailCatDialog";
 import { page, input, btn, entity } from "@/pages/page-classes";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Eye, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
@@ -15,6 +16,7 @@ const ITEMS_PER_PAGE = 10;
 
 export default function CatManagementPage() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [productTypes, setProductTypes] = useState<Producttype[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
@@ -24,21 +26,21 @@ export default function CatManagementPage() {
   // Dialog states
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isNewOpen, setIsNewOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const topRef = useRef<HTMLDivElement>(null);
 
-  const loadCategories = async () => {
+  const loadData = async () => {
     setLoading(true);
     try {
-      const data = await api.categories.list();
-      if (!data || data.length === 0) {
-        toast.error("Không có dữ liệu");
-        setCategories([]);
-      } else {
-        setCategories(data);
-      }
+      const [catData, typeData] = await Promise.all([
+        api.categories.list(),
+        api.productTypes.list()
+      ]);
+      setCategories(catData || []);
+      setProductTypes(typeData || []);
     } catch (error: any) {
       toast.error(error.message || "Lỗi lấy dữ liệu danh mục");
       setCategories([]);
@@ -48,7 +50,7 @@ export default function CatManagementPage() {
   };
 
   useEffect(() => {
-    loadCategories();
+    loadData();
   }, []);
 
   // Reset về trang 1 khi tìm kiếm
@@ -73,22 +75,31 @@ export default function CatManagementPage() {
     startIndex + ITEMS_PER_PAGE,
   );
 
-  const openAction = async (category: Category, type: "edit" | "delete") => {
-    if (type === "edit") {
-      setSelectedCategory(category);
-      setIsEditOpen(true);
-    }
+  const openAction = async (category: Category, type: "edit" | "delete" | "detail") => {
+    setSelectedCategory(category);
+    if (type === "detail") setIsDetailOpen(true);
+    if (type === "edit") setIsEditOpen(true);
     if (type === "delete") {
+      const hasTypes = productTypes.some(t => t.categoryid === category.id);
+      if (hasTypes) {
+        toast.error("Không thể xóa danh mục đang có loại sản phẩm bên trong!");
+        return;
+      }
+
       if (window.confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.categoryname}"?`)) {
         try {
           await api.categories.delete(category.id);
           toast.success("Xóa danh mục thành công!");
-          loadCategories();
+          loadData();
         } catch (error: any) {
           toast.error("Xóa danh mục thất bại: " + error.message);
         }
       }
     }
+  };
+
+  const getTypeCount = (catId: number) => {
+    return productTypes.filter(t => t.categoryid === catId).length;
   };
 
   return (
@@ -114,7 +125,7 @@ export default function CatManagementPage() {
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <span className="ml-2 text-slate-500 font-medium">Đang tải dữ liệu danh mục...</span>
+            <span className="ml-2 text-slate-500 font-medium">Đang tải dữ liệu...</span>
           </div>
         ) : paginatedCategories.length === 0 ? (
           <div className="text-center py-20 text-slate-400 font-medium">
@@ -124,39 +135,60 @@ export default function CatManagementPage() {
           <>
             <Table>
               <TableBody>
-                {paginatedCategories.map((c) => (
-                  <TableRow
-                    key={c.id}
-                    className={page.tableRow}
-                  >
-                    <TableCell className={cn("w-20", entity.id)}>
-                      {c.id}
-                    </TableCell>
-                    <TableCell className={cn("text-left", entity.name)}>
-                      {c.categoryname}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2 justify-end">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className={btn.actionPrimary}
-                          onClick={() => openAction(c, "edit")}
-                        >
-                          Cập nhật
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className={btn.actionDestructive}
-                          onClick={() => openAction(c, "delete")}
-                        >
-                          Xóa
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {paginatedCategories.map((c) => {
+                  const tCount = getTypeCount(c.id);
+                  return (
+                    <TableRow
+                      key={c.id}
+                      className={page.tableRow}
+                    >
+                      <TableCell className={cn("w-20", entity.id)}>
+                        {c.id}
+                      </TableCell>
+                      <TableCell className={cn("text-left", entity.name)}>
+                        <div className="flex flex-col">
+                          <span>{c.categoryname}</span>
+                          <span className="text-[10px] text-slate-400 font-medium uppercase mt-0.5 tracking-tight">
+                            Số lượng loại sản phẩm: {tCount}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={cn(btn.actionSecondary, "w-28")}
+                            onClick={() => openAction(c, "detail")}
+                          >
+                            <Eye className="w-4 h-4 mr-1.5" /> Xem chi tiết
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={cn(btn.actionPrimary, "w-28")}
+                            onClick={() => openAction(c, "edit")}
+                          >
+                            Cập nhật
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={cn(
+                              btn.actionDestructive, 
+                              "w-28",
+                              tCount > 0 && "opacity-30 cursor-not-allowed grayscale pointer-events-none"
+                            )}
+                            disabled={tCount > 0}
+                            onClick={() => openAction(c, "delete")}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1.5" /> Xóa
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
 
@@ -214,16 +246,22 @@ export default function CatManagementPage() {
       </div>
 
       {/* Dialogs */}
+      <DetailCatDialog
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
+        category={selectedCategory}
+        productTypes={productTypes}
+      />
       <EditCatDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         cat={selectedCategory}
-        onSave={loadCategories}
+        onSave={loadData}
       />
       <NewCatDialog
         open={isNewOpen}
         onOpenChange={setIsNewOpen}
-        onSave={loadCategories}
+        onSave={loadData}
       />
     </div>
   );

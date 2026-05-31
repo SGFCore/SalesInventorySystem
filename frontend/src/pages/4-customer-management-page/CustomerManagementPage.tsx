@@ -25,17 +25,43 @@ export default function CustomerManagementPage() {
   );
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [eligibleCustomerIds, setEligibleCustomerIds] = useState<Set<number>>(new Set());
 
   const loadCustomers = async () => {
     setLoading(true);
     try {
-      const data = await api.customers.list();
-      if (!data || data.length === 0) {
-        toast.error("Không có dữ liệu");
+      const [customerData, orderData, invoiceData] = await Promise.all([
+        api.customers.list(),
+        api.orders.list(),
+        api.invoices.list()
+      ]);
+
+      if (!customerData || customerData.length === 0) {
+        toast.error("Không có dữ liệu khách hàng");
         setCustomers([]);
       } else {
-        setCustomers(data);
+        setCustomers(customerData);
       }
+
+      // TẬP HỢP KHÁCH HÀNG ĐỦ ĐIỀU KIỆN PHẢN HỒI:
+      const eligibleIds = new Set<number>();
+
+      // 1. Kiểm tra đơn hàng trực tuyến (Online): Mã trạng thái 3 = Giao thành công
+      orderData.forEach(o => {
+        if (o.shippingstatus === 3) {
+          eligibleIds.add(o.customerId);
+        }
+      });
+
+      // 2. Kiểm tra đơn hàng tại quầy (Offline): Thông qua Hóa đơn có trạng thái 'Đã thanh toán'
+      invoiceData.forEach(inv => {
+        if (inv.Status === 'Đã thanh toán' && inv.SaleChannelCode === 0) {
+          eligibleIds.add(inv.CustomerID);
+        }
+      });
+
+      setEligibleCustomerIds(eligibleIds);
+
     } catch (error: any) {
       toast.error(error.message || "Lỗi lấy dữ liệu khách hàng");
       setCustomers([]);
@@ -148,8 +174,13 @@ export default function CustomerManagementPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className={btn.actionPrimary}
+                          className={cn(
+                            btn.actionPrimary,
+                            !eligibleCustomerIds.has(c.id) && "opacity-40 cursor-not-allowed grayscale pointer-events-none"
+                          )}
+                          disabled={!eligibleCustomerIds.has(c.id)}
                           onClick={() => openAction(c, "feedback")}
+                          title={!eligibleCustomerIds.has(c.id) ? "Chưa có đơn hàng giao thành công" : ""}
                         >
                           Phản hồi
                         </Button>
