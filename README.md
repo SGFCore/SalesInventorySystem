@@ -21,8 +21,6 @@
 5. [Hướng dẫn cài đặt và chạy dự án](#hướng-dẫn-cài-đặt-và-chạy-dự-án)
 6. [Tài khoản mặc định (seed)](#tài-khoản-mặc-định-seed)
 7. [Kiểm thử hệ thống](#kiểm-thử-hệ-thống)
-8. [Tài liệu phát triển](#tài-liệu-phát-triển)
-
 ---
 
 ## Giới thiệu đồ án
@@ -217,12 +215,3 @@ Các tình huống kiểm thử chính:
 - Tạo phiếu nhập kho, kiểm kê, đề xuất bổ sung
 - Xem báo cáo doanh thu dạng biểu đồ (Line/Bar chart)
 - Xem và đánh dấu thông báo hệ thống
-
----
-
-## Tài liệu phát triển
-
-- Mô tả chi tiết API: [api-contract.md](docs/api-contract.md) (tự xây dựng từ code)
-- Sơ đồ database: [database-schema.png](docs/database-schema.png)
-- Hướng dẫn sử dụng: [user-guide.md](docs/user-guide.md)
-- Báo cáo đồ án (PDF) bao gồm phân tích, thiết kế, kiến trúc, kết quả thử nghiệm
