@@ -30,6 +30,8 @@ import ReportManagementGroup from "@/pages/grouped/ReportManagementGroup";
 import ShippingManagementGroup from "@/pages/grouped/ShippingManagementGroup";
 import AccountingManagementGroup from "@/pages/grouped/AccountingManagementGroup";
 
+import OrderProcessingPage from "@/pages/11.1-warehouse-management-page/OrderProcessingPage";
+
 function App() {
   return (
     <EmpProvider>
@@ -54,6 +56,14 @@ function App() {
                   element={
                     <PrivateRoute>
                       <Home />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/order-processing"
+                  element={
+                    <PrivateRoute>
+                      <OrderProcessingPage />
                     </PrivateRoute>
                   }
                 />

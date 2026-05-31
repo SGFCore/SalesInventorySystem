@@ -20,6 +20,8 @@ public class OrderService {
     private final InvoiceRepository invoiceRepository;
     private final ShipcompanyRepository shipcompanyRepository;
     private final ExportreceiptRepository exportreceiptRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final OrderPdfService orderPdfService;
 
     public List<OrderDTO> list() {
         return orderRepository.findAll()
@@ -141,6 +143,11 @@ public class OrderService {
         order.setShippingstatus(3L); // 3 = Returned/Refused (or suitable status)
         
         return OrderDTO.fromEntity(orderRepository.save(order));
+    }
+
+    public java.io.ByteArrayOutputStream generatePickListPdf(List<Long> orderIds) throws com.itextpdf.text.DocumentException {
+        List<Orderdetail> allDetails = orderDetailRepository.findByOrderid_IdIn(orderIds);
+        return orderPdfService.generatePickListPdf(allDetails);
     }
 
     private Order convertToEntity(OrderDTO dto) {

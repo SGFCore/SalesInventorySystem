@@ -6,172 +6,132 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { api } from "@/lib/api";
-import type { Order, Shipcompany, Warehouse } from "@/lib/types";
+import type { Shipcompany, ExtendedOrder } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { dialog, btn } from "@/pages/page-classes";
-import { Loader2, Package, Truck } from "lucide-react";
+import { Loader2, FileOutput, Info } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useEmp } from "@/context/empContext";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: () => void;
+  initialSelectedOrderIds: number[];
 }
 
-export function NewExportReceiptDialog({ open, onOpenChange, onSave }: Props) {
+export function NewExportReceiptDialog({ open, onOpenChange, onSave, initialSelectedOrderIds }: Props) {
   const { emp } = useEmp();
-  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [shipCompanies, setShipCompanies] = useState<Shipcompany[]>([]);
-  const [selectedShipCompany, setSelectedShipCompany] = useState<number | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-  const [selectedWarehouseId, setSelectedWarehouseId] = useState<number>(1); // Default to main warehouse
+  const [selectedOrders, setSelectedOrders] = useState<ExtendedOrder[]>([]);
+  const [shipCompany, setShipCompany] = useState<Shipcompany | null>(null);
+
+  const loadSelection = async () => {
+    setLoading(true);
+    try {
+      const [orderData, customerData, scData] = await Promise.all([
+        api.orders.list(),
+        api.customers.list(),
+        api.shipCompanies.list()
+      ]);
+
+      const customerMap = new Map(customerData.map(c => [c.id, c]));
+      const scMap = new Map(scData.map(s => [s.ShipCompanyID, s]));
+
+      const selected = orderData
+        .filter(o => initialSelectedOrderIds.includes(o.id))
+        .map(o => ({
+          ...o,
+          customer: customerMap.get(Number(o.customerId)),
+          shipCompany: scMap.get(Number(o.shipcompanyId))
+        }));
+
+      setSelectedOrders(selected);
+      if (selected.length > 0) {
+        setShipCompany(selected[0].shipCompany || null);
+      }
+    } catch (e) {
+      toast.error("Lỗi tải dữ liệu đơn hàng đã chọn");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (open) {
-      setStep(1);
-      setSelectedShipCompany(null);
-      setSelectedOrderIds([]);
-      loadInitialData();
+    if (open && initialSelectedOrderIds.length > 0) {
+      loadSelection();
     }
-  }, [open]);
-
-  const loadInitialData = async () => {
-    setLoading(true);
-    try {
-      const [scData, whData] = await Promise.all([
-        api.shipCompanies.list(),
-        api.warehouses.list(),
-      ]);
-      setShipCompanies(scData.filter(sc => sc.Status === 1));
-      setWarehouses(whData);
-    } catch (error) {
-      toast.error("Không thể tải dữ liệu ban đầu");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadReadyOrders = async (shipCompanyId: number) => {
-    setLoading(true);
-    try {
-      const allOrders = await api.orders.list();
-      // Filter orders with ShipCompanyID and shippingstatus === 4 (Đã đóng gói)
-      const readyOrders = allOrders.filter(
-        (o) => o.shipcompanyId === shipCompanyId && o.shippingstatus === 4
-      );
-      setOrders(readyOrders);
-      setSelectedOrderIds(readyOrders.map((o) => o.id)); // Default select all
-      if (readyOrders.length === 0) {
-        toast.info("Không có kiện hàng chờ xuất cho đơn vị này.");
-      }
-    } catch (error) {
-      toast.error("Không thể tải danh sách kiện hàng");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleNext = () => {
-    if (step === 1) {
-      if (!selectedShipCompany) {
-        toast.error("Vui lòng chọn đơn vị vận chuyển!");
-        return;
-      }
-      loadReadyOrders(selectedShipCompany);
-      setStep(2);
-    }
-  };
-
-  const handleToggleOrder = (orderId: number) => {
-    setSelectedOrderIds((prev) =>
-      prev.includes(orderId)
-        ? prev.filter((id) => id !== orderId)
-        : [...prev, orderId]
-    );
-  };
+  }, [open, initialSelectedOrderIds]);
 
   const handleSubmit = async () => {
-    if (selectedOrderIds.length === 0) {
-      toast.error("Vui lòng chọn ít nhất một kiện hàng để xuất kho!");
-      return;
-    }
+    if (selectedOrders.length === 0) return;
 
     setLoading(true);
     try {
-      // 1. Lấy chi tiết của tất cả các đơn hàng đã chọn để tổng hợp sản phẩm
-      const allOrderDetailsData = await api.orderDetails.list();
-      const selectedDetails = allOrderDetailsData.filter(d => selectedOrderIds.includes(d.OrderID));
-      
-      // Tổng hợp số lượng theo ProductID
+      // 1. Get all OrderDetails to aggregate products
+      const allOrderDetails = await api.orderDetails.list();
+      const selectedDetails = allOrderDetails.filter(d => initialSelectedOrderIds.includes(d.OrderID || d.orderid));
+
       const productSummary: Record<number, number> = {};
       selectedDetails.forEach(d => {
-        if (d.ProductID) {
-          productSummary[d.ProductID] = (productSummary[d.ProductID] || 0) + d.Quantity;
+        const pId = d.ProductID || d.productid;
+        const qty = d.Quantity || d.quantity;
+        if (pId) {
+          productSummary[pId] = (productSummary[pId] || 0) + qty;
         }
       });
 
-      // 2. Tạo Phiếu xuất kho (ExportReceipt)
+      const productDetails = Object.entries(productSummary).map(([pIdStr, qty]) => ({
+        productId: Number(pIdStr),
+        quantity: Number(qty)
+      }));
+
+      // 2. Create ONE Batch Export Receipt with nested details (Atomic Save)
+      const warehouseId = 1;
+      const orderIdsStr = initialSelectedOrderIds.join(", #");
+      
       const receipt = await api.exportReceipts.create({
         employeeId: emp!.EmployeeID,
         exporttype: 1, // Bán hàng
-        reason: `Xuất kho giao vận - Đơn vị: ${shipCompanies.find(sc => sc.ShipCompanyID === selectedShipCompany)?.ShipCompanyName}`,
+        reason: `Xuất bán đơn hàng online: #${orderIdsStr}`,
         status: "Đã hoàn thành",
-        warehouseId: selectedWarehouseId,
+        warehouseId: warehouseId,
         createddate: new Date().toISOString().split('T')[0],
-      });
+        details: productDetails // Integrated Details for Cascade Save
+      } as any);
 
-      // 3. Tạo Chi tiết phiếu xuất (ExportReceiptDetail) và cập nhật Tồn kho vật lý (RealStock)
+      // 3. Update RealStock (Integrated)
       const allInventories = await api.detailInventories.list();
-      
-      for (const [productIdStr, quantity] of Object.entries(productSummary)) {
-        const productId = Number(productIdStr);
-        
-        // Tạo ExportReceiptDetail
-        await api.exportReceiptDetails.create({
-          ExportReceiptID: receipt.id,
-          ProductID: productId,
-          Quantity: quantity
+      for (const item of productDetails) {
+        const inv = allInventories.find(i => i.WarehouseID === warehouseId && i.ProductID === item.ProductID);
+        if (inv) {
+          await api.detailInventories.update(warehouseId, {
+            ...inv,
+            RealStock: inv.RealStock - item.Quantity,
+            AvailableStock: inv.AvailableStock 
+          });
+        }
+      }
+
+      // 4. Update each Order (Link Receipt, Update Status, Generate ShipCode)
+      for (const order of selectedOrders) {
+        const randomShipCode = "SGF" + Math.floor(Math.random() * 900000 + 100000);
+        await api.orders.update(order.id, {
+          ...order,
+          exportreceiptId: receipt.id,
+          shippingstatus: 2, // Đã gửi vận chuyển
+          shipcode: randomShipCode
         });
-
-        // Cập nhật RealStock trong DetailInventory
-        const existingInv = allInventories.find(
-          (inv) => inv.WarehouseID === selectedWarehouseId && inv.ProductID === productId
-        );
-
-        if (existingInv) {
-          await api.detailInventories.update(selectedWarehouseId, {
-            ...existingInv,
-            RealStock: existingInv.RealStock - quantity,
-            // Giữ nguyên AvailableStock vì nó đã được trừ khi tạo đơn hàng/hóa đơn
-          });
-        }
       }
 
-      // 4. Cập nhật trạng thái các Đơn hàng sang "Đang giao" (shippingstatus = 2)
-      for (const orderId of selectedOrderIds) {
-        const order = orders.find(o => o.id === orderId);
-        if (order) {
-          await api.orders.update(orderId, {
-            ...order,
-            shippingstatus: 2, // Đã gửi vận chuyển -> Trigger C26 sẽ tự update orderstatus = 2 (Đang giao)
-            exportreceiptId: receipt.id,
-          });
-        }
-      }
-
-      toast.success("Xuất kho thành công và đã cập nhật tồn kho vật lý!");
+      toast.success(`Đã xác nhận xuất kho thành công! Đã tạo phiếu #${receipt.id}.`);
       onSave();
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error.message || "Xuất kho thất bại!");
+    } catch (e: any) {
+      toast.error(e.message || "Lỗi trong quá trình xuất kho");
     } finally {
       setLoading(false);
     }
@@ -179,175 +139,87 @@ export function NewExportReceiptDialog({ open, onOpenChange, onSave }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={cn("sm:max-w-[600px]", dialog.content)}>
+      <DialogContent className={cn("sm:max-w-[650px]", dialog.content)}>
         <DialogHeader>
-          <DialogTitle className={dialog.title}>
-            Xuất kho giao vận
+          <DialogTitle className={cn(dialog.title, "flex items-center gap-2")}>
+            <FileOutput className="h-5 w-5 text-blue-600" />
+            Xác nhận xuất kho cho {initialSelectedOrderIds.length} đơn hàng
           </DialogTitle>
         </DialogHeader>
 
-        <div className={dialog.body}>
-          {step === 1 ? (
-            <div className="space-y-4">
-              <div className="grid gap-2">
-                <Label className="font-semibold text-slate-700 flex items-center gap-2">
-                  <Truck className="h-4 w-4 text-blue-600" />
-                  Chọn đơn vị vận chuyển
-                </Label>
-                <div className="grid grid-cols-2 gap-3">
-                  {shipCompanies.map((sc) => (
-                    <div
-                      key={sc.ShipCompanyID}
-                      onClick={() => setSelectedShipCompany(sc.ShipCompanyID)}
-                      className={cn(
-                        "cursor-pointer border-2 rounded-lg p-3 transition-all flex flex-col items-center justify-center gap-2 text-center",
-                        selectedShipCompany === sc.ShipCompanyID
-                          ? "border-blue-600 bg-blue-50 text-blue-700"
-                          : "border-slate-100 bg-white text-slate-600 hover:border-blue-200"
-                      )}
-                    >
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                        {sc.ShipCompanyName.charAt(0)}
-                      </div>
-                      <span className="text-sm font-bold">{sc.ShipCompanyName}</span>
-                      <span className="text-[10px] text-slate-400">{sc.Phone}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid gap-2 pt-2 border-t border-slate-100">
-                <Label className="font-semibold text-slate-700">Xuất từ kho</Label>
-                <select
-                  className={cn(dialog.input, "h-10 text-sm")}
-                  value={selectedWarehouseId}
-                  onChange={(e) => setSelectedWarehouseId(Number(e.target.value))}
-                >
-                  {warehouses.map(wh => (
-                    <option key={wh.WareHouseID} value={wh.WareHouseID}>
-                      {wh.WareHouseName}
-                    </option>
-                  ))}
-                </select>
+        <div className={cn(dialog.body, "max-h-[60vh] overflow-y-auto pr-2")}>
+          <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex gap-3 items-start mb-4">
+            <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+            <div className="text-xs text-blue-800 space-y-1">
+              <p className="font-bold uppercase tracking-wide">Thông tin xuất kho chung</p>
+              <div className="grid grid-cols-2 gap-x-4">
+                <p>Kho xuất: <span className="font-bold">Kho tổng SGF (1)</span></p>
+                <p>Đơn vị vận chuyển: <span className="font-bold text-blue-700">{shipCompany?.ShipCompanyName || "N/A"}</span></p>
+                <p className="col-span-2">Lý do: <span className="italic">Xuất bán đơn hàng online</span></p>
               </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <Label className="font-semibold text-slate-700 flex items-center gap-2">
-                  <Package className="h-4 w-4 text-blue-600" />
-                  Danh sách kiện hàng "Đã đóng gói"
-                </Label>
-                <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded">
-                  Đã chọn: {selectedOrderIds.length} / {orders.length}
-                </span>
-              </div>
+          </div>
 
-              {loading ? (
-                <div className="flex flex-col items-center justify-center py-12 gap-3">
-                  <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-                  <span className="text-sm text-slate-500">Đang tải kiện hàng...</span>
-                </div>
-              ) : orders.length === 0 ? (
-                <div className="text-center py-12 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
-                  <Package className="h-10 w-10 text-slate-300 mx-auto mb-2" />
-                  <p className="text-slate-500 font-medium">Không có kiện hàng nào chờ xuất</p>
-                  <Button
-                    variant="link"
-                    className="text-blue-600 mt-1"
-                    onClick={() => setStep(1)}
-                  >
-                    Quay lại chọn đơn vị khác
-                  </Button>
-                </div>
-              ) : (
-                <div className="border rounded-md overflow-hidden bg-white max-h-[350px] overflow-y-auto border-slate-200">
-                  <Table>
-                    <TableBody>
-                      {orders.map((order) => (
-                        <TableRow
-                          key={order.id}
-                          className={cn(
-                            "cursor-pointer hover:bg-slate-50",
-                            selectedOrderIds.includes(order.id) ? "bg-blue-50/30" : ""
-                          )}
-                          onClick={() => handleToggleOrder(order.id)}
-                        >
-                          <TableCell className="w-10">
-                            <Checkbox
-                              checked={selectedOrderIds.includes(order.id)}
-                              onCheckedChange={() => handleToggleOrder(order.id)}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-slate-700 text-sm">#{order.id}</span>
-                              <span className="text-[10px] text-slate-500">Mã vận đơn: {order.shipcode || "N/A"}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-xs font-medium text-slate-600">
-                              {order.totalamount.toLocaleString("vi-VN")} đ
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">
-                              Đã đóng gói
-                            </span>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </div>
-          )}
+          <div className="border rounded-lg overflow-hidden border-slate-200">
+            <Table>
+              <TableHeader className="bg-slate-50">
+                <TableRow>
+                  <TableHead className="w-[100px] text-xs uppercase font-bold">Mã đơn</TableHead>
+                  <TableHead className="text-xs uppercase font-bold">Khách hàng</TableHead>
+                  <TableHead className="text-xs uppercase font-bold">Địa chỉ giao</TableHead>
+                  <TableHead className="text-right text-xs uppercase font-bold">Tổng tiền</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                   <TableRow>
+                     <TableCell colSpan={4} className="text-center py-10">
+                        <Loader2 className="h-6 w-6 animate-spin mx-auto text-blue-600" />
+                     </TableCell>
+                   </TableRow>
+                ) : (
+                  selectedOrders.map(o => (
+                    <TableRow key={o.id} className="text-xs">
+                      <TableCell className="font-bold text-slate-500">#{o.id}</TableCell>
+                      <TableCell className="font-medium">
+                        {o.customer ? `${o.customer.firstname} ${o.customer.lastname}` : "Khách lẻ"}
+                      </TableCell>
+                      <TableCell className="max-w-[200px] truncate italic text-slate-500">
+                        {o.customer?.address || o.shipmentnote || "-"}
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-blue-600">
+                        {o.totalamount.toLocaleString()}đ
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          
+          <p className="text-[11px] text-slate-400 mt-4 italic text-center">
+            * Hệ thống sẽ tự động trừ tồn kho vật lý và gán mã vận đơn cho các đơn hàng này.
+          </p>
         </div>
 
-        <DialogFooter className="gap-2">
-          {step === 2 && (
-            <Button
-              variant="outline"
-              className={dialog.cancel}
-              onClick={() => setStep(1)}
-              disabled={loading}
-            >
-              Quay lại
-            </Button>
-          )}
-          <Button
-            variant="outline"
-            className={dialog.cancel}
-            onClick={() => onOpenChange(false)}
-            disabled={loading}
-          >
+        <DialogFooter className="border-t pt-4">
+          <Button variant="outline" className={dialog.cancel} onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
-          {step === 1 ? (
-            <Button
-              className={cn(btn.primary, "w-32")}
-              onClick={handleNext}
-              disabled={loading || !selectedShipCompany}
-            >
-              Tiếp theo
-            </Button>
-          ) : (
-            <Button
-              className={cn(btn.primary, "w-32")}
-              onClick={handleSubmit}
-              disabled={loading || orders.length === 0}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Đang xử lý
-                </>
-              ) : (
-                "Xác nhận xuất"
-              )}
-            </Button>
-          )}
+          <Button 
+            className={cn(btn.primary, "bg-blue-600 hover:bg-blue-700")}
+            disabled={loading || selectedOrders.length === 0}
+            onClick={handleSubmit}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Đang xử lý...
+              </>
+            ) : (
+              "Xác nhận xuất kho"
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

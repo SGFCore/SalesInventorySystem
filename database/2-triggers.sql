@@ -588,3 +588,29 @@ begin
    :new.invoiceid := v_new_invoice_id;
 end;
 /
+-- =============================================
+-- TRIGGER: TỰ ĐỘNG GÁN HẠNG VIP NẾU CÓ COMPANYNAME
+-- Kích hoạt trước khi INSERT vào bảng customer
+-- =============================================
+CREATE OR REPLACE TRIGGER trg_customer_company_to_vip
+    BEFORE INSERT ON customer
+    FOR EACH ROW
+    WHEN (NEW.companyname IS NOT NULL)
+DECLARE
+    v_vip_type_id NUMBER;
+BEGIN
+    -- Lấy customertypeid của hạng VIP (dựa trên tên 'VIP')
+    SELECT customertypeid
+    INTO v_vip_type_id
+    FROM customertype
+    WHERE customertypename = 'VIP';
+
+    -- Gán hạng VIP cho khách hàng doanh nghiệp
+    :NEW.customertypeid := v_vip_type_id;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        -- Nếu không tìm thấy hạng VIP trong bảng customertype
+        RAISE_APPLICATION_ERROR(-20050, 
+            'Không tìm thấy hạng VIP trong bảng customertype. Vui lòng kiểm tra dữ liệu tham chiếu.');
+END trg_customer_company_to_vip;
+/

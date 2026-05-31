@@ -57,13 +57,13 @@ export function EditCustomerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={cn("sm:max-w-[450px]", dialog.content)}>
+      <DialogContent className={cn("sm:max-w-[500px]", dialog.content)}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
             Cập nhật khách hàng
           </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-3 py-4">
+        <div className="grid gap-3 py-4 max-h-[70vh] overflow-y-auto pr-2">
           <div className="grid grid-cols-2 gap-2">
             <div className="grid gap-1">
               <Label>Họ <span className="text-red-500">*</span></Label>
@@ -96,29 +96,64 @@ export function EditCustomerDialog({
               disabled={loading}
             />
           </div>
-          <div className="grid gap-1">
-            <Label>Số điện thoại <span className="text-red-500">*</span></Label>
-            <Input
-              value={form.phone || ""}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              disabled={loading}
-            />
+          <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-1">
+              <Label>Số điện thoại <span className="text-red-500">*</span></Label>
+              <Input
+                value={form.phone || ""}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                disabled={loading}
+              />
+            </div>
+            <div className="grid gap-1">
+              <Label>Email</Label>
+              <Input
+                value={form.email || ""}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                disabled={loading}
+              />
+            </div>
           </div>
           <div className="grid gap-1">
-            <Label>Email</Label>
-            <Input
-              value={form.email || ""}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              disabled={loading}
-            />
-          </div>
-          <div className="grid gap-1">
-            <Label>Địa chỉ</Label>
+            <Label>Địa chỉ liên hệ</Label>
             <Input
               value={form.address || ""}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
               disabled={loading}
             />
+          </div>
+
+          <div className="border-t border-slate-200 pt-4 mt-2">
+            <Label className="text-blue-600 font-bold text-xs uppercase tracking-wider">Thông tin xuất hóa đơn VAT</Label>
+            <div className="grid gap-3 mt-3">
+              <div className="grid gap-1">
+                <Label>Mã số thuế</Label>
+                <Input
+                  value={(form as any).tax_code || ""}
+                  onChange={(e) => setForm({ ...form, tax_code: e.target.value } as any)}
+                  placeholder="Nhập mã số thuế..."
+                  disabled={loading}
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label>Địa chỉ xuất hóa đơn</Label>
+                <Input
+                  value={(form as any).invoice_address || ""}
+                  onChange={(e) => setForm({ ...form, invoice_address: e.target.value } as any)}
+                  placeholder="Địa chỉ ghi trên hóa đơn..."
+                  disabled={loading}
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label>Thuế suất (%)</Label>
+                <Input
+                  type="number"
+                  value={(form as any).tax_rate || 10}
+                  onChange={(e) => setForm({ ...form, tax_rate: Number(e.target.value) } as any)}
+                  disabled={loading}
+                />
+              </div>
+            </div>
           </div>
         </div>
         <DialogFooter>

@@ -10,4 +10,7 @@ import java.util.List;
 public interface DetailinventoryRepository extends JpaRepository<Detailinventory, DetailinventoryId> {
     @Query("SELECT di FROM Detailinventory di WHERE (:warehouseId IS NULL OR di.id.warehouseid = :warehouseId) AND (:productId IS NULL OR di.id.productid = :productId)")
     List<Detailinventory> findWithFilters(@Param("warehouseId") Long warehouseId, @Param("productId") Long productId);
+
+    @Query("SELECT di FROM Detailinventory di WHERE di.id.warehouseid = :warehouseId")
+    List<Detailinventory> findByWarehouseId(@Param("warehouseId") Long warehouseId);
 }

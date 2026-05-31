@@ -538,7 +538,7 @@ create table exportreceipt (
 );
 
 -- =============================================
--- 31. EXPORTRECEIPTDETAIL TABLE (references ExportReceip, Product)
+-- 31. EXPORTRECEIPTDETAIL TABLE (references ExportReceipt, Product)
 -- =============================================
 create table exportreceiptdetail (
    exportreceiptid number,
@@ -638,3 +638,10 @@ create table feedback (
 alter table orders
    add constraint fk_order_exportreceipt foreign key ( exportreceiptid )
       references exportreceipt ( exportreceiptid );
+
+ALTER TABLE invoice ADD (
+    buyer_name NVARCHAR2(200),        -- Tên người mua (công ty/cá nhân) – bắt buộc nhập
+    buyer_tax_code VARCHAR2(20),      -- Mã số thuế (nếu có)
+    buyer_address NVARCHAR2(255),     -- Địa chỉ xuất hóa đơn – bắt buộc
+    tax_rate NUMBER(5,2) DEFAULT 10   -- Thuế suất áp dụng cho hóa đơn (mặc định 10%)
+);

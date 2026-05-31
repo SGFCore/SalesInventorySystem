@@ -98,4 +98,20 @@ public class OrderController {
     public ResponseEntity<OrderDTO> cancelShipping(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.cancelShipping(id));
     }
+
+    @PostMapping("/pick-list/pdf")
+    public ResponseEntity<byte[]> generatePickListPdf(@RequestBody java.util.Map<String, List<Long>> payload) {
+        try {
+            List<Long> orderIds = payload.get("orderIds");
+            java.io.ByteArrayOutputStream pdf = orderService.generatePickListPdf(orderIds);
+            
+            return ResponseEntity.ok()
+                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=danh_sach_lay_hang.pdf")
+                    .body(pdf.toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

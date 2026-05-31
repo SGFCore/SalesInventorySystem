@@ -12,13 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ExportreceiptdetailDTO {
 
-    @JsonProperty("ExportReceiptID")
     private Long exportreceiptId;
-
-    @JsonProperty("ProductID")
     private Long productId;
-
-    @JsonProperty("Quantity")
     private Long quantity;
 
     public static ExportreceiptdetailDTO fromEntity(Exportreceiptdetail entity) {
@@ -30,7 +25,7 @@ public class ExportreceiptdetailDTO {
     public Exportreceiptdetail toEntity() {
         Exportreceiptdetail entity = new Exportreceiptdetail();
         dev.uit.project.entity.ExportreceiptdetailId cid = new dev.uit.project.entity.ExportreceiptdetailId();
-        cid.setExportreceiptid(this.exportreceiptId);
+        // Leave exportreceiptid in ID null for @MapsId to handle during cascade
         cid.setProductid(this.productId);
         entity.setId(cid);
         entity.setQuantity(this.quantity);

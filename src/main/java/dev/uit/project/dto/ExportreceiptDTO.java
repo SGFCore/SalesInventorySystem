@@ -17,11 +17,20 @@ public class ExportreceiptDTO {
     private String status;
     private LocalDate createddate;
     private Long warehouseId;
+    private java.util.List<ExportreceiptdetailDTO> details;
 
     public static ExportreceiptDTO fromEntity(Exportreceipt entity) {
         if (entity == null) return null;
         Long employeeId = entity.getEmployeeid() != null ? entity.getEmployeeid().getId() : null;
         Long warehouseId = entity.getWarehouseid() != null ? entity.getWarehouseid().getId() : null;
+        
+        java.util.List<ExportreceiptdetailDTO> detailsDTO = null;
+        if (entity.getDetails() != null) {
+            detailsDTO = entity.getDetails().stream()
+                    .map(ExportreceiptdetailDTO::fromEntity)
+                    .toList();
+        }
+
         return new ExportreceiptDTO(
                 entity.getId(),
                 employeeId,
@@ -29,7 +38,8 @@ public class ExportreceiptDTO {
                 entity.getReason(),
                 entity.getStatus(),
                 entity.getCreateddate(),
-                warehouseId
+                warehouseId,
+                detailsDTO
         );
     }
 
@@ -50,6 +60,17 @@ public class ExportreceiptDTO {
             wh.setId(this.warehouseId);
             entity.setWarehouseid(wh);
         }
+
+        if (this.details != null) {
+            java.util.List<dev.uit.project.entity.Exportreceiptdetail> entityDetails = new java.util.ArrayList<>();
+            for (ExportreceiptdetailDTO dDTO : this.details) {
+                dev.uit.project.entity.Exportreceiptdetail d = dDTO.toEntity();
+                d.setExportreceiptid(entity); // CRITICAL: bidirectional link
+                entityDetails.add(d);
+            }
+            entity.setDetails(entityDetails);
+        }
+
         return entity;
     }
 }

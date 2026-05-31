@@ -43,7 +43,7 @@ export default function ShippingManagementPage() {
       const shipCompanyMap = new Map(shipCompanyData.map(sc => [sc.ShipCompanyID, sc]));
 
       const mappedOrders = orderData
-        .filter(o => o.shipcompanyId && o.shipcompanyId !== 0)
+        .filter(o => (o.shipcompanyId && o.shipcompanyId !== 0) || o.orderstatus === 4)
         .map(order => ({
           ...order,
           customer: customerMap.get(Number(order.customerId)),
@@ -80,10 +80,10 @@ export default function ShippingManagementPage() {
 
   const filteredOrders = orders.filter((ord) => {
     if (activeTab === "ready") {
-      // Show all in "ready" tab, but cancelled ones are grayed out
+      // Cho phép hiện cả đơn đã hủy để nó hiển thị trạng thái làm mờ (blurred)
     } else {
-      // Unpacking tab: OrderStatus = 4 AND shippingstatus = 4
-      if (!(ord.orderstatus === 4 && ord.shippingstatus === 4)) return false;
+      // Tab tháo dỡ: Đã hủy (status 4) và CHƯA tháo dỡ (shippingstatus !== 0)
+      if (!(ord.orderstatus === 4 && ord.shippingstatus !== 0)) return false;
     }
 
     const safeSearch = (search || "").trim().toLowerCase();
@@ -149,9 +149,8 @@ export default function ShippingManagementPage() {
       toast.success(
         <div className="flex flex-col gap-1">
           <p className="font-bold text-green-700">Hủy giao vận thành công!</p>
-          <p className="text-xs text-slate-600 italic">Vui lòng thông báo Thủ kho để tháo dỡ kiện hàng (Mã đơn: {order.id}).</p>
         </div>,
-        { duration: 6000 }
+        { duration: 4000 }
       );
       loadOrders();
     } catch (e: any) {
@@ -175,20 +174,22 @@ export default function ShippingManagementPage() {
             >
               Chờ giao vận
             </button>
-            <button
-              onClick={() => setActiveTab("unpacking")}
-              className={cn(
-                "px-4 py-1.5 text-xs font-semibold rounded-md transition-all",
-                activeTab === "unpacking" ? "bg-white text-red-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-              )}
-            >
-              Hủy chờ tháo dỡ
-              {orders.filter(o => o.orderstatus === 4 && o.shippingstatus === 4).length > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full text-[10px]">
-                  {orders.filter(o => o.orderstatus === 4 && o.shippingstatus === 4).length}
-                </span>
-              )}
-            </button>
+            {!isSales && (
+              <button
+                onClick={() => setActiveTab("unpacking")}
+                className={cn(
+                  "px-4 py-1.5 text-xs font-semibold rounded-md transition-all",
+                  activeTab === "unpacking" ? "bg-white text-red-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                )}
+              >
+                Hủy chờ tháo dỡ
+                {orders.filter(o => o.orderstatus === 4 && o.shippingstatus === 4).length > 0 && (
+                  <span className="ml-1.5 px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full text-[10px]">
+                    {orders.filter(o => o.orderstatus === 4 && o.shippingstatus === 4).length}
+                  </span>
+                )}
+              </button>
+            )}
           </div>
         </div>
 

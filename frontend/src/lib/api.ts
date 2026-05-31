@@ -195,6 +195,8 @@ export const api = {
     update: (id: number, data: Order) =>
       apiClient.put<Order>(`/orders/${id}`, data),
     delete: (id: number) => apiClient.delete<void>(`/orders/${id}`),
+    downloadPickListPdf: (orderIds: number[]) => 
+      apiClient.downloadPost("/orders/pick-list/pdf", { orderIds }, "danh_sach_lay_hang.pdf"),
   },
 
   // 15. ORDERDETAIL TABLE

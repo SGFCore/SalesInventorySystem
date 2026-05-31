@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { NativeSelect } from "@/components/ui/native-select";
 import { btn, dialog } from "@/pages/page-classes";
 import { api } from "@/lib/api";
 import type { Invoice, Customer } from "@/lib/types";
@@ -26,42 +25,35 @@ interface PrintProps {
 
 export function PrintInvoiceDialog({ open, onOpenChange, invoice, customer }: PrintProps) {
   const [loading, setLoading] = useState(false);
-  const [printType, setPrintType] = useState<"standard" | "vat">("standard");
   const [vatInfo, setVatInfo] = useState({
     taxCode: "",
-    discount: 0,
     companyName: "",
     address: "",
   });
 
-  const isB2B = !!(customer?.companyname && customer.companyname.trim().length > 0);
-
   useEffect(() => {
     if (open) {
-      if (isB2B) {
-        setPrintType("vat");
-      } else {
-        setPrintType("standard");
-      }
       setVatInfo({
-        taxCode: "",
-        discount: 0,
-        companyName: customer?.companyname || "",
-        address: customer?.address || "",
+        taxCode: (invoice as any).buyer_tax_code || "",
+        companyName: (invoice as any).buyer_name || (customer ? `${customer.firstname} ${customer.lastname}` : "Khách hàng lẻ"),
+        address: (invoice as any).buyer_address || customer?.address || "Theo địa chỉ giao hàng",
       });
     }
-  }, [open, isB2B, customer]);
+  }, [open, customer, invoice]);
 
   const handlePrint = async () => {
+    if (!vatInfo.companyName || !vatInfo.address) {
+      toast.error("Vui lòng nhập Tên người mua và Địa chỉ xuất hóa đơn!");
+      return;
+    }
     setLoading(true);
     try {
-      const isVat = printType === "vat";
       await api.invoices.generatePdf(
         invoice.InvoiceID,
-        isVat,
-        isVat ? vatInfo : undefined
+        true,
+        vatInfo
       );
-      toast.success("Xuất hóa đơn thành công!");
+      toast.success("Xuất hóa đơn VAT thành công!");
       onOpenChange(false);
     } catch (e: any) {
       toast.error(e.message || "Lỗi khi xuất hóa đơn");
@@ -76,81 +68,49 @@ export function PrintInvoiceDialog({ open, onOpenChange, invoice, customer }: Pr
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-4 flex items-center gap-2">
             <Printer className="h-5 w-5 text-blue-600" />
-            In hóa đơn #{invoice.InvoiceID}
+            In hóa đơn VAT #{invoice.InvoiceID}
           </DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-6 py-4">
-          <div className="grid gap-2">
-            <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Loại hóa đơn
-            </Label>
-            <NativeSelect
-              value={printType}
-              onChange={(e) => setPrintType(e.target.value as "standard" | "vat")}
-              className="border-slate-200 focus-visible:ring-blue-600 h-10"
-              disabled={isB2B || loading}
-            >
-              {!isB2B && <option value="standard">Hóa đơn thường</option>}
-              <option value="vat">Hóa đơn VAT</option>
-            </NativeSelect>
-            {isB2B && (
-              <p className="text-[11px] text-amber-600 font-medium">
-                * Khách hàng doanh nghiệp: Mặc định in hóa đơn VAT.
-              </p>
-            )}
-          </div>
-
-          {printType === "vat" && (
-            <div className="grid gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200 animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="grid gap-2">
-                <Label className="text-xs text-slate-600 font-medium">
-                  Tên doanh nghiệp
-                </Label>
-                <Input
-                  value={vatInfo.companyName}
-                  readOnly
-                  className="bg-slate-100 border-slate-200 h-9 text-sm"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-xs text-slate-600 font-medium">
-                  Địa chỉ
-                </Label>
-                <Input
-                  value={vatInfo.address}
-                  readOnly
-                  className="bg-slate-100 border-slate-200 h-9 text-sm"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-xs text-slate-600 font-medium">
-                  Mã số thuế
-                </Label>
-                <Input
-                  placeholder="Nhập mã số thuế..."
-                  value={vatInfo.taxCode}
-                  onChange={(e) => setVatInfo({ ...vatInfo, taxCode: e.target.value })}
-                  className="border-slate-200 h-9 text-sm focus-visible:ring-blue-600"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label className="text-xs text-slate-600 font-medium">
-                  Chiết khấu hóa đơn
-                </Label>
-                <Input
-                  type="number"
-                  placeholder="Nhập số tiền hoặc % (VD: 10 cho 10%)"
-                  value={vatInfo.discount}
-                  onChange={(e) => setVatInfo({ ...vatInfo, discount: Number(e.target.value) })}
-                  className="border-slate-200 h-9 text-sm focus-visible:ring-blue-600"
-                />
-                <p className="text-[10px] text-slate-400 italic">
-                  * Nếu nhập ≤ 100 hệ thống sẽ tính theo %, &gt; 100 tính theo số tiền.
-                </p>
-              </div>
+          <div className="grid gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="grid gap-2">
+              <Label className="text-xs text-slate-600 font-semibold uppercase tracking-wider">
+                Tên người mua (Công ty/Cá nhân) <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                placeholder="Nhập tên người mua..."
+                value={vatInfo.companyName}
+                onChange={(e) => setVatInfo({ ...vatInfo, companyName: e.target.value })}
+                className="border-slate-200 h-10 text-sm focus-visible:ring-blue-600"
+              />
             </div>
-          )}
+            <div className="grid gap-2">
+              <Label className="text-xs text-slate-600 font-semibold uppercase tracking-wider">
+                Địa chỉ xuất hóa đơn <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                placeholder="Nhập địa chỉ ghi trên hóa đơn..."
+                value={vatInfo.address}
+                onChange={(e) => setVatInfo({ ...vatInfo, address: e.target.value })}
+                className="border-slate-200 h-10 text-sm focus-visible:ring-blue-600"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-xs text-slate-600 font-semibold uppercase tracking-wider">
+                Mã số thuế (nếu có)
+              </Label>
+              <Input
+                placeholder="Nhập mã số thuế..."
+                value={vatInfo.taxCode}
+                onChange={(e) => setVatInfo({ ...vatInfo, taxCode: e.target.value })}
+                className="border-slate-200 h-10 text-sm focus-visible:ring-blue-600"
+              />
+            </div>
+          </div>
+          <p className="text-[11px] text-slate-400 italic text-center px-4">
+            Lưu ý: Thông tin trên sẽ được in trực tiếp lên hóa đơn VAT chính thức.
+          </p>
         </div>
 
         <DialogFooter className="border-t border-slate-200 pt-4">
@@ -169,7 +129,7 @@ export function PrintInvoiceDialog({ open, onOpenChange, invoice, customer }: Pr
             {loading ? "Đang xử lý..." : (
               <>
                 <FileText className="h-4 w-4 mr-2" />
-                Xuất PDF
+                Xuất PDF VAT
               </>
             )}
           </Button>

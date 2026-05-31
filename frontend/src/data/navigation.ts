@@ -55,6 +55,11 @@ export const sidebarData: SidebarItem[] = [
     availableRole: [1, 2, 3],
   },
   {
+    directionTo: "/order-processing",
+    label: "Xử lý đơn hàng",
+    availableRole: [1, 2],
+  },
+  {
     directionTo: "/report-management",
     label: "Quản lý Báo cáo và Thống kê",
     availableRole: [1],

@@ -54,5 +54,6 @@ public class Exportreceipt {
     @JoinColumn(name = "WAREHOUSEID", nullable = false)
     private Warehouse warehouseid;
 
-
+    @OneToMany(mappedBy = "exportreceiptid", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Exportreceiptdetail> details = new java.util.ArrayList<>();
 }

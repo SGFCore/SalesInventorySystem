@@ -18,4 +18,6 @@ public interface OrderDetailRepository extends JpaRepository<Orderdetail, Long> 
     List<Object[]> sumByOrderIds(@Param("orderIds") List<Long> orderIds);
 
     List<Orderdetail> findByOrderid_Id(Long orderId);
+
+    List<Orderdetail> findByOrderid_IdIn(List<Long> orderIds);
 }
