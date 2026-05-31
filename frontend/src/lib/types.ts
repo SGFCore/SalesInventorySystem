@@ -231,6 +231,7 @@ export type Order = {
 export type ExtendedOrder = Order & {
   customer?: Customer;
   invoice?: Invoice;
+  shipCompany?: Shipcompany;
 };
 
 // orderreturn.dto.ts
