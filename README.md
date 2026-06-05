@@ -2,6 +2,7 @@
 
 **Đề tài:** Hệ thống quản lý bán hàng và kho hàng SGF  
 **Kiến trúc:** Oracle Database · Java Spring Boot Backend · React/Vite Frontend  
+**Link Respository:** https://github.com/SGFCore/SalesInventorySystem.git  
 
 | Thành phần | Công nghệ chính |
 |---|---|
